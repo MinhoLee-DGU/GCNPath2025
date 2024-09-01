@@ -1,5 +1,5 @@
 # GCNPath2024
-GCNPath is a deep learning model of anticancer drug response prediction. This model utilizes pathway-pathway association (PPA) graphs compressed from STRING and RegNetwork and a GSVA pathway correlation network. This model is trained with cell-line transcriptome from SANGER Cell Passports.
+GCNPath is a deep learning model of anticancer drug response prediction. This model utilizes pathway-pathway association (PPA) graphs compressed from STRING and RegNetwork and a GSVA pathway correlation network. This model is trained with cell-line transcriptome from SANGER Cell Model Passports.
 
 The GCNPath2024 directory is originally the subdirectory of ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. ```_IC50_Prediction``` is the root directory of GCNPath project including the benchmark tests and preprocessing of cell-lines, drugs and ln(IC50) data.
 
@@ -77,10 +77,10 @@ bash process_drug.sh
 
 ## 3. Model Training
 
-# 3-1. Model Training in various test scenarios
-Training a model in all fold is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyper-parameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder if you utilize SLURM with ```-use_slurm``` as 1 in  ```train.sh```.
+### 3-1. Model Training in various test scenarios
+Training a model in outer cross validation with several test situations is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder if you utilize SLURM with ```-use_slurm 1``` in  ```train.sh```.
 
-The column of cell-line, drug, ln(IC50) can be designated with ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
+The column of a cell line, a drug, a ln(IC50) can be designated with ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
 IC50 data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
 Test type : 0 [Normal], 1 [Cell-Blind], 2 [Drug-Blind], 3 [Strict-Blind]
 
@@ -96,7 +96,7 @@ bash train.sh 0 0
 #    -col_cell Cell -col_drug Drug -col_ic50 IC50
 ```
 
-# 3-2. Model Training with Whole Dataset without Splitting Data
+### 3-2. Model Training with Whole Dataset without Splitting Data
 Training a model with whole GDSC1+2 dataset is implemented by ```retrain_total.sh```, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The description is similar to **Section 3-1**. 
 
 ```
