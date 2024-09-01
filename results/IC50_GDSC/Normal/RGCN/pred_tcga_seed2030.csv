@@ -1,0 +1,415 @@
+Patient,Sample,Sample_Type,Drug_Name,Drug_CID,Response,TCGA_Code,Prediction
+TCGA-AC-A62V,TCGA-AC-A62V-01A-11R-A31O-07,Primary Tumor,Paclitaxel,36314,Partial Response,BRCA,-2.563208
+TCGA-OL-A5S0,TCGA-OL-A5S0-01A-11R-A28M-07,Primary Tumor,TAXOL,36314,Complete Response,BRCA,-3.5622716
+TCGA-CE-A481,TCGA-CE-A481-01A-21R-A23W-07,Primary Tumor,Doxorubicin,31703,Complete Response,THCA,-1.7824832
+TCGA-CE-A482,TCGA-CE-A482-01A-11R-A23W-07,Primary Tumor,Doxorubicin,31703,Complete Response,THCA,-0.7115189
+TCGA-A5-A1OH,TCGA-A5-A1OH-01A-21R-A22K-07,Primary Tumor,Carboplatin,426756,Complete Response,UCEC,3.260658
+TCGA-A5-A3LP,TCGA-A5-A3LP-01A-11R-A22K-07,Primary Tumor,Carboplatin,426756,Complete Response,UCEC,4.647667
+TCGA-BG-A2L7,TCGA-BG-A2L7-01A-11R-A18M-07,Primary Tumor,Carboplatin,426756,Complete Response,UCEC,3.528765
+TCGA-DI-A2QY,TCGA-DI-A2QY-01A-12R-A19W-07,Primary Tumor,Paclitaxel,36314,Complete Response,UCEC,-3.535253
+TCGA-DI-A2QY,TCGA-DI-A2QY-11A-11R-A19W-07,Solid Tissue Normal,Paclitaxel,36314,Complete Response,UCEC,-3.2569828
+TCGA-QF-A5YT,TCGA-QF-A5YT-01A-11R-A31O-07,Primary Tumor,Cisplatin,5702198,Complete Response,UCEC,2.3690138
+TCGA-AA-3662,TCGA-AA-3662-11A-01R-1723-07,Solid Tissue Normal,Capecitabine,60953,Partial Response,COAD,4.2737303
+TCGA-AA-3662,TCGA-AA-3662-01A-01R-1723-07,Primary Tumor,Capecitabine,60953,Partial Response,COAD,3.5800896
+TCGA-AA-3713,TCGA-AA-3713-11A-01R-1723-07,Solid Tissue Normal,5-Fluorouracil,3385,Partial Response,COAD,3.0208044
+TCGA-AA-3713,TCGA-AA-3713-01A-21R-1723-07,Primary Tumor,5-Fluorouracil,3385,Partial Response,COAD,2.3875196
+TCGA-AA-3930,TCGA-AA-3930-01A-01R-1022-07,Primary Tumor,Capecitabine,60953,Clinical Progressive Disease,COAD,2.8832698
+TCGA-AA-3994,TCGA-AA-3994-01A-01R-1113-07,Primary Tumor,Capecitabine,60953,Complete Response,COAD,3.704659
+TCGA-AA-A00J,TCGA-AA-A00J-01A-02R-A002-07,Primary Tumor,5-Fluorouracil,3385,Partial Response,COAD,2.9607334
+TCGA-AD-6889,TCGA-AD-6889-01A-11R-1928-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,3.4698129
+TCGA-AD-6901,TCGA-AD-6901-01A-11R-1928-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,3.1850214
+TCGA-AZ-4616,TCGA-AZ-4616-01A-21R-1839-07,Primary Tumor,XELODA,60953,Stable Disease,COAD,3.6046329
+TCGA-AZ-6606,TCGA-AZ-6606-01A-11R-1839-07,Primary Tumor,5 FU,3385,Clinical Progressive Disease,COAD,2.2904284
+TCGA-F4-6805,TCGA-F4-6805-01A-11R-1839-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,2.737679
+TCGA-F4-6807,TCGA-F4-6807-01A-11R-1839-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,2.7668557
+TCGA-QG-A5YV,TCGA-QG-A5YV-01A-11R-A28H-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,3.4947534
+TCGA-QG-A5YX,TCGA-QG-A5YX-01A-11R-A28H-07,Primary Tumor,Xeloda,60953,Complete Response,COAD,3.381854
+TCGA-2W-A8YY,TCGA-2W-A8YY-01A-11R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.0799823
+TCGA-C5-A1BQ,TCGA-C5-A1BQ-01C-11R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.3071752
+TCGA-DS-A5RQ,TCGA-DS-A5RQ-01A-11R-A28H-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.5577163
+TCGA-DS-A7WF,TCGA-DS-A7WF-01A-11R-A352-07,Primary Tumor,Cisplatin,5702198,Partial Response,CESC,2.205624
+TCGA-DS-A7WH,TCGA-DS-A7WH-01A-22R-A352-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.3570733
+TCGA-DS-A7WI,TCGA-DS-A7WI-01A-12R-A352-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.3944612
+TCGA-EA-A3QD,TCGA-EA-A3QD-01A-32R-A22U-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.5339669
+TCGA-EK-A2H0,TCGA-EK-A2H0-01A-11R-A180-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.4947176
+TCGA-EK-A2RL,TCGA-EK-A2RL-01A-11R-A18M-07,Primary Tumor,Taxol,36314,Clinical Progressive Disease,CESC,-4.3660016
+TCGA-EX-A3L1,TCGA-EX-A3L1-01A-11R-A32Y-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.4830446
+TCGA-FU-A23L,TCGA-FU-A23L-01A-11R-A16R-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.6476947
+TCGA-FU-A3HY,TCGA-FU-A3HY-01A-11R-A21T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.377513
+TCGA-FU-A3HZ,TCGA-FU-A3HZ-01A-11R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.4828858
+TCGA-HM-A4S6,TCGA-HM-A4S6-01A-11R-A26T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.5739946
+TCGA-IR-A3L7,TCGA-IR-A3L7-01A-21R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.7387528
+TCGA-IR-A3LC,TCGA-IR-A3LC-01A-11R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4315107
+TCGA-IR-A3LH,TCGA-IR-A3LH-01A-21R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.6114241
+TCGA-IR-A3LL,TCGA-IR-A3LL-01A-11R-A213-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4974766
+TCGA-MA-AA3W,TCGA-MA-AA3W-01A-11R-A38B-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.2637138
+TCGA-MA-AA3X,TCGA-MA-AA3X-01A-22R-A42S-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,3.0035806
+TCGA-MY-A5BD,TCGA-MY-A5BD-01A-11R-A26T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.379941
+TCGA-MY-A5BF,TCGA-MY-A5BF-11A-11R-A26T-07,Solid Tissue Normal,Cisplatin,5702198,Complete Response,CESC,3.0579967
+TCGA-MY-A5BF,TCGA-MY-A5BF-01A-11R-A26T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4263968
+TCGA-MY-A913,TCGA-MY-A913-01A-11R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.9762756
+TCGA-Q1-A5R2,TCGA-Q1-A5R2-01A-11R-A28H-07,Primary Tumor,Cisplatin,5702198,Partial Response,CESC,1.8224807
+TCGA-Q1-A5R3,TCGA-Q1-A5R3-01A-11R-A28H-07,Primary Tumor,Cisplatin,5702198,Partial Response,CESC,2.2291465
+TCGA-Q1-A73O,TCGA-Q1-A73O-01A-11R-A32P-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4756141
+TCGA-UC-A7PG,TCGA-UC-A7PG-01A-11R-A42S-07,Primary Tumor,cisplatin,5702198,Clinical Progressive Disease,CESC,2.4592843
+TCGA-UC-A7PG,TCGA-UC-A7PG-06A-11R-A42S-07,Metastatic,cisplatin,5702198,Clinical Progressive Disease,CESC,2.0300128
+TCGA-VS-A8EH,TCGA-VS-A8EH-01A-11R-A36F-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.6715858
+TCGA-VS-A8EI,TCGA-VS-A8EI-01A-11R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.1909833
+TCGA-VS-A8EK,TCGA-VS-A8EK-01A-12R-A37O-07,Primary Tumor,Cisplatin,5702198,Partial Response,CESC,3.153212
+TCGA-VS-A8EL,TCGA-VS-A8EL-01A-11R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.3274536
+TCGA-VS-A8QC,TCGA-VS-A8QC-01A-11R-A37O-07,Primary Tumor,Paclitaxel,36314,Clinical Progressive Disease,CESC,-4.261289
+TCGA-VS-A8QF,TCGA-VS-A8QF-01A-21R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.1480153
+TCGA-VS-A94W,TCGA-VS-A94W-01A-12R-A37O-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4591641
+TCGA-VS-A94X,TCGA-VS-A94X-01A-11R-A38B-07,Primary Tumor,Cisplatin,5702198,Partial Response,CESC,2.1270604
+TCGA-VS-A94Y,TCGA-VS-A94Y-01A-11R-A38B-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,CESC,2.7678642
+TCGA-VS-A94Z,TCGA-VS-A94Z-01A-11R-A38B-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,0.87186396
+TCGA-VS-A954,TCGA-VS-A954-01A-11R-A38B-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.6478318
+TCGA-VS-A957,TCGA-VS-A957-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.2997484
+TCGA-VS-A958,TCGA-VS-A958-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.7445934
+TCGA-VS-A9U5,TCGA-VS-A9U5-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4836487
+TCGA-VS-A9U6,TCGA-VS-A9U6-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Stable Disease,CESC,2.167254
+TCGA-VS-A9U7,TCGA-VS-A9U7-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.9830005
+TCGA-VS-A9UB,TCGA-VS-A9UB-01A-22R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.4215469
+TCGA-VS-A9UC,TCGA-VS-A9UC-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Stable Disease,CESC,2.5837405
+TCGA-VS-A9UD,TCGA-VS-A9UD-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.2451078
+TCGA-VS-A9UH,TCGA-VS-A9UH-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.0165873
+TCGA-VS-A9UO,TCGA-VS-A9UO-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.7610486
+TCGA-VS-A9UP,TCGA-VS-A9UP-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.1549098
+TCGA-VS-A9UR,TCGA-VS-A9UR-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.2986188
+TCGA-VS-A9UU,TCGA-VS-A9UU-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.5294507
+TCGA-VS-A9UY,TCGA-VS-A9UY-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,CESC,1.7186416
+TCGA-VS-A9V0,TCGA-VS-A9V0-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,2.203854
+TCGA-VS-A9V1,TCGA-VS-A9V1-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,CESC,2.3410792
+TCGA-VS-A9V3,TCGA-VS-A9V3-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Complete Response,CESC,1.642382
+TCGA-VS-A9V5,TCGA-VS-A9V5-01A-11R-A42T-07,Primary Tumor,Carboplatin,426756,Clinical Progressive Disease,CESC,3.8681436
+TCGA-VS-AA62,TCGA-VS-AA62-01A-11R-A42T-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,CESC,1.9049269
+TCGA-CF-A47S,TCGA-CF-A47S-01A-11R-A23W-07,Primary Tumor,Doxobubicin,31703,Complete Response,BLCA,-0.92121136
+TCGA-DK-A6B2,TCGA-DK-A6B2-01A-11R-A30C-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,BLCA,-0.44081676
+TCGA-DK-AA6W,TCGA-DK-AA6W-01A-12R-A39I-07,Primary Tumor,Gemcitabine,60750,Stable Disease,BLCA,-2.8054385
+TCGA-GV-A3QI,TCGA-GV-A3QI-01A-11R-A220-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,BLCA,-2.6602101
+TCGA-4G-AAZO,TCGA-4G-AAZO-01A-12R-A41I-07,Primary Tumor,GEMCITABINE,60750,Stable Disease,CHOL,-1.1010178
+TCGA-W5-AA2H,TCGA-W5-AA2H-01A-31R-A41I-07,Primary Tumor,gemcitabine,60750,Complete Response,CHOL,-4.318406
+TCGA-W5-AA2T,TCGA-W5-AA2T-01A-12R-A41I-07,Primary Tumor,Gemcitabine,60750,Complete Response,CHOL,-2.3968735
+TCGA-ZH-A8Y4,TCGA-ZH-A8Y4-01A-11R-A41I-07,Primary Tumor,Gemzar,60750,Partial Response,CHOL,-1.0255383
+TCGA-JY-A93D,TCGA-JY-A93D-01A-11R-A38D-31,Primary Tumor,Fluorouracil,3385,Complete Response,ESCA,4.0858617
+TCGA-LN-A49M,TCGA-LN-A49M-01A-21R-A260-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,3.3156161
+TCGA-LN-A49O,TCGA-LN-A49O-01A-11R-A24K-31,Primary Tumor,Capecitabine,60953,Clinical Progressive Disease,ESCA,2.728515
+TCGA-LN-A49Y,TCGA-LN-A49Y-01A-11R-A260-31,Primary Tumor,Capecitabine,60953,Clinical Progressive Disease,ESCA,3.58528
+TCGA-LN-A4A6,TCGA-LN-A4A6-01A-11R-A260-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,3.009977
+TCGA-LN-A5U6,TCGA-LN-A5U6-01A-11R-A28J-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,3.358276
+TCGA-LN-A7HV,TCGA-LN-A7HV-01A-21R-A354-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,2.9544132
+TCGA-LN-A7HX,TCGA-LN-A7HX-01A-11R-A336-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,3.4068284
+TCGA-LN-A9FP,TCGA-LN-A9FP-01A-31R-A38D-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,4.175846
+TCGA-LN-A9FR,TCGA-LN-A9FR-01A-11R-A38D-31,Primary Tumor,Capecitabine,60953,Complete Response,ESCA,3.424654
+TCGA-VR-A8EQ,TCGA-VR-A8EQ-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Complete Response,ESCA,3.905322
+TCGA-PK-A5HB,TCGA-PK-A5HB-01A-11R-A29S-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,ACC,3.0536375
+TCGA-KN-8428,TCGA-KN-8428-11A-01R-2315-07,Solid Tissue Normal,sorafenib,216239,Clinical Progressive Disease,KICH,3.3044891
+TCGA-KN-8428,TCGA-KN-8428-01A-11R-2315-07,Primary Tumor,sorafenib,216239,Clinical Progressive Disease,KICH,2.5765898
+TCGA-BA-A4IF,TCGA-BA-A4IF-01A-11R-A266-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.6080074
+TCGA-BA-A4IH,TCGA-BA-A4IH-01A-11R-A266-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,0.9670756
+TCGA-BA-A6D8,TCGA-BA-A6D8-01A-31R-A31N-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.3079479
+TCGA-BA-A6DA,TCGA-BA-A6DA-01A-31R-A31N-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,3.482841
+TCGA-BA-A6DD,TCGA-BA-A6DD-01A-12R-A31N-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,HNSC,2.4414363
+TCGA-BA-A6DI,TCGA-BA-A6DI-01A-11R-A30B-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.8332782
+TCGA-BA-A6DJ,TCGA-BA-A6DJ-01A-11R-A30B-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,1.6113964
+TCGA-BB-7864,TCGA-BB-7864-01A-11R-2232-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.7603219
+TCGA-BB-7866,TCGA-BB-7866-01A-11R-2232-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,1.7520133
+TCGA-BB-7872,TCGA-BB-7872-01A-11R-2232-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.699802
+TCGA-BB-A5HU,TCGA-BB-A5HU-01A-11R-A28V-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.1870456
+TCGA-BB-A5HY,TCGA-BB-A5HY-01A-11R-A28V-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.3772628
+TCGA-CN-6998,TCGA-CN-6998-01A-23R-2016-07,Primary Tumor,cisplatin,5702198,Clinical Progressive Disease,HNSC,2.6459785
+TCGA-CN-A49A,TCGA-CN-A49A-01A-11R-A24H-07,Primary Tumor,carboplatin,426756,Complete Response,HNSC,4.277349
+TCGA-CN-A63T,TCGA-CN-A63T-01A-11R-A28V-07,Primary Tumor,CISPLATIN,5702198,Complete Response,HNSC,3.0094817
+TCGA-CN-A641,TCGA-CN-A641-01A-11R-A30B-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,3.080946
+TCGA-CN-A6UY,TCGA-CN-A6UY-01A-12R-A34R-07,Primary Tumor,carboplatin,426756,Complete Response,HNSC,3.4193492
+TCGA-CN-A6V3,TCGA-CN-A6V3-01A-12R-A34R-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,2.079102
+TCGA-CN-A6V6,TCGA-CN-A6V6-01A-12R-A34R-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,1.8682438
+TCGA-CN-A6V7,TCGA-CN-A6V7-01A-12R-A34R-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,1.9794542
+TCGA-CQ-A4CH,TCGA-CQ-A4CH-01A-11R-A266-07,Primary Tumor,cisplatin,5702198,Partial Response,HNSC,2.4733465
+TCGA-D6-A6EK,TCGA-D6-A6EK-01A-11R-A31N-07,Primary Tumor,cisplatin,5702198,Partial Response,HNSC,2.70108
+TCGA-DQ-7595,TCGA-DQ-7595-01A-11R-2232-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,2.6116562
+TCGA-F7-A50J,TCGA-F7-A50J-01A-21R-A28V-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.7015288
+TCGA-HD-8314,TCGA-HD-8314-01A-11R-2403-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.587198
+TCGA-IQ-A61E,TCGA-IQ-A61E-01A-22R-A30B-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.1229286
+TCGA-IQ-A61G,TCGA-IQ-A61G-01A-11R-A30B-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,HNSC,2.1035862
+TCGA-IQ-A61J,TCGA-IQ-A61J-01A-11R-A30B-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,1.422758
+TCGA-IQ-A61O,TCGA-IQ-A61O-01A-11R-A30B-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.890387
+TCGA-KU-A6H7,TCGA-KU-A6H7-01A-11R-A31N-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,1.796623
+TCGA-KU-A6H7,TCGA-KU-A6H7-06A-21R-A31N-07,Metastatic,Cisplatin,5702198,Complete Response,HNSC,2.2306492
+TCGA-MZ-A5BI,TCGA-MZ-A5BI-01A-31R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.019502
+TCGA-P3-A5Q6,TCGA-P3-A5Q6-01A-11R-A28V-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.589097
+TCGA-P3-A6SW,TCGA-P3-A6SW-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.4699185
+TCGA-P3-A6T2,TCGA-P3-A6T2-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.1685624
+TCGA-P3-A6T3,TCGA-P3-A6T3-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.5008168
+TCGA-P3-A6T6,TCGA-P3-A6T6-01A-11R-A34R-07,Primary Tumor,Taxol,36314,Clinical Progressive Disease,HNSC,-3.7924
+TCGA-P3-A6T7,TCGA-P3-A6T7-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.4649384
+TCGA-P3-A6T8,TCGA-P3-A6T8-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.862401
+TCGA-T2-A6X0,TCGA-T2-A6X0-01A-11R-A34R-07,Primary Tumor,cisplatin,5702198,Complete Response,HNSC,2.357925
+TCGA-TN-A7HJ,TCGA-TN-A7HJ-01A-12R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.8788757
+TCGA-TN-A7HL,TCGA-TN-A7HL-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,1.867305
+TCGA-UF-A7JC,TCGA-UF-A7JC-01A-21R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.3862329
+TCGA-UF-A7JF,TCGA-UF-A7JF-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.1668167
+TCGA-UF-A7JJ,TCGA-UF-A7JJ-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.7521815
+TCGA-UF-A7JK,TCGA-UF-A7JK-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.8529258
+TCGA-UF-A7JT,TCGA-UF-A7JT-01A-11R-A34R-07,Primary Tumor,Cisplatin,5702198,Complete Response,HNSC,2.1723309
+TCGA-2Y-A9GV,TCGA-2Y-A9GV-01A-11R-A38B-07,Primary Tumor,Naxavar,216239,Clinical Progressive Disease,LIHC,2.6950448
+TCGA-BC-A8YO,TCGA-BC-A8YO-01A-11R-A37K-07,Primary Tumor,Nexavar,216239,Partial Response,LIHC,2.555478
+TCGA-BW-A5NP,TCGA-BW-A5NP-01A-11R-A27V-07,Primary Tumor,Nexavar,216239,Clinical Progressive Disease,LIHC,2.7524385
+TCGA-CC-A8HV,TCGA-CC-A8HV-01A-11R-A36F-07,Primary Tumor,Nexavar,216239,Clinical Progressive Disease,LIHC,2.7753024
+TCGA-DD-A1EJ,TCGA-DD-A1EJ-01A-11R-A155-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.562654
+TCGA-DD-A1EJ,TCGA-DD-A1EJ-11A-11R-A155-07,Solid Tissue Normal,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.9926357
+TCGA-DD-A1EK,TCGA-DD-A1EK-01A-11R-A213-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.9761615
+TCGA-DD-A3A4,TCGA-DD-A3A4-11A-11R-A22L-07,Solid Tissue Normal,Gemcitabine,60750,Clinical Progressive Disease,LIHC,-2.323916
+TCGA-DD-A3A4,TCGA-DD-A3A4-01A-11R-A22L-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,LIHC,-1.2369083
+TCGA-DD-A4NH,TCGA-DD-A4NH-01A-11R-A27V-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.5626066
+TCGA-FV-A3I0,TCGA-FV-A3I0-11A-11R-A22L-07,Solid Tissue Normal,Gemcitabine,60750,Clinical Progressive Disease,LIHC,-2.041068
+TCGA-FV-A3I0,TCGA-FV-A3I0-01A-11R-A22L-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,LIHC,-0.89667237
+TCGA-G3-A3CG,TCGA-G3-A3CG-01A-11R-A213-07,Primary Tumor,Sorafenib,216239,Stable Disease,LIHC,2.7571855
+TCGA-G3-A3CJ,TCGA-G3-A3CJ-01A-11R-A213-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.6627915
+TCGA-G3-A5SI,TCGA-G3-A5SI-01A-31R-A27V-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,2.9533272
+TCGA-WX-AA44,TCGA-WX-AA44-01A-11R-A39D-07,Primary Tumor,SORAFENIB,216239,Partial Response,LIHC,2.725069
+TCGA-WX-AA47,TCGA-WX-AA47-01A-11R-A39D-07,Primary Tumor,Sorafenib,216239,Clinical Progressive Disease,LIHC,3.0243149
+TCGA-LK-A4NZ,TCGA-LK-A4NZ-01A-12R-A34F-07,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,MESO,2.528286
+TCGA-LK-A4O0,TCGA-LK-A4O0-01A-11R-A34F-07,Primary Tumor,Cisplatinum,5702198,Complete Response,MESO,2.3274744
+TCGA-19-5960,TCGA-19-5960-01A-11R-1850-01,Primary Tumor,Temodar,5394,Stable Disease,GBM,6.424369
+TCGA-DB-A4XB,TCGA-DB-A4XB-01A-11R-A26U-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.26786
+TCGA-DB-A4XD,TCGA-DB-A4XD-01A-11R-A27Q-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.2342577
+TCGA-DB-A4XF,TCGA-DB-A4XF-01A-11R-A27Q-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.673596
+TCGA-DB-A4XG,TCGA-DB-A4XG-01A-11R-A27Q-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.397989
+TCGA-DB-A64O,TCGA-DB-A64O-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.3478456
+TCGA-DB-A64P,TCGA-DB-A64P-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.5598083
+TCGA-DB-A64V,TCGA-DB-A64V-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.2703586
+TCGA-DB-A64W,TCGA-DB-A64W-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.181497
+TCGA-DB-A64X,TCGA-DB-A64X-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.6815743
+TCGA-DB-A75K,TCGA-DB-A75K-01A-11R-A32Q-07,Primary Tumor,Temozolomide,5394,Complete Response,LGG,6.2702518
+TCGA-DH-A66B,TCGA-DH-A66B-01A-11R-A29R-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.154668
+TCGA-DH-A66D,TCGA-DH-A66D-01A-11R-A31N-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.5193896
+TCGA-DH-A66G,TCGA-DH-A66G-01A-21R-A31N-07,Primary Tumor,Temodar,5394,Partial Response,LGG,6.4834046
+TCGA-DH-A7UR,TCGA-DH-A7UR-01A-11R-A33Z-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.409709
+TCGA-DH-A7UT,TCGA-DH-A7UT-01A-12R-A34F-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.458662
+TCGA-DH-A7UU,TCGA-DH-A7UU-01A-12R-A34F-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.496946
+TCGA-DH-A7UV,TCGA-DH-A7UV-01A-12R-A34F-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.511593
+TCGA-DU-8162,TCGA-DU-8162-01A-21R-2256-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.412205
+TCGA-DU-8163,TCGA-DU-8163-01A-11R-2256-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.317269
+TCGA-DU-8165,TCGA-DU-8165-01A-11R-2256-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,5.783924
+TCGA-DU-8168,TCGA-DU-8168-01A-11R-2256-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.2084246
+TCGA-DU-A5TP,TCGA-DU-A5TP-01A-11R-A28M-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.1256804
+TCGA-DU-A5TS,TCGA-DU-A5TS-01A-11R-A28M-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.7075014
+TCGA-DU-A5TU,TCGA-DU-A5TU-01A-11R-A28M-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.386254
+TCGA-DU-A6S6,TCGA-DU-A6S6-01A-21R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.3745785
+TCGA-DU-A6S7,TCGA-DU-A6S7-01A-21R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.3592343
+TCGA-DU-A76K,TCGA-DU-A76K-01A-11R-A33Z-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.543709
+TCGA-DU-A76O,TCGA-DU-A76O-01A-11R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.358561
+TCGA-DU-A76R,TCGA-DU-A76R-01A-11R-A32Q-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.400787
+TCGA-DU-A7TA,TCGA-DU-A7TA-01A-11R-A33Z-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.2242517
+TCGA-E1-A7YK,TCGA-E1-A7YK-01A-11R-A34F-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.34146
+TCGA-E1-A7YS,TCGA-E1-A7YS-01A-11R-A34F-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.239653
+TCGA-FG-6689,TCGA-FG-6689-01A-11R-1896-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.396726
+TCGA-FG-7638,TCGA-FG-7638-01B-12R-2090-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.4236426
+TCGA-FG-8181,TCGA-FG-8181-01A-11R-2256-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.5140095
+TCGA-FG-8189,TCGA-FG-8189-01B-11R-A28M-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.3506165
+TCGA-FG-8191,TCGA-FG-8191-01A-11R-2256-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.4935575
+TCGA-FG-A4MW,TCGA-FG-A4MW-01A-11R-A26U-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.3779445
+TCGA-FG-A6J3,TCGA-FG-A6J3-01A-11R-A31N-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.564515
+TCGA-FG-A70Y,TCGA-FG-A70Y-01A-12R-A34R-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.648621
+TCGA-FG-A710,TCGA-FG-A710-01A-12R-A33Z-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.390043
+TCGA-FN-7833,TCGA-FN-7833-01A-11R-2090-07,Primary Tumor,Temozolomide,5394,Complete Response,LGG,6.0951405
+TCGA-HT-7477,TCGA-HT-7477-01B-11R-A28M-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.1935725
+TCGA-HT-7483,TCGA-HT-7483-01A-11R-2027-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.2469354
+TCGA-HT-7604,TCGA-HT-7604-01A-11R-2090-07,Primary Tumor,Temodar,5394,Partial Response,LGG,6.1359544
+TCGA-HT-7884,TCGA-HT-7884-01B-11R-2403-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.3503532
+TCGA-HT-8013,TCGA-HT-8013-01A-11R-2403-07,Primary Tumor,Temodar,5394,Clinical Progressive Disease,LGG,6.224786
+TCGA-HT-8114,TCGA-HT-8114-01A-11R-2404-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.376223
+TCGA-HT-A5RA,TCGA-HT-A5RA-01A-11R-A28M-07,Primary Tumor,Temodar,5394,Partial Response,LGG,6.4136667
+TCGA-HT-A5RC,TCGA-HT-A5RC-01A-11R-A28M-07,Primary Tumor,Temodar,5394,Clinical Progressive Disease,LGG,6.000992
+TCGA-HT-A619,TCGA-HT-A619-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.1795034
+TCGA-HT-A61C,TCGA-HT-A61C-01A-11R-A29R-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.138377
+TCGA-HT-A74K,TCGA-HT-A74K-01A-11R-A32Q-07,Primary Tumor,temodar,5394,Complete Response,LGG,6.3945255
+TCGA-HW-8320,TCGA-HW-8320-01A-11R-2404-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.362167
+TCGA-HW-8321,TCGA-HW-8321-01A-11R-2404-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.631504
+TCGA-HW-A5KK,TCGA-HW-A5KK-01A-11R-A27Q-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.3786936
+TCGA-HW-A5KL,TCGA-HW-A5KL-01A-11R-A27Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.5870385
+TCGA-IK-8125,TCGA-IK-8125-01A-11R-2256-07,Primary Tumor,Temodar,5394,Complete Response,LGG,6.477056
+TCGA-KT-A74X,TCGA-KT-A74X-01A-11R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.411398
+TCGA-KT-A7W1,TCGA-KT-A7W1-01A-11R-A34F-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,5.9758286
+TCGA-P5-A5EX,TCGA-P5-A5EX-01A-12R-A28M-07,Primary Tumor,Temozolomide,5394,Partial Response,LGG,6.2396984
+TCGA-QH-A65R,TCGA-QH-A65R-01A-21R-A31N-07,Primary Tumor,TEMOZOLOMIDE,5394,Stable Disease,LGG,6.5290384
+TCGA-QH-A6CY,TCGA-QH-A6CY-01A-11R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.53125
+TCGA-QH-A6X4,TCGA-QH-A6X4-01A-51R-A32Q-07,Primary Tumor,temozolomide,5394,Clinical Progressive Disease,LGG,6.4548235
+TCGA-QH-A6X8,TCGA-QH-A6X8-01A-12R-A32Q-07,Primary Tumor,temozolomide,5394,Stable Disease,LGG,6.4054008
+TCGA-S9-A6TV,TCGA-S9-A6TV-01A-12R-A34R-07,Primary Tumor,Temozolamide,5394,Stable Disease,LGG,6.3876615
+TCGA-S9-A6TW,TCGA-S9-A6TW-01A-12R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.5960083
+TCGA-S9-A6TX,TCGA-S9-A6TX-01A-21R-A32Q-07,Primary Tumor,Temozolomide,5394,Complete Response,LGG,6.6784496
+TCGA-S9-A6TY,TCGA-S9-A6TY-01A-12R-A32Q-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.3338304
+TCGA-S9-A6U1,TCGA-S9-A6U1-01A-21R-A33Z-07,Primary Tumor,Temozolomide,5394,Complete Response,LGG,6.210034
+TCGA-S9-A6WD,TCGA-S9-A6WD-01A-12R-A33Z-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.493911
+TCGA-S9-A6WG,TCGA-S9-A6WG-01A-11R-A33Z-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.508973
+TCGA-S9-A6WM,TCGA-S9-A6WM-01A-12R-A33Z-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.2536483
+TCGA-S9-A7QW,TCGA-S9-A7QW-01A-11R-A34F-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.2789645
+TCGA-S9-A7QY,TCGA-S9-A7QY-01A-11R-A34F-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.3161345
+TCGA-S9-A7R1,TCGA-S9-A7R1-01A-12R-A34R-07,Primary Tumor,Temozolamide,5394,Stable Disease,LGG,6.5795712
+TCGA-S9-A7R4,TCGA-S9-A7R4-01A-12R-A34R-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.632353
+TCGA-S9-A89V,TCGA-S9-A89V-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.5914893
+TCGA-S9-A89Z,TCGA-S9-A89Z-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.26369
+TCGA-TM-A84B,TCGA-TM-A84B-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,5.9172606
+TCGA-TM-A84C,TCGA-TM-A84C-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.333467
+TCGA-TM-A84L,TCGA-TM-A84L-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Clinical Progressive Disease,LGG,6.505505
+TCGA-VM-A8C8,TCGA-VM-A8C8-01A-11R-A36H-07,Primary Tumor,Temozolomide,5394,Stable Disease,LGG,6.482631
+TCGA-VM-A8CF,TCGA-VM-A8CF-01A-11R-A36H-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.537901
+TCGA-VV-A829,TCGA-VV-A829-01A-21R-A36H-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.5987997
+TCGA-VW-A7QS,TCGA-VW-A7QS-01A-12R-A33Z-07,Primary Tumor,Temodar,5394,Partial Response,LGG,6.464123
+TCGA-WH-A86K,TCGA-WH-A86K-01A-11R-A36H-07,Primary Tumor,Temodar,5394,Stable Disease,LGG,6.467234
+TCGA-3B-A9HT,TCGA-3B-A9HT-01A-11R-A39D-07,Primary Tumor,CISPLATINUM,5702198,Complete Response,SARC,1.3631759
+TCGA-DX-A6B8,TCGA-DX-A6B8-01A-11R-A30C-07,Primary Tumor,Adriamycin,31703,Clinical Progressive Disease,SARC,-1.0576559
+TCGA-FX-A3RE,TCGA-FX-A3RE-01A-11R-A22K-07,Primary Tumor,Adriamycin,31703,Complete Response,SARC,-1.4790565
+TCGA-IF-A3RQ,TCGA-IF-A3RQ-01A-11R-A22K-07,Primary Tumor,Adriamycin,31703,Partial Response,SARC,-1.2499369
+TCGA-IF-A4AJ,TCGA-IF-A4AJ-01A-11R-A24X-07,Primary Tumor,Adriamycin,31703,Clinical Progressive Disease,SARC,-1.8766547
+TCGA-IS-A3K7,TCGA-IS-A3K7-01A-11R-A21T-07,Primary Tumor,Doxorubicin,31703,Partial Response,SARC,-1.4437522
+TCGA-K1-A6RU,TCGA-K1-A6RU-01A-11R-A32Q-07,Primary Tumor,Adriamycin,31703,Clinical Progressive Disease,SARC,-0.91171086
+TCGA-LI-A67I,TCGA-LI-A67I-01A-31R-A30C-07,Primary Tumor,Doxil,31703,Clinical Progressive Disease,SARC,-1.6349028
+TCGA-MO-A47P,TCGA-MO-A47P-01A-11R-A24X-07,Primary Tumor,Doxorubicin,31703,Complete Response,SARC,-1.0521394
+TCGA-X6-A7WC,TCGA-X6-A7WC-01A-12R-A355-07,Primary Tumor,Gemcitabine,60750,Stable Disease,SARC,-1.758447
+TCGA-AF-A56N,TCGA-AF-A56N-01A-12R-A39D-07,Primary Tumor,xeloda,60953,Complete Response,READ,3.295449
+TCGA-AG-3593,TCGA-AG-3593-01A-01R-0821-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,3.2291274
+TCGA-AG-3600,TCGA-AG-3600-01A-01R-0826-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,3.1726851
+TCGA-AG-3894,TCGA-AG-3894-01A-01R-1119-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,4.1905932
+TCGA-AG-4022,TCGA-AG-4022-01A-01R-1736-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,2.661343
+TCGA-AG-A00H,TCGA-AG-A00H-01A-01R-A00A-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,4.649767
+TCGA-AG-A01L,TCGA-AG-A01L-01A-01R-A002-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,3.2586837
+TCGA-AG-A01W,TCGA-AG-A01W-01A-21R-A083-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,3.6253595
+TCGA-AG-A01Y,TCGA-AG-A01Y-01A-41R-A083-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,4.371145
+TCGA-AG-A036,TCGA-AG-A036-01A-12R-A083-07,Primary Tumor,5-Fluorouracil,3385,Complete Response,READ,2.8421612
+TCGA-DY-A1DC,TCGA-DY-A1DC-01A-31R-A155-07,Primary Tumor,Capecitabine -xeloda,60953,Partial Response,READ,3.6942427
+TCGA-2L-AAQA,TCGA-2L-AAQA-01A-21R-A38C-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.1096826
+TCGA-2L-AAQE,TCGA-2L-AAQE-01A-11R-A39D-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.7430137
+TCGA-2L-AAQI,TCGA-2L-AAQI-01A-12R-A39D-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-0.9130639
+TCGA-2L-AAQJ,TCGA-2L-AAQJ-01A-12R-A39D-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.899741
+TCGA-3A-A9IZ,TCGA-3A-A9IZ-01A-12R-A41B-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.2745258
+TCGA-F2-6879,TCGA-F2-6879-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Partial Response,PAAD,-1.961326
+TCGA-F2-6880,TCGA-F2-6880-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-1.6602479
+TCGA-F2-7276,TCGA-F2-7276-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-3.0898662
+TCGA-F2-A8YN,TCGA-F2-A8YN-01A-11R-A37L-07,Primary Tumor,Gemzar,60750,Clinical Progressive Disease,PAAD,-0.036159992
+TCGA-FB-A78T,TCGA-FB-A78T-01A-12R-A32O-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-2.2189317
+TCGA-FB-AAPY,TCGA-FB-AAPY-01A-11R-A41B-07,Primary Tumor,Gemzar,60750,Complete Response,PAAD,-1.8612174
+TCGA-FB-AAQ6,TCGA-FB-AAQ6-01A-11R-A41B-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-1.2023059
+TCGA-HV-AA8X,TCGA-HV-AA8X-01A-11R-A39D-07,Primary Tumor,Gemcitabine Injection,60750,Clinical Progressive Disease,PAAD,-0.7302443
+TCGA-HZ-7920,TCGA-HZ-7920-01A-11R-2204-07,Primary Tumor,5-FU,3385,Complete Response,PAAD,4.3365235
+TCGA-HZ-7923,TCGA-HZ-7923-01A-12R-2156-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-2.579545
+TCGA-HZ-7924,TCGA-HZ-7924-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-2.9290323
+TCGA-HZ-8317,TCGA-HZ-8317-01A-11R-2404-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.8739625
+TCGA-HZ-8637,TCGA-HZ-8637-01A-11R-2404-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-4.2358985
+TCGA-HZ-A49G,TCGA-HZ-A49G-01A-11R-A26U-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-3.1105218
+TCGA-HZ-A49H,TCGA-HZ-A49H-01A-11R-A26U-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-2.4852123
+TCGA-HZ-A49I,TCGA-HZ-A49I-01A-12R-A26U-07,Primary Tumor,5-FU,3385,Clinical Progressive Disease,PAAD,5.783365
+TCGA-HZ-A77O,TCGA-HZ-A77O-01A-11R-A33R-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.4344314
+TCGA-HZ-A77P,TCGA-HZ-A77P-01A-11R-A33R-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-1.6104814
+TCGA-IB-7644,TCGA-IB-7644-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.6126105
+TCGA-IB-7647,TCGA-IB-7647-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.9282268
+TCGA-IB-7652,TCGA-IB-7652-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-1.4100107
+TCGA-IB-7885,TCGA-IB-7885-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-2.2641397
+TCGA-IB-7889,TCGA-IB-7889-01A-11R-2156-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.0866857
+TCGA-IB-8126,TCGA-IB-8126-01A-11R-2404-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.9100798
+TCGA-IB-8127,TCGA-IB-8127-01A-11R-2404-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-0.40302455
+TCGA-IB-A5SO,TCGA-IB-A5SO-01A-11R-A32O-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.2135202
+TCGA-IB-A5SP,TCGA-IB-A5SP-01A-11R-A32O-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-1.5524503
+TCGA-IB-A5SS,TCGA-IB-A5SS-01A-11R-A32O-07,Primary Tumor,Gemcitabine,60750,Partial Response,PAAD,-0.77109873
+TCGA-IB-AAUO,TCGA-IB-AAUO-01A-12R-A38C-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.1671534
+TCGA-L1-A7W4,TCGA-L1-A7W4-01A-12R-A36G-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.9227076
+TCGA-Q3-A5QY,TCGA-Q3-A5QY-01A-12R-A32O-07,Primary Tumor,Gemcitabine,60750,Partial Response,PAAD,-3.3911476
+TCGA-RB-AA9M,TCGA-RB-AA9M-01A-11R-A39D-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.1951747
+TCGA-S4-A8RM,TCGA-S4-A8RM-01A-11R-A37L-07,Primary Tumor,Gemzar,60750,Complete Response,PAAD,-2.583261
+TCGA-US-A774,TCGA-US-A774-01A-21R-A32O-07,Primary Tumor,Gemcitabine,60750,Clinical Progressive Disease,PAAD,-2.211
+TCGA-YB-A89D,TCGA-YB-A89D-11A-11R-A36G-07,Solid Tissue Normal,Gemcitabine,60750,Complete Response,PAAD,-2.1780157
+TCGA-YB-A89D,TCGA-YB-A89D-01A-12R-A36G-07,Primary Tumor,Gemcitabine,60750,Complete Response,PAAD,-1.1488487
+TCGA-49-AAR2,TCGA-49-AAR2-01A-11R-A39D-07,Primary Tumor,TAXOL,36314,Complete Response,LUAD,-2.2974377
+TCGA-50-5068,TCGA-50-5068-01A-01R-1628-07,Primary Tumor,Taxol,36314,Clinical Progressive Disease,LUAD,-2.8412557
+TCGA-50-5936,TCGA-50-5936-01A-11R-1628-07,Primary Tumor,TAXOL,36314,Clinical Progressive Disease,LUAD,-2.6960459
+TCGA-50-5936,TCGA-50-5936-11A-01R-1628-07,Solid Tissue Normal,TAXOL,36314,Clinical Progressive Disease,LUAD,-2.488212
+TCGA-50-6595,TCGA-50-6595-01A-12R-1858-07,Primary Tumor,Carboplatin,426756,Clinical Progressive Disease,LUAD,3.084415
+TCGA-50-6595,TCGA-50-6595-11A-01R-1858-07,Solid Tissue Normal,Carboplatin,426756,Clinical Progressive Disease,LUAD,3.6902595
+TCGA-55-7910,TCGA-55-7910-01A-11R-2170-07,Primary Tumor,Cisplatin,5702198,Complete Response,LUAD,2.9073129
+TCGA-93-A4JP,TCGA-93-A4JP-01A-11R-A24X-07,Primary Tumor,Carboplatin,426756,Partial Response,LUAD,4.3141747
+TCGA-2A-A8VT,TCGA-2A-A8VT-01A-11R-A37L-07,Primary Tumor,Lupron,657181,Stable Disease,PRAD,2.2691712
+TCGA-CH-5741,TCGA-CH-5741-01A-11R-1580-07,Primary Tumor,Leuprorelin,657181,Complete Response,PRAD,2.3525863
+TCGA-HC-7742,TCGA-HC-7742-11A-01R-2118-07,Solid Tissue Normal,Eligard,657181,Partial Response,PRAD,2.5609612
+TCGA-HC-7742,TCGA-HC-7742-01A-11R-2118-07,Primary Tumor,Eligard,657181,Partial Response,PRAD,2.558281
+TCGA-HC-A9TE,TCGA-HC-A9TE-01A-11R-A41O-07,Primary Tumor,Eligard,657181,Stable Disease,PRAD,3.3790662
+TCGA-HI-7168,TCGA-HI-7168-01A-11R-2118-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,3.3122478
+TCGA-KC-A4BR,TCGA-KC-A4BR-01A-32R-A32Y-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,3.0788922
+TCGA-KK-A59Y,TCGA-KK-A59Y-01A-11R-A26U-07,Primary Tumor,Leuprolide Acetate,657181,Complete Response,PRAD,1.7612628
+TCGA-KK-A6E1,TCGA-KK-A6E1-01A-11R-A311-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,2.081684
+TCGA-KK-A8I4,TCGA-KK-A8I4-01A-11R-A36G-07,Primary Tumor,Lupron,657181,Stable Disease,PRAD,1.902325
+TCGA-KK-A8I7,TCGA-KK-A8I7-01A-21R-A36G-07,Primary Tumor,Leuprolide Acetate,657181,Complete Response,PRAD,2.0536172
+TCGA-KK-A8I9,TCGA-KK-A8I9-01A-11R-A36G-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,2.7420797
+TCGA-KK-A8ID,TCGA-KK-A8ID-01A-11R-A36G-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,2.812745
+TCGA-YL-A9WL,TCGA-YL-A9WL-01A-11R-A41O-07,Primary Tumor,Lupron,657181,Complete Response,PRAD,2.6709595
+TCGA-37-A5EL,TCGA-37-A5EL-01A-11R-A26W-07,Primary Tumor,Temodal,5394,Partial Response,LUSC,6.2920384
+TCGA-43-5668,TCGA-43-5668-01A-01R-1635-07,Primary Tumor,Gemzar,60750,Clinical Progressive Disease,LUSC,-2.9633322
+TCGA-85-8664,TCGA-85-8664-01A-11R-2403-07,Primary Tumor,Carboplatin,426756,Clinical Progressive Disease,LUSC,3.0748205
+TCGA-90-A59Q,TCGA-90-A59Q-01A-11R-A26W-07,Primary Tumor,Cisplatin,5702198,Complete Response,LUSC,1.9744185
+TCGA-2G-AAF1,TCGA-2G-AAF1-01A-11R-A430-07,Primary Tumor,Carboplatin,426756,Complete Response,TGCT,2.5398102
+TCGA-WZ-A7V4,TCGA-WZ-A7V4-01A-11R-A431-07,Primary Tumor,Carboplatin,426756,Complete Response,TGCT,3.2741828
+TCGA-YU-A90Q,TCGA-YU-A90Q-01A-11R-A431-07,Primary Tumor,Carboplatin,426756,Complete Response,TGCT,2.5584564
+TCGA-XM-AAZ1,TCGA-XM-AAZ1-01A-11R-A42C-07,Primary Tumor,Cisplatin,5702198,Stable Disease,THYM,2.2055235
+TCGA-D3-A1Q3,TCGA-D3-A1Q3-06A-11R-A18T-07,Metastatic,Cisplatin,5702198,Complete Response,SKCM,2.058042
+TCGA-EB-A3XC,TCGA-EB-A3XC-01A-11R-A239-07,Primary Tumor,Dacarbazine,135398738,Complete Response,SKCM,5.646541
+TCGA-EB-A3Y6,TCGA-EB-A3Y6-01A-21R-A239-07,Primary Tumor,Dacarbazine,135398738,Complete Response,SKCM,5.809496
+TCGA-EE-A185,TCGA-EE-A185-06A-11R-A18S-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,6.0387573
+TCGA-EE-A29Q,TCGA-EE-A29Q-06A-11R-A18T-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,5.686077
+TCGA-EE-A29V,TCGA-EE-A29V-06A-12R-A18S-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,6.236014
+TCGA-EE-A2MD,TCGA-EE-A2MD-06A-11R-A18T-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,5.729666
+TCGA-EE-A2MN,TCGA-EE-A2MN-06A-11R-A18S-07,Metastatic,Dacabarzine,135398738,Clinical Progressive Disease,SKCM,5.3837695
+TCGA-EE-A2MQ,TCGA-EE-A2MQ-06A-11R-A18S-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,5.570705
+TCGA-EE-A3JI,TCGA-EE-A3JI-06A-11R-A21D-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,5.6479554
+TCGA-FR-A8YC,TCGA-FR-A8YC-06A-11R-A37K-07,Metastatic,2B3-101,31703,Clinical Progressive Disease,SKCM,-2.3715587
+TCGA-HR-A2OH,TCGA-HR-A2OH-06A-11R-A18U-07,Metastatic,Dacarbazine,135398738,Clinical Progressive Disease,SKCM,5.389999
+TCGA-N6-A4VC,TCGA-N6-A4VC-01A-11R-A28V-07,Primary Tumor,Carboplatin,426756,Clinical Progressive Disease,UCS,2.9576883
+TCGA-NA-A4QW,TCGA-NA-A4QW-01A-11R-A28V-07,Primary Tumor,Taxol,36314,Complete Response,UCS,-3.6287303
+TCGA-ND-A4WC,TCGA-ND-A4WC-01A-21R-A28V-07,Primary Tumor,Carboplatin,426756,Complete Response,UCS,2.8989022
+TCGA-B7-A5TK,TCGA-B7-A5TK-01A-12R-A36D-31,Primary Tumor,Xeloda,60953,Complete Response,STAD,3.800631
+TCGA-B7-A5TN,TCGA-B7-A5TN-01A-21R-A31P-31,Primary Tumor,Cisplatin,5702198,Complete Response,STAD,3.3357573
+TCGA-BR-A4J8,TCGA-BR-A4J8-01A-11R-A251-31,Primary Tumor,Xeloda,60953,Complete Response,STAD,4.0034366
+TCGA-CD-8533,TCGA-CD-8533-01A-11R-2343-13,Primary Tumor,Capecitabine,60953,Clinical Progressive Disease,STAD,3.8888187
+TCGA-CD-A48A,TCGA-CD-A48A-01A-12R-A36D-31,Primary Tumor,Capecitabine,60953,Complete Response,STAD,4.175242
+TCGA-CG-4444,TCGA-CG-4444-01A-01R-1157-13,Primary Tumor,5-Fluorouracil,3385,Complete Response,STAD,3.8362188
+TCGA-CG-5724,TCGA-CG-5724-01A-11R-1602-13,Primary Tumor,Cisplatin,5702198,Clinical Progressive Disease,STAD,3.8190274
+TCGA-D7-8579,TCGA-D7-8579-01A-11R-2343-13,Primary Tumor,5-fluorouracilum,3385,Complete Response,STAD,4.0200086
+TCGA-F1-A72C,TCGA-F1-A72C-01A-21R-A33Y-31,Primary Tumor,Capecitabine,60953,Complete Response,STAD,3.6065316
+TCGA-FP-7829,TCGA-FP-7829-01A-11R-2055-13,Primary Tumor,5-FU,3385,Complete Response,STAD,3.798141
+TCGA-FP-7829,TCGA-FP-7829-11A-01R-2055-13,Solid Tissue Normal,5-FU,3385,Complete Response,STAD,5.7444034
+TCGA-FP-7916,TCGA-FP-7916-01A-11R-2203-13,Primary Tumor,Xeloda,60953,Clinical Progressive Disease,STAD,2.937142
+TCGA-FP-A4BE,TCGA-FP-A4BE-01A-12R-A24K-31,Primary Tumor,5-FU,3385,Complete Response,STAD,2.69292
+TCGA-HU-8243,TCGA-HU-8243-01A-11R-2343-13,Primary Tumor,5-FU,3385,Complete Response,STAD,4.8477607
+TCGA-HU-8249,TCGA-HU-8249-01A-11R-A36D-31,Primary Tumor,Xeloda,60953,Complete Response,STAD,2.990995
+TCGA-HU-8602,TCGA-HU-8602-01A-11R-2402-13,Primary Tumor,Xeloda,60953,Complete Response,STAD,2.8540485
+TCGA-KB-A6F7,TCGA-KB-A6F7-01A-12R-A32D-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,3.2987595
+TCGA-KB-A93J,TCGA-KB-A93J-01A-11R-A39E-31,Primary Tumor,5-fluorouracil,3385,Complete Response,STAD,3.2881262
+TCGA-VQ-A8DT,TCGA-VQ-A8DT-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.9677997
+TCGA-VQ-A8DU,TCGA-VQ-A8DU-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,5.138742
+TCGA-VQ-A8DZ,TCGA-VQ-A8DZ-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.83697
+TCGA-VQ-A8E0,TCGA-VQ-A8E0-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.852886
+TCGA-VQ-A8E2,TCGA-VQ-A8E2-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.019464
+TCGA-VQ-A8P3,TCGA-VQ-A8P3-01A-11R-A36D-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.840229
+TCGA-VQ-A8PB,TCGA-VQ-A8PB-01A-11R-A39E-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,3.907586
+TCGA-VQ-A8PD,TCGA-VQ-A8PD-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.696137
+TCGA-VQ-A8PP,TCGA-VQ-A8PP-01A-21R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.8591924
+TCGA-VQ-A8PU,TCGA-VQ-A8PU-01A-12R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,3.7585006
+TCGA-VQ-A91D,TCGA-VQ-A91D-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.7518926
+TCGA-VQ-A91E,TCGA-VQ-A91E-01A-31R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.06405
+TCGA-VQ-A91K,TCGA-VQ-A91K-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,3.403028
+TCGA-VQ-A91N,TCGA-VQ-A91N-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.759105
+TCGA-VQ-A91Q,TCGA-VQ-A91Q-01A-12R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,5.033585
+TCGA-VQ-A91S,TCGA-VQ-A91S-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,2.8170094
+TCGA-VQ-A91W,TCGA-VQ-A91W-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,2.7967954
+TCGA-VQ-A91Y,TCGA-VQ-A91Y-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,5.099893
+TCGA-VQ-A922,TCGA-VQ-A922-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.068271
+TCGA-VQ-A928,TCGA-VQ-A928-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.7718306
+TCGA-VQ-A94O,TCGA-VQ-A94O-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.876666
+TCGA-VQ-A94R,TCGA-VQ-A94R-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.6592755
+TCGA-VQ-AA64,TCGA-VQ-AA64-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.6056314
+TCGA-VQ-AA68,TCGA-VQ-AA68-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.6275597
+TCGA-VQ-AA6B,TCGA-VQ-AA6B-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,3.6944451
+TCGA-VQ-AA6D,TCGA-VQ-AA6D-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Complete Response,STAD,4.667722
+TCGA-VQ-AA6F,TCGA-VQ-AA6F-01A-31R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,3.635643
+TCGA-VQ-AA6G,TCGA-VQ-AA6G-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,4.282969
+TCGA-VQ-AA6K,TCGA-VQ-AA6K-01A-11R-A414-31,Primary Tumor,Fluorouracil,3385,Clinical Progressive Disease,STAD,5.3734536
