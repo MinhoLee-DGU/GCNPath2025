@@ -48,7 +48,7 @@ bash process_cell.sh
 
 1-1. Compress RNA data from gene- to pathway-level using GSVA
 # Rscript process_cell_gsva.R \
-#     data/cell_data/SANGER_RNA_TPM.csv \
+#     data/cell_data/SANGER_RNA_TPM_Filt.csv \
 #     data/path_data/c2.cp.biocarta.v2023.1.Hs.entrez.gmt \
 #     processed/cell_data_biocarta/SANGER_RNA_GSVA.csv
 
@@ -76,11 +76,15 @@ bash process_drug.sh
 ```
 
 ## 3. Model Training
-Training a model in all fold is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyper-parameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder. 
+
+# 3-1. Model Training in various test scenarios
+Training a model in all fold is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyper-parameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder if you utilize SLURM with ```-use_slurm``` as 1 in  ```train.sh```.
 
 The column of cell-line, drug, ln(IC50) can be designated with ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
 IC50 data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
 Test type : 0 [Normal], 1 [Cell-Blind], 2 [Drug-Blind], 3 [Strict-Blind]
+
+You can set random seed for the initialization of model parameter weights with ```-seed_model``` (default 2021). Note that the aim of setting seed is for assessing the stabilities of model performances, not for reproducing the exactly same prediction results. It is due to the non-determinate operations within the modules of Pytorch Geometrics such as ```torch_scatter```, or training models rapidly using multi-workers for data loader with ```-cpu```.
 
 ```
 bash train.sh 0 0
@@ -92,8 +96,21 @@ bash train.sh 0 0
 #    -col_cell Cell -col_drug Drug -col_ic50 IC50
 ```
 
+# 3-2. Model Training with Whole Dataset without Splitting Data
+Training a model with whole GDSC1+2 dataset is implemented by ```retrain_total.sh```, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The description is similar to **Section 3-1**. 
+
+```
+bash retrain_total.sh
+# python retrain_total.py \
+#    -cell processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle \
+#    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
+#    -ic50 data/ic50_data/IC50_GDSC.txt \
+#    -out_dir results/IC50_GDSC/Normal/RGCN \
+#    -col_cell Cell -col_drug Drug -col_ic50 IC50 -seed 2021
+```
+
 ## 4. Model Testing
-Testing a model in all fold is implemented by test bash files (ex. ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially executes ```test_write.sh``` and ```test.py```. The description is the same as **3. Model Training**. If you want to only output predicted response values without performance, set the parameter ```-col_ic50 0```.
+Testing a model is implemented by test bash files (ex. ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially executes ```test_write.sh``` and ```test.py```. The description  is similar to **Section 3-1**. If you want to only output predicted response values without performance, set the parameter ```-col_ic50 0```.
 
 ```
 bash test_ccle.sh
@@ -101,8 +118,8 @@ bash test_ccle.sh
 #    -cell processed/cell_data_biocarta/CCLE_RNA_KNN5_STR9_Reg_Corr.pickle \
 #    -drug processed/drug_data/CCLE_Drug_Custom.pickle \
 #    -ic50 data/ic50_data/IC50_CCLE.txt \
-#    -dir_param results/IC50_GDSC/Normal/RGCN/param_0.pt \
-#    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_0.pickle \
-#    -out_file results/IC50_GDSC/Normal/RGCN/pred_ccle_0.csv \
+#    -dir_param results/IC50_GDSC/Normal/RGCN/param_retrain_seed2021.pt \
+#    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_retrain_seed2021.pickle \
+#    -out_file results/IC50_GDSC/Normal/RGCN/pred_ccle_seed2021.csv \
 #    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50
 ```
