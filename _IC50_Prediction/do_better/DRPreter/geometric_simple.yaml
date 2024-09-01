@@ -1,0 +1,25 @@
+name: geometric
+channels:
+  - defaults
+dependencies:
+  - nvidia-ml=7.352.0=pyhd3eb1b0_0
+  - python=3.8.5=h7579374_1
+  - pip:
+    - dgl==0.6.1
+    - dgllife==0.2.9
+    - networkx==2.5.1
+    - numpy==1.20.3
+    - pandas==1.2.4
+    - rdkit-pypi==2021.9.3
+    - scikit-learn==0.24.2
+    - scipy==1.6.3
+    - torch==1.9.0+cu111
+    - torch-cluster==1.5.9
+    - torch-geometric==1.7.1
+    - torch-scatter==2.0.7
+    - torch-sparse==0.6.10
+    - torch-spline-conv==1.2.1
+    - torchaudio==0.9.0
+    - torchvision==0.10.0+cu111
+    - tqdm==4.61.1
+prefix: /data/project/jihye/anaconda3/envs/geometric

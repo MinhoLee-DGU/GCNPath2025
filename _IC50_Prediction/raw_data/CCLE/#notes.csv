@@ -1,0 +1,11 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+CCLE,DepMap Public 21Q4,2023-07-17,sample_info.csv,Cell Annotation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=sample_info.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_expression.csv,RNA-Seq [TPM],https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_expression.csv
+CCLE,DepMap Public 21Q4,2023-07-26,CCLE_expression_full.csv,RNA-Seq [TPM],https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_expression.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_mutations.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_mutations.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_mutations_bool_hotspot.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_mutations_bool_hotspot.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_mutations_bool_damaging.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_mutations_bool_damaging.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_mutations_bool_nonconserving.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_mutations_bool_nonconserving.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_mutations_bool_otherconserving.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_mutations_bool_otherconserving.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_gene_cn.csv,Copy Number Variation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_gene_cn.csv
+CCLE,DepMap Public 21Q4,2023-07-17,CCLE_wes_gene_cn.csv,Copy Number Variation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+21Q4&filename=CCLE_wes_gene_cn.csv

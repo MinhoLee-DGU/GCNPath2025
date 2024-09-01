@@ -1,0 +1,5 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+STiTCH,Version: 5.0,2023-07-27,chemicals.v5.0.tsv,Chemical Annotation,http://stitch.embl.de/download/chemicals.v5.0.tsv.gz
+STiTCH,Version: 5.0,2023-07-27,9606.protein_chemical.links.detailed.v5.0.tsv,"Drug-Target Interaction [Human 9606, Detail]",http://stitch.embl.de/download/protein_chemical.links.v5.0/9606.protein_chemical.links.v5.0.tsv.gz
+,,,,,
+,,,,,

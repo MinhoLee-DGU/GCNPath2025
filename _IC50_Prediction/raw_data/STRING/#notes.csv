@@ -1,0 +1,3 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+STRING,Version: 11.5,2023-06-16,9606.protein.info.v11.5.txt,Protein Annotation,https://string-db.org/cgi/download?sessionId=btooBqgiAEcP&species_text=9606
+STRING,Version: 11.5,2023-06-16,9606.protein.links.v11.5.txt,Protein-Protein Interaction,https://string-db.org/cgi/download?sessionId=btooBqgiAEcP&species_text=9606

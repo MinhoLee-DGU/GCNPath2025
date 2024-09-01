@@ -1,0 +1,11 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+MSigDB,MSigDB 2023.1,2023-06-16,c2.cp.biocarta.v2023.1.Hs.entrez.gmt,BIOCARTA [Entrez],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.biocarta.v2023.1.Hs.entrez.gmt
+MSigDB,MSigDB 2023.1,2023-06-16,c2.cp.biocarta.v2023.1.Hs.symbols.gmt,BIOCARTA [Symbol],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.biocarta.v2023.1.Hs.symbols.gmt
+MSigDB,MSigDB 2023.1,2023-06-16,c2.cp.kegg.v2023.1.Hs.entrez.gmt,KEGG [Entrez],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.kegg.v2023.1.Hs.entrez.gmt
+MSigDB,MSigDB 2023.1,2023-06-16,c2.cp.kegg.v2023.1.Hs.symbols.gmt,KEGG [Symbol],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.kegg.v2023.1.Hs.symbols.gmt
+MSigDB,MSigDB 2023.1,2023-06-16,c4.cm.v2023.1.Hs.entrez.gmt,C4_CM [Entrez],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c4.cm.v2023.1.Hs.entrez.gmt
+MSigDB,MSigDB 2023.1,2023-06-16,c4.cm.v2023.1.Hs.symbols.gmt,C4_CM [Symbol],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c4.cm.v2023.1.Hs.symbols.gmt
+MSigDB,MSigDB 2023.1,2024-06-17,c2.cp.pid.v2023.1.Hs.entrez.gmt,PID [Entrez],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.pid.v2023.1.Hs.entrez.gmt
+MSigDB,MSigDB 2023.1,2024-06-17,c2.cp.pid.v2023.1.Hs.symbols.gmt,PID [Symbol],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.pid.v2023.1.Hs.symbols.gmt
+MSigDB,MSigDB 2023.1,2024-06-17,c2.cp.wikipathways.v2023.1.Hs.entrez.gmt,WikiPathway [Entrez],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.wikipathways.v2023.1.Hs.entrez.gmt
+MSigDB,MSigDB 2023.1,2024-06-17,c2.cp.wikipathways.v2023.1.Hs.symbols.gmt,WikiPathway [Symbol],https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2023.1.Hs/c2.cp.wikipathways.v2023.1.Hs.symbols.gmt

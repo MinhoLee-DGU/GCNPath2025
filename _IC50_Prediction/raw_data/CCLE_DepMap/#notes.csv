@@ -1,0 +1,6 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+CCLE_DepMap,DepMap Public 23Q2,2023-06-15,Model.csv,Cell Annotation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+23Q2&filename=Model.csv
+CCLE_DepMap,DepMap Public 23Q2,2023-06-15,OmicsExpressionProteinCodingGenesTPMLogp1.csv,RNA-Seq [TPM],https://depmap.org/portal/download/all/?releasename=DepMap+Public+23Q2&filename=OmicsExpressionProteinCodingGenesTPMLogp1.csv
+CCLE_DepMap,DepMap Public 23Q2,2023-06-20,OmicsCNGene.csv,CNV [Gene-Level],https://depmap.org/portal/download/all/?releasename=DepMap+Public+23Q2&filename=OmicsCNGene.csv
+CCLE_DepMap,DepMap Public 23Q2,2023-06-20,OmicsSomaticMutations.csv,Mutation,https://depmap.org/portal/download/all/?releasename=DepMap+Public+23Q2&filename=OmicsSomaticMutations.csv
+CCLE_DepMap,Pharmacological Profiling,2023-08-19,CCLE_NP24.2009_Drug_data_2015.02.24.csv,IC50 Data [CCLE],https://depmap.org/portal/download/all/?releasename=Pharmacological+Profiling&filename=CCLE_NP24.2009_Drug_data_2015.02.24.csv

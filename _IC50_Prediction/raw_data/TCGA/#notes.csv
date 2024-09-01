@@ -1,0 +1,3 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+GDISC,,2023-08-01,DrugCorrection1.csv,Standardized drug names from TCGA [One-to-One],https://gdisc.bme.gatech.edu/Data/DrugCorrection.csv
+GDISC,,2023-08-01,DrugCorrection2.csv,Standardized drug names from TCGA [One-to-Many],https://gdisc.bme.gatech.edu/Data/GoodlookingTable.csv

@@ -1,0 +1,5 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+ChEMBL,NA,2023-08-25,ChEMBL.csv,Drug Annotation,https://www.ebi.ac.uk/chembl/g/#browse/compounds
+ChEMBL,NA,2023-06-10,DOWNLOAD-bGxOa7WMXUE0NN6ZKzAhPRjpjNgO-KtkZjIlyPHO01c=.csv,Drug Annotation,https://www.ebi.ac.uk/chembl/g/#browse/compounds
+DrugBank,Release Version 5.1.10,2023-06-10,drugbank vocabulary.csv,Drug Annotation,https://go.drugbank.com/releases/latest#open-data
+HMS LINCS,NA,2023-06-10,small_molecule_20230609151933.csv,https://lincs.hms.harvard.edu/db/sm/,

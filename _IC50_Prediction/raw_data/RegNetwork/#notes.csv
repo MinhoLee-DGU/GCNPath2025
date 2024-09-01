@@ -1,0 +1,3 @@
+﻿DB,DB_Version,Download_Date,File_Name,Decription,Download_Site
+RegNetwork,2015,2023-06-16,human.source,Gene Regulatory Network [Download - CSV Source File],https://regnetworkweb.org/download.jsp
+RegNetwork,2015,2023-06-16,new_kegg.human.reg.direction.txt,Gene Regulatory Network [Download - Regulatory Directions],https://regnetworkweb.org/download.jsp
