@@ -2,9 +2,9 @@
 
 ![_GCNPath](https://github.com/user-attachments/assets/15a24078-e7c7-429b-80a1-3a99ac64f361)
 
-GCNPath is a deep learning model of anticancer drug response prediction. This model utilizes pathway-pathway association (PPA) graphs compressed from STRING and RegNetwork and a GSVA pathway correlation network. This model is trained with cell-line transcriptome from SANGER Cell Model Passports.
+GCNPath is a graph-based deep learning model of anticancer drug response prediction. This model utilizes pathway-pathway association (PPA) graphs compressed from STRING and RegNetwork and a GSVA pathway correlation network. This model is trained with cell-line transcriptome from SANGER Cell Model Passports.
 
-The GCNPath2024 directory is originally the subdirectory of ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. ```_IC50_Prediction``` is the root directory of GCNPath project including the benchmark tests and preprocessing of cell-lines, drugs and ln(IC50) data.
+The GCNPath2024 directory is originally the subdirectory of ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. ```_IC50_Prediction``` is the root directory of GCNPath project including the benchmark tests and preprocessing of cell lines, drugs and ln(IC50) data.
 
 
 # Quick start
@@ -81,13 +81,13 @@ bash process_drug.sh
 ## 3. Model Training
 
 ### 3-1. Model Training in various test scenarios
-Training a model in outer cross validation with several test situations is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder if you utilize SLURM with ```-use_slurm 1``` in  ```train.sh```.
+Training models in outer cross-validation with several test situations is implemented by ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. All log files will be created in the ```out``` folder if you utilize SLURM with ```-use_slurm 1``` in  ```train.sh```.
 
-The column of a cell line, a drug, a ln(IC50) can be designated with ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
+The column of a cell line, a drug, a ln(IC50) can be designated with ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold in cross-validation is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
 IC50 data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
 Test type : 0 [Normal], 1 [Cell-Blind], 2 [Drug-Blind], 3 [Strict-Blind]
 
-You can set random seed for the initialization of model parameter weights with ```-seed_model``` (default 2021). Note that the aim of setting seed is for assessing the stabilities of model performances, not for reproducing the exactly same prediction results. It is due to the non-determinate operations within the modules of Pytorch Geometrics such as ```torch_scatter```, or training models rapidly using multi-workers for data loader with ```-cpu```.
+You can set random seed for the initialization of model parameter weights with ```-seed_model (default 2021)```. Note that the aim of setting seed is for assessing the stabilities of model performances, not for reproducing the exactly same prediction results. It is due to the non-determinate operations within the modules of Pytorch Geometrics such as ```torch_scatter```, or training models rapidly using multi-workers for data loader with ```-cpu```.
 
 ```
 bash train.sh 0 0
@@ -113,7 +113,7 @@ bash retrain_total.sh
 ```
 
 ## 4. Model Testing
-Testing a model is implemented by test bash files (ex. ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially executes ```test_write.sh``` and ```test.py```. The description  is similar to **Section 3-1**. If you want to only output predicted response values without performance, set the parameter ```-col_ic50 0```.
+Testing a model is implemented by test bash files (ex. ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially executes ```test_write.sh``` and ```test.py```. The description  is similar to **Section 3-1**. If you want to only output predicted response values without calculating performance, set the parameter ```-col_ic50 0```.
 
 ```
 bash test_ccle.sh
