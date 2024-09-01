@@ -12,7 +12,8 @@ conda env create -f GCNPath.yaml
 conda activate GCNPath
 bash process_cell.sh
 bash process_drug.sh
-bash train.sh 0 0
+# bash train.sh 0 0
+bash retrain_total.sh
 bash test_ccle.sh
 ```
 
