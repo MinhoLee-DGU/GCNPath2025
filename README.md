@@ -1,10 +1,10 @@
 # GCNPath2024
 
-![_GCNPath](https://github.com/user-attachments/assets/15a24078-e7c7-429b-80a1-3a99ac64f361)
+![_GCNPath](https://github.com/user-attachments/assets/630a0c93-15d0-462d-942a-61aa0c94000a)
 
 GCNPath is a graph-based deep learning model designed for predicting anticancer drug response. This model leverages pathway-pathway association (PPA) graphs, which are compressed from STRING and RegNetwork, as well as a GSVA pathway correlation network. The training of GCNPath is conducted using transcriptome data from the SANGER Cell Model Passports.
 
-The GCNPath2024 directory is originally the subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory of the GCNPath project, encompassing the benchmark tests, as well as the preprocessing steps for cell lines, drugs, and ln(IC50) data.
+The GCNPath2024 directory is originally the subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory of the GCNPath project, encompassing the benchmark tests, as well as the preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
 
 # Quick start
 ```
@@ -81,10 +81,10 @@ bash process_drug.sh
 ## 3. Model Training
 
 ### 3-1. Model Training in Various Test Scenarios
-Model training in outer cross-validation across different test scenarios is handled by the ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input files and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This file writes all inputs and parameters into new bash files in ```exe``` folder, which eventually implement the ```train.py```. If you utilize SLURM with ```use_slurm``` as 1 within  ```train.sh```, all log files will be created in the ```out``` folder.
+Model training in outer cross-validation across different test scenarios is handled by the ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input file paths and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g. ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If you utilize SLURM with ```use_slurm``` as 1 within  ```train.sh```, all log files will be created in the ```out``` folder.
 
-The columns for a cell line, drug, and ln(IC50) can be specified using the ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold in cross-validation is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
-IC50 data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
+The columns for a cell line, drug, and ln(IC<sub>50</sub>) can be specified using the ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold in cross-validation is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
+IC<sub>50</sub> data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
 Test type : 0 [Normal], 1 [Cell-Blind], 2 [Drug-Blind], 3 [Strict-Blind]
 
 You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
@@ -96,7 +96,7 @@ bash train.sh 0 0
 #    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN -nth 0 \
-#    -col_cell Cell -col_drug Drug -col_ic50 IC50 -cpu 0
+#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
 ```
 
 ### 3-2. Model Training with Whole Dataset without Splitting Data
@@ -109,7 +109,7 @@ bash retrain_total.sh
 #    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN \
-#    -col_cell Cell -col_drug Drug -col_ic50 IC50 -cpu 0 -seed 2021
+#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
 ```
 
 ## 4. Model Testing
@@ -124,5 +124,5 @@ bash test_ccle.sh
 #    -dir_param results/IC50_GDSC/Normal/RGCN/param_retrain_seed2021.pt \
 #    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_retrain_seed2021.pickle \
 #    -out_file results/IC50_GDSC/Normal/RGCN/pred_ccle_seed2021.csv \
-#    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50
+#    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
 ```
