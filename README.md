@@ -96,7 +96,7 @@ bash train.sh 0 0
 #    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN -nth 0 \
-#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
+#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4
 ```
 
 ### 3-2. Model Training with Whole Dataset without Splitting Data
@@ -109,7 +109,7 @@ bash retrain_total.sh
 #    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN \
-#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
+#    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4 -seed_model 2021
 ```
 
 ## 4. Model Testing
@@ -124,5 +124,5 @@ bash test_ccle.sh
 #    -dir_param results/IC50_GDSC/Normal/RGCN/param_retrain_seed2021.pt \
 #    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_retrain_seed2021.pickle \
 #    -out_file results/IC50_GDSC/Normal/RGCN/pred_ccle_seed2021.csv \
-#    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50 -seed_model 2021 -cpu 4
+#    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50 -cpu 4
 ```
