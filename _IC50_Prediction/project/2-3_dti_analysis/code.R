@@ -62,7 +62,7 @@ plot_dfs_knn = function(Drug_IC50_Info, x, y, knn=5, mode="max", return_val=T, .
 }
 
 plot_dfs_multi = function(Drug_IC50_Info, x, knn=5, mode="max", xlab="Tanimoto", 
-                          dir=NULL, subtitle=NULL, width=20, height=16, alpha=0.25, 
+                          dir=NULL, subtitle=NULL, width=20, height=16, alpha=0.2, 
                           axis_tl=25, axis_tx=20, legend_tl=20, legend_tx=18, return_val=T, save=T) {
   
   x = deparse(substitute(x))
@@ -230,7 +230,7 @@ Drug_IC50_Info$Tanimoto[is.na(Drug_IC50_Info$Tanimoto)] = 1
 
 
 dir = mkdir("../../processed_data/drug_data/DTI_Analysis/Tanimoto")
-xlab = "Drug Similarity [Tanimoto, Morgan]"
+xlab = "Structural Similarity [Tanimoto, Morgan]"
 GDSC_DFS_Tan_Morgan_ = Drug_IC50_Info %>% 
   plot_dfs_multi(Tanimoto, xlab=xlab, dir=dir, save=T)
 
@@ -270,12 +270,12 @@ Drug_IC50_Info$Tanimoto_PC[is.na(Drug_IC50_Info$Tanimoto_PC)] = 1
 
 
 dir = "../../processed_data/drug_data/DTI_Analysis/Tanimoto"
-xlab = "Drug Similarity [Tanimoto, PubChem]"
+xlab = "Structural Similarity [Tanimoto, PubChem]"
 GDSC_DFS_Tan_PubChem_ = Drug_IC50_Info %>% 
-  plot_dfs_multi(Tanimoto_PC, xlab=xlab, dir=dir, save=T)
+  plot_dfs_multi(Tanimoto_PC, xlab=xlab, dir=dir, axis_tl=22.5, save=T)
 
-xlab = "Drug Similarity [Tanimoto, Morgan]"
-ylab = "Drug Similarity [Tanimoto, PubChem]"
+xlab = "Structural Similarity [Tanimoto, Morgan]"
+ylab = "Structural Similarity [Tanimoto, PubChem]"
 main = sprintf("%s/Tanimoto & Tanimoto_PC", dir)
 Drug_IC50_Info %>% plot_def(Tanimoto, Tanimoto_PC, main=main[1], 
                             xlab=xlab, ylab=ylab, width=20, height=20,
@@ -437,7 +437,7 @@ analyze_dpi = function(DPI, Drug_IC50_Info, subtitle="RWR_DTI", method="pearson"
   col = c("Drug1", "Drug2", "Dist_IC50", "PCC_IC50", "SCC_IC50", "Sim_IC50")
   DFS = inner_join(DPI_Corr, Drug_IC50_Info[, col], by=by)
   
-  xlab = "Drug Similarity [PCC]"
+  xlab = "Target Similarity [PCC]"
   DFS %>% plot_dfs_multi(Corr_DPI, xlab=xlab, dir=dir, subtitle=subtitle, save=T)
   return(DFS)
 }
@@ -488,7 +488,7 @@ GDSC_DFS_SING_0.9 = GDSC_DTI_Wide %>%
 
 plot_only = T
 restart_list = c(0.3, 0.5, 0.7, 0.9)
-xlab = "Drug Similarity [PCC]"
+xlab = "Target Similarity [PCC]"
 
 if (plot_only) {
   dir = "../../processed_data/drug_data/DTI_Analysis/RWR_ssGSEA"
@@ -589,7 +589,7 @@ GDSC_DFS_RWRH_0.9 = GDSC_DTI_Wide %>%
 
 plot_only = T
 restart_list = c(0.3, 0.5, 0.7, 0.9)
-xlab = "Drug Similarity [PCC]"
+xlab = "Target Similarity [PCC]"
 
 if (plot_only) {
   dir = "../../processed_data/drug_data/DTI_Analysis/RWR_Path_Hetero"
@@ -680,7 +680,7 @@ analyze_dfs = function(DFS, Drug_IC50_Info, subtitle="PathSim", dir=".", neighbo
   col = c("Drug1", "Drug2", "Dist_IC50", "PCC_IC50", "SCC_IC50", "Sim_IC50")
   DFS = inner_join(DFS, Drug_IC50_Info[, col], by=by)
   
-  xlab = sprintf("Drug Similarity [PathSim, %s-hop]", neighbor)
+  xlab = sprintf("Target Similarity [PathSim, %s-hop]", neighbor)
   DFS_KNN = DFS %>% plot_dfs_multi(PathSim, xlab=xlab, dir=dir, subtitle=subtitle, return_val=T, save=T)
   
   if (return_knn) {
@@ -706,7 +706,7 @@ GDSC_DFS_PathSim1 = analyze_dfs(PathSim_1hop$DFS, Drug_IC50_Info, dir=dir, subti
 GDSC_DFS_PathSim0_ = analyze_dfs(PathSim_0hop$DFS, Drug_IC50_Info, dir=dir, 
                                  subtitle=subtitle[1], neighbor=0, return_knn=T)
 GDSC_DFS_PathSim1_ = analyze_dfs(PathSim_1hop$DFS, Drug_IC50_Info, dir=dir, 
-                                 subtitle=subtitle[2], neighbor=0, return_knn=T)
+                                 subtitle=subtitle[2], neighbor=1, return_knn=T)
 
 GDSC_DFS_PathSim0 = GDSC_DFS_PathSim0 %>% 
   subset(select=c(Drug1, Drug2, PathSim))
@@ -772,7 +772,7 @@ GDSC_DFS_GO_Seq = inner_join(GDSC_DFS_GO_Seq, Drug_IC50_Info[, col], by=by)
 
 
 option_go = c("GO:BP", "GO:MF", "GO:CC")
-xlab = sprintf("Drug Similarity [Target %s]", option_go)
+xlab = sprintf("Target Similarity [%s Enrichment]", option_go)
 dir = "../../processed_data/drug_data/DTI_Analysis/Target_GO"
 
 GDSC_DFS_GOBP_Seq_ = GDSC_DFS_GO_Seq %>% 
@@ -782,8 +782,8 @@ GDSC_DFS_GOMF_Seq_ = GDSC_DFS_GO_Seq %>%
 GDSC_DFS_GOCC_Seq_ = GDSC_DFS_GO_Seq %>% 
   plot_dfs_multi(Sim_GOCC, xlab=xlab[3], dir=dir, save=T)
 
-option_seq = c("Sequence, Local", "Sequence, Global")
-xlab = sprintf("Drug Similarity [Target %s]", option_seq)
+option_seq = c("Local Alignment", "Global Alignment")
+xlab = sprintf("Target Similarity [%s]", option_seq)
 dir = "../../processed_data/drug_data/DTI_Analysis/Target_Seq"
 
 GDSC_DFS_Local_Seq_ = GDSC_DFS_GO_Seq %>% 
