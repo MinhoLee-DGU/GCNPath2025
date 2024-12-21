@@ -1,6 +1,6 @@
 # GCNPath2024
 
-![_GCNPath](https://github.com/user-attachments/assets/29c4c1d2-f506-4931-aad8-187fbe05358d)
+![_GCNPath](https://github.com/user-attachments/assets/13d9a4da-4efa-4548-bec6-91459141d176)
 
 GCNPath is a graph-based deep learning model designed for predicting anticancer drug response. This model leverages pathway-pathway association (PPA) graphs, which are compressed from STRING and RegNetwork, as well as a GSVA pathway correlation network. The training of GCNPath is conducted using transcriptome data from the SANGER Cell Model Passports.
 
