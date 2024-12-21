@@ -107,8 +107,8 @@ fill_col_na = function(df, col, value=0) {
 }
 
 MUT_TGSA = MUT_TGSA %>% fill_col_na(geneset_ori, value=0)   # 698 > 706
-EXP_TGSA = EXP_TGSA %>% fill_col_na(geneset_ori, value=0)   # 706 > 706
-CNV_TGSA = CNV_TGSA %>% fill_col_na(geneset_ori, value=0)   # 706 > 706
+# EXP_TGSA = EXP_TGSA %>% fill_col_na(geneset_ori, value=0)   # 706 > 706
+# CNV_TGSA = CNV_TGSA %>% fill_col_na(geneset_ori, value=1)   # 706 > 706
 
 identical(colnames(MUT_TGSA), colnames(EXP_TGSA))   # T
 identical(colnames(MUT_TGSA), colnames(CNV_TGSA))   # T
