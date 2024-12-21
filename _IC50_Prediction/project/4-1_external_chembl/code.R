@@ -364,7 +364,7 @@ prepared_tag_ref = T
 if (prepared_tag_ref) {
   dir = "../../do_better/_performance_chembl"
   file = sprintf("%s/Cell_Drug_Pair.csv", dir)
-  Cell_Drug_Pair = fread(file)
+  Cell_Drug_Pair = fread(file)   # 237580
   
   IC50_ChEMBL_List_Final = list()
   tag_ref = Cell_Drug_Pair %>% with(paste0(Cell_ChEMBL_ID, "@", Drug_ChEMBL_ID))
@@ -378,12 +378,12 @@ if (prepared_tag_ref) {
   IC50_ChEMBL_EQ_List %>% sapply(nrow)
   # [IC50] 302648, [IC50_Dup] 17704, [IC50_Dup_Raw] 56492
   IC50_ChEMBL_List_Final %>% sapply(nrow)
-  # [IC50] 237646, [IC50_Dup] 12979, [IC50_Dup_Raw] 33223 
+  # [IC50] 237580, [IC50_Dup] 12976, [IC50_Dup_Raw] 33213 
   
   
   # 1. Duplicated IC50
-  rmse = IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% with(RMSE(LN_IC50, LN_IC50_Mean))   # 1.249929
-  corr = IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% with(cor(LN_IC50, LN_IC50_Mean))    # 0.9302559
+  rmse = IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% with(RMSE(LN_IC50, LN_IC50_Mean))   # 1.250103
+  corr = IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% with(cor(LN_IC50, LN_IC50_Mean))    # 0.9302273
   
   dir = "../../processed_data/ic50_data/ChEMBL"
   main = sprintf("%s/LN_IC50 & LN_IC50_Mean [ChEMBL, Final]", dir)
@@ -394,7 +394,7 @@ if (prepared_tag_ref) {
   IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% 
     plot_def(LN_IC50, LN_IC50_Mean, main=main, xlab=xlab, ylab=ylab, 
              size=1.5, alpha=0.5, axis_tl=30, axis_tx=24, dpi=1200,
-             xy_line=T, force_bold=F, raster=T, save=T, save_svg=T)
+             xy_line=T, raster=T, save=T, save_svg=T)
   
   
   # 2. ChEMBL vs GDSC
@@ -443,13 +443,14 @@ if (prepared_tag_ref) {
   font_lgt = font("legend.title", size=20, margin=margin2)
   font_lgx = font("legend.text", size=20, margin=margin3)
   
+  ylab = "Density"
   font = font_label + font_text + font_lgt + font_lgx
   color = scale_color_manual(values=c("firebrick2", "royalblue2"), labels=levels)
   fill = scale_fill_manual(values=c("firebrick1", "royalblue1"), labels=levels)
   
   pl = IC50_GDSC_ChEMBL %>% 
     ggdensity(x="LN_IC50", color="Dataset", fill="Dataset") %>% 
-    ggpar(legend="right") + labs(x=xlab) + font + color + fill + theme_lg
+    ggpar(legend="right") + labs(x=xlab, y=ylab) + font + color + fill + theme_lg
   
   main = sprintf("%s/Histogram of LN_IC50 [GDSC & ChEMBL, Final]", dir)
   pl %>% save_fig_ggpubr(main=main, width=18, height=12, svg=T)
@@ -460,40 +461,37 @@ supplementary = T
 if (supplementary) {
   suppressMessages(library(openxlsx))
   
-  ### [Supplementary Data] Supplementary Data 9
+  ### [Supplementary Data] Supplementary Data 7
   Anno_Drugs_ChEMBL_ = Anno_Drugs_ChEMBL %>% 
     subset(Molecule_ChEMBL_ID %in% unique(Cell_Drug_Pair$Drug_ChEMBL_ID)) %>% 
     rename(GDSC_Drug=Drug_GDSC) %>% arrange() %>% as.data.frame   # 112946
   all(Anno_Drugs_ChEMBL_$GDSC_Drug)   # F
   
-  # dir = "../../processed_data/ic50_data/ChEMBL"
-  sheets = "Supplementary Data 9"
-  # file = sprintf("%s/%s.xlsx", dir, sheets)
+  sheets = "Supplementary Data 7"
   file = sprintf("%s.xlsx", sheets)
   write.xlsx(Anno_Drugs_ChEMBL_, file=file, sheetName=sheets, rowNames=F)
   
   
-  ### [Supplementary Data] Supplementary Data 10
+  ### [Supplementary Data] Supplementary Data 8
   by = c("Molecule_ChEMBL_ID"="Drug_ChEMBL_ID", "Cell_ChEMBL_ID"="Cell_ChEMBL_ID")
   IC50_ChEMBL_EQ_1 = IC50_ChEMBL_ %>% 
     subset(Standard_Relation=="=") %>% 
     right_join(Cell_Drug_Pair, by=by) %>% 
-    rename(GDSC_Cell=Cell_GDSC, GDSC_Drug=Drug_GDSC) %>% as.data.frame   # 237646
+    rename(GDSC_Cell=Cell_GDSC, GDSC_Drug=Drug_GDSC) %>% as.data.frame   # 237580
   
-  # dir = "../../processed_data/ic50_data/ChEMBL"
-  sheets = "Supplementary Data 10"
-  # file = sprintf("%s/%s.xlsx", dir, sheets)
+  sheets = "Supplementary Data 8"
   file = sprintf("%s.xlsx", sheets)
   write.xlsx(IC50_ChEMBL_EQ_1, file=file, sheetName=sheets, rowNames=F)
   
   
-  ### [Source Data] Supplementary Fig. 48
+  ### [Source Data] Supplementary Fig. 34
   IC50_Dup_ = IC50_ChEMBL_List_Final$IC50_Dup_Raw %>% subset(select=-TAG)
-  df_list = list(IC50_Dup_, IC50_GDSC_ChEMBL)
+  IC50_GDSC_ChEMBL_ = IC50_GDSC_ChEMBL %>% 
+    mutate(Dataset=recode(Dataset, "GDSC"="GDSC1+2"))
+  df_list = list(IC50_Dup_, IC50_GDSC_ChEMBL_)
   
   num_fig = letters[1:2]
-  sheets = sprintf("Supplementary Fig. 48%s", num_fig)
-  # file = sprintf("%s/SourceData_SupplementaryFig48.xlsx", dir)
-  file = "SourceData_SupplementaryFig48.xlsx"
+  sheets = sprintf("Supplementary Fig. 34%s", num_fig)
+  file = "SourceData_SupplementaryFig34.xlsx"
   write.xlsx(df_list, file=file, sheetName=sheets, rowNames=F)
 }

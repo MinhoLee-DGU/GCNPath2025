@@ -87,8 +87,6 @@ calc_perf = function(Pred, option=0, ignore_weight=F) {
     group_by(across(all_of(col_by))) %>% 
     summarize(N_Test = n(),
               RMSE = RMSE(LN_IC50, Prediction),
-              MAE = MAE(LN_IC50, Prediction),
-              R2 = R2(LN_IC50, Prediction),
               PCC = cor(LN_IC50, Prediction), 
               SCC = cor(LN_IC50, Prediction, method="spearman"))
   
@@ -102,68 +100,6 @@ to_dir_list = function(dir, ...) {
   dir_list = sprintf("%s/%s", dir, dir_list)
   return(dir_list)
 }
-
-# barplot_def = function(df, x, y, fill=NULL, main=NULL, xlab=NULL, ylab=NULL, 
-#                        text=NULL, add=NULL, size=1, alpha=1, color="black", 
-#                        plot_tl=22.5, axis_tl=18, axis_tx=15, legend_tl=16.5, legend_tx=15, 
-#                        margin=0.25, margin_pl=0.25, plot_face="plain", axis_face="plain", legend_face="plain",
-#                        width=15, height=15, show_title=F, reorder=T, force_bold=F, save=T) {
-# 
-#   title = NULL
-#   e_text = element_text
-#   # if (!is.null(text)) text = sprintf("\n%s", text)
-#   
-#   if (show_title) { 
-#     title = sprintf("%s\n", main)
-#     title = title %>% strsplit("/") %>% unlist
-#     title = title[length(title)]
-#   }
-#   
-#   mapping = aes(x={{x}}, y={{y}})
-#   fill_string = deparse(substitute(fill))
-#   reorder_string = deparse(substitute(reorder))
-#   
-#   margin_lg = margin(b=0.2, unit="cm")
-#   margin_x = margin(t=margin, b=margin, unit="cm")
-#   margin_y = margin(l=margin, r=margin, unit="cm")
-#   
-#   xlab = ifelse_def(!is.null(xlab), xlab, deparse(substitute(x)))
-#   ylab = ifelse_def(!is.null(ylab), ylab, deparse(substitute(y)))
-#   
-#   if (force_bold) {
-#     plot_face = "bold"; axis_face = "bold"; 
-#     legend_face = "bold" ; text_face = "bold"; 
-#   }
-#   
-#   if (fill_string=="NULL" & !reorder) {
-#     mapping = aes(x={{x}}, y={{y}}, fill={{x}})
-#   } else if (fill_string!="NULL" & !reorder) {
-#     mapping = aes(x={{x}}, y={{y}}, fill={{fill}})
-#   } else if (fill_string=="NULL" & reorder) {
-#     mapping = aes(x=reorder({{x}}, {{y}}), y={{y}}, fill=reorder({{x}}, {{y}}))
-#   } else {
-#     mapping = aes(x=reorder({{x}}, {{y}}), y={{y}}, fill=reorder({{fill}}, {{y}}))
-#   }
-#   
-#   pl = ggplot(df, mapping) + 
-#     theme_classic() + labs(x=xlab, y=ylab, title=title) + 
-#     geom_bar(stat="identity", width=0.9) +
-#     theme(plot.margin = unit(rep(margin_pl, 4), units="cm"),
-#           plot.title = e_text(size=plot_tl, face=plot_face, hjust=0.5),
-#           axis.title = e_text(size=axis_tl, face=axis_face, hjust=0.5), 
-#           legend.title = e_text(size=legend_tl, face=legend_face, margin=margin_lg),
-#           legend.text = e_text(size=legend_tx, face=legend_face, margin=margin_lg),
-#           axis.text.x = e_text(size=axis_tx, face=axis_face, margin=margin_x), 
-#           axis.text.y = e_text(size=axis_tx, face=axis_face, margin=margin_y))
-#   
-#   if (!is.null(add)) for (i in 1:length(add)) pl = pl + add[[i]]
-#   
-#   if (save) {
-#     main = gsub("\n", " ", main)
-#     file = sprintf("%s.png", main)
-#     ggsave(file, pl, width=width, height=height, units="cm")
-#   } else print(pl)
-# }
 
 
 
@@ -282,7 +218,7 @@ Perf_Pretrain %>% plot_perf_pre(y="RMSE")
 Perf_Pretrain %>% plot_perf_pre(y="PCC")
 Perf_Pretrain %>% plot_perf_pre(y="SCC")
 
-col = c("RMSE", "MAE", "R2", "PCC", "SCC")
+col = c("RMSE", "PCC", "SCC")
 avg_plus_sd_ = function(x) sprintf("%.3f±%.3f", mean(x), sd(x))
 avg_plus_sd = function(x) ifelse(length(x)!=1, avg_plus_sd_(x), sprintf("%.3f", x))
 
@@ -438,7 +374,6 @@ compare_pretrain = function(Perf, Perf_Pre, model="DRPreter", pretrain="DRPreter
     arrange(RMSE_Median) %>% pull(by_group)
   
   Perf[[by_group]] = Perf[[by_group]] %>% factor(levels=lvl)
-  # Perf %>% compare_boxplot_pre(model, pretrain=pretrain, test_type=test_type, by=by, dir=dir, save=save)
   corr = Perf %>% compare_scatter_pre(model, pretrain=pretrain, test_type=test_type, by=by, dir=dir, save=save)
   return(corr)
 }
@@ -465,29 +400,6 @@ compare_scatter_pre = function(Perf, model="DRPreter", pretrain="DRPreter",
 
   return(corr)
 }
-
-# compare_boxplot_pre = function(Perf, model="DRPreter", pretrain="DRPreter", 
-#                                test_type="Normal", by="Cell", dir=NULL, 
-#                                axis_tl=20, axis_tx=20, legend_tl=18, legend_tx=18,
-#                                width=54, height=20, dpi=400, save=T) {
-#   
-#   legend = "Test Type"
-#   Perf$Test_Type[Perf$Test_Type==pretrain] = "Pretrain"
-#   Perf$Test_Type = Perf$Test_Type %>% factor(levels=c("Pretrain", test_type))
-#   main = sprintf("%s/Boxplot Comparison of %s RMSE [%s, Pretrain & %s]", dir, by, pretrain, test_type)
-#   
-#   if (by=="Cell") {
-#     Perf %>% boxplot_def(Cell_TCGA, RMSE, fill=Test_Type, main=main, 
-#                          xlab=NULL, ylab="Cell RMSE", axis_tl=axis_tl, axis_tx=axis_tx, 
-#                          legend_tl=legend_tl, legend_tx=legend_tx, legend=legend, 
-#                          width=width, height=height, reorder=F, force_bold=F, dpi=dpi, save=save)
-#   } else {
-#     Perf %>% boxplot_def(Drug_Pathway, RMSE, fill=Test_Type, main=main, 
-#                          xlab=NULL, ylab="Drug RMSE", axis_tl=axis_tl, axis_tx=axis_tx, 
-#                          legend_tl=legend_tl, legend_tx=legend_tx, legend=legend, 
-#                          width=width, height=height, reorder=F, force_bold=F, dpi=dpi, save=save)
-#   }
-# }
 
 
 dir = "../_performance/Performance [Cell, Drug]"
@@ -627,16 +539,19 @@ add = list(theme(legend.key.width=unit(0.8, "cm"),
 
 legend_c = bquote(PCC(RMSE[C]))
 legend_d = bquote(PCC(RMSE[D]))
+levels(Test_Corr_Pre_$Test_Type)[1] = "Unblinded"
 
-Test_Corr_Pre_ %>% grid_def(Model, Test_Type, fill=PCC_Cell_RMSE, main=main1, 
-                            legend=legend_c, color=color, add=add,
-                            round=2, size=7.2, axis_tx=20, legend_tl=20, legend_tx=20,
-                            margin_lg=0.4, width=30, height=14.4, mean_summary=F, save=T, save_svg=T)
+Test_Corr_Pre_ %>% 
+  grid_def(Model, Test_Type, fill=PCC_Cell_RMSE, main=main1, 
+           legend=legend_c, color=color, add=add,
+           round=2, size=7.2, axis_tx=20, legend_tl=20, legend_tx=20,
+           margin_lg=0.4, width=30, height=14.4, mean_summary=F, save=T, save_svg=T)
 
-Test_Corr_Pre_ %>% grid_def(Model, Test_Type, fill=PCC_Drug_RMSE, main=main2, 
-                            legend=legend_d, color=color, add=add,
-                            round=2, size=7.2, axis_tx=20, legend_tl=20, legend_tx=20,
-                            margin_lg=0.4, width=30, height=14.4, mean_summary=F, save=T, save_svg=T)
+Test_Corr_Pre_ %>% 
+  grid_def(Model, Test_Type, fill=PCC_Drug_RMSE, main=main2, 
+           legend=legend_d, color=color, add=add,
+           round=2, size=7.2, axis_tx=20, legend_tl=20, legend_tx=20,
+           margin_lg=0.4, width=30, height=14.4, mean_summary=F, save=T, save_svg=T)
 
 
 supplementary = T
@@ -666,15 +581,14 @@ if (supplementary) {
     write.xlsx(df_list, file=file, sheetName=sheets, rowNames=rowNames)
   }
   
-  
-  ### [Source Data] Supplementary Fig. 19
+  ### [Source Data] Supplementary Fig. 17
   Test_Corr_Pre_ = Test_Corr_Pre_ %>% 
     rename(PCC_Cell_RMSE=Corr_Cell_RMSE, PCC_Drug_RMSE=Corr_Drug_RMSE)
-  Test_Corr_Pre_ %>% save_for_nc(num=19, suppl=T)
+  Test_Corr_Pre_ %>% save_for_nc(num=17, suppl=T)
   
-  
-  ### [Source Data] Supplementary Fig. 20
-  Perf_Pretrain_ = Perf_Pretrain %>% rename(Num_Test=N_Test)
-  Perf_Pretrain_ %>% save_for_nc(num=20, suppl=T)
+  ### [Source Data] Supplementary Fig. 18
+  Perf_Pretrain_ = Perf_Pretrain %>% rename(Num_Test=N_Test) %>% 
+    mutate(Dataset=recode(Dataset, "GDSC"="GDSC1+2"))
+  Perf_Pretrain_ %>% save_for_nc(num=18, suppl=T)
 }
 

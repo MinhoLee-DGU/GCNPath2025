@@ -276,30 +276,28 @@ if (supplementary) {
   IC50_GDSC2_ = IC50_GDSC2[, col]
   IC50_GDSC_ = IC50_GDSC[, col]
   
-  dir = "../../processed_data/ic50_data/GDSC"
-  
-  sheets = "Supplementary Data 6"
-  file = sprintf("%s/%s.xlsx", dir, sheets)
+  sheets = "Supplementary Data 4"
+  file = sprintf("%s.xlsx", sheets)
   write.xlsx(IC50_GDSC1_, file=file, sheetName=sheets, rowNames=F)
   
-  sheets = "Supplementary Data 7"
-  file = sprintf("%s/%s.xlsx", dir, sheets)
+  sheets = "Supplementary Data 5"
+  file = sprintf("%s.xlsx", sheets)
   write.xlsx(IC50_GDSC2_, file=file, sheetName=sheets, rowNames=F)
   
-  sheets = "Supplementary Data 8"
-  file = sprintf("%s/%s.xlsx", dir, sheets)
+  sheets = "Supplementary Data 6"
+  file = sprintf("%s.xlsx", sheets)
   write.xlsx(IC50_GDSC_, file=file, sheetName=sheets, rowNames=F)
   
   
-  ### [Source Data] Supplementary Fig. 50
+  ### [Source Data] Supplementary Fig. 37
   IC50_GDSC1_Dup_ = IC50_GDSC1_List$IC50_Dup_Raw %>% subset(select=-c(TAG, AUC, AUC_Mean))
   IC50_GDSC2_Dup_ = IC50_GDSC2_List$IC50_Dup_Raw %>% subset(select=-c(TAG, AUC, AUC_Mean))
   IC50_GDSC_Dup_ = IC50_GDSC_List$IC50_Dup_Raw %>% subset(select=-c(TAG, AUC, AUC_Mean))
   df_list = list(IC50_GDSC1_Dup_, IC50_GDSC2_Dup_, IC50_GDSC_Dup_)
   
   num_fig = letters[1:3]
-  sheets = sprintf("Supplementary Fig. 50%s", num_fig)
-  file = sprintf("%s/SourceData_SupplementaryFig50.xlsx", dir)
+  sheets = sprintf("Supplementary Fig. 37%s", num_fig)
+  file = "SourceData_SupplementaryFig37.xlsx"
   write.xlsx(df_list, file=file, sheetName=sheets, rowNames=F)
 }
 

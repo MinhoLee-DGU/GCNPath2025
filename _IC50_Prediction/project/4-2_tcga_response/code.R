@@ -9,10 +9,10 @@ suppressMessages(library(SummarizedExperiment))
 source("../functions.R")
 loadings()
 
-dir = "../../processed_data/path_data"
-file = sprintf("%s/KEGG_Total_Ent.gmt", dir)
-KEGG_List = gmt2list(file)
-geneset = KEGG_List %>% unlist %>% unique   # 5365
+dir = "../../raw_data/MSigDB"
+file = sprintf("%s/c2.cp.biocarta.v2023.1.Hs.entrez.gmt", dir)
+Path_List = gmt2list(file)
+geneset = Path_List %>% unlist %>% unique   # 1509
 
 dir = "../../processed_data/cell_data/SANGER_Passports"
 
@@ -25,7 +25,7 @@ Anno_Genes = read.csv(file)
 file = sprintf("%s/TPM_Ent.csv", dir)
 SANGER_RNA_Ent = fread_def(file, check_names=F)
 
-dir = "../../processed_data/cell_data/KEGG"
+dir = "../../processed_data/cell_data/BIOCARTA"
 file = sprintf("%s/SANGER_RNA_GSVA.csv", dir)
 SANGER_RNA_GSVA = read.csv(file, row.names=1, check.names=F)
 
@@ -123,12 +123,12 @@ Anno_Genes_TCGA = Anno_Genes_TCGA %>% rbind(Anno_Genes_TCGA_)   # 98347
 Anno_Genes_TCGA$ENSEMBL %>% is.na %>% sum   # 0
 
 Anno_Genes_TCGA = Anno_Genes_TCGA %>% 
-  group_by(ENSEMBL) %>% fill(ENTREZID, SYMBOL, .direction="downup")
+  group_by(ENSEMBL) %>% tidyr::fill(ENTREZID, SYMBOL, .direction="downup")
 
 Anno_Genes_TCGA$ENTREZID %>% is.na %>% sum   # 19882
 Anno_Genes_TCGA = Anno_Genes_TCGA %>% distinct(.keep_all=T)   # 69135
-sum(geneset %in% Anno_Genes_TCGA$ENTREZID)   # 5356 [5365]
-# Most KEGG genes exist in TCGA genes
+sum(geneset %in% Anno_Genes_TCGA$ENTREZID)   # 1509 [1509]
+# All BIOCARTA genes exist in TCGA genes
 
 key %>% unique %>% length
 # 60660 [from 60660, all unique]
@@ -154,8 +154,8 @@ TCGA_RNA_Ent = log2(TCGA_RNA_Ent+1) %>% as.data.frame
 
 # Calculate GSVA pathway scores
 cores = 48
-sum(colnames(TCGA_RNA_Ent) %in% geneset)   # 5347/5365 [99.66%]
-TCGA_RNA_GSVA = TCGA_RNA_Ent %>% gsva_def(KEGG_List, method="gsva", cores=cores)
+sum(colnames(TCGA_RNA_Ent) %in% geneset)   # 1505/1509 [99.73%]
+TCGA_RNA_GSVA = TCGA_RNA_Ent %>% gsva_def(Path_List, method="gsva", cores=cores)
 
 
 # ### Cf. How many tumor-normal samples are from the same tissues?
@@ -185,7 +185,7 @@ fwrite(TCGA_RNA_Ent, row.names=T, file=file)
 file = sprintf("%s/Anno_Genes.csv", dir)
 fwrite(Anno_Genes_TCGA, file=file)
 
-dir = "../../processed_data/cell_data/KEGG"
+dir = "../../processed_data/cell_data/BIOCARTA"
 file = sprintf("%s/TCGA_RNA_GSVA.csv", dir)
 fwrite(TCGA_RNA_GSVA, row.names=T, file=file)
 
@@ -252,28 +252,31 @@ SANGER_TCGA_GSVA_PCA = rbind(SANGER_RNA_GSVA, TCGA_RNA_GSVA) %>%
 tcga_main = SANGER_TCGA_GSVA_PCA$TCGA_Code %>% 
   table %>% sort(decreasing=T) %>% head(5) %>% names
 
+xlim = SANGER_TCGA_GSVA_PCA$PC1 %>% range
+ylim = SANGER_TCGA_GSVA_PCA$PC2 %>% range
+xlim = c(xlim[1]-0.1, xlim[2]+0.1)
+ylim = c(ylim[1]-0.1, ylim[2]+0.1)
+
 dir_ = "GSVA_Analysis/Batch Correction [TCGA]"
-dir = mkdir(sprintf("../../processed_data/cell_data/KEGG/%s", dir_))
+dir = mkdir(sprintf("../../processed_data/cell_data/BIOCARTA/%s", dir_))
 
 file = sprintf("%s/PC2 Plot [GSVA]", dir)
 SANGER_TCGA_GSVA_PCA %>% arrange(Database) %>% 
   plot_def(PC1, PC2, color=Database, main=file, 
-           xlab="PC1", ylab="PC2", alpha=0.8, size=0.8, 
-           width=20, height=16, force_bold=T, save=T)
+           xlim=xlim, ylim=ylim, xlab="PC1", ylab="PC2", 
+           alpha=0.8, size=0.8, width=20, height=16, force_bold=T, save=T)
 
 file = sprintf("%s/PC2 Plot [GSVA, SANGER, Top 5]", dir)
 SANGER_TCGA_GSVA_PCA %>% subset(Database=="SANGER" & TCGA_Code %in% tcga_main) %>% 
   plot_def(PC1, PC2, color=TCGA_Code, main=file, 
-           xlim=c(-18, 18), ylim=c(-15, 20), 
-           xlab="PC1", ylab="PC2", alpha=0.8, size=2, 
-           width=20, height=16, force_bold=T, save=T)
+           xlim=xlim, ylim=ylim, xlab="PC1", ylab="PC2", 
+           alpha=0.8, size=2, width=20, height=16, force_bold=T, save=T)
 
 file = sprintf("%s/PC2 Plot [GSVA, TCGA, Top 5]", dir)
 SANGER_TCGA_GSVA_PCA %>% subset(Database=="TCGA" & TCGA_Code %in% tcga_main) %>% 
   plot_def(PC1, PC2, color=TCGA_Code, main=file, 
-           xlim=c(-18, 18), ylim=c(-15, 20), 
-           xlab="PC1", ylab="PC2", alpha=0.8, size=1.2, 
-           width=20, height=16, force_bold=T, save=T)
+           xlim=xlim, ylim=ylim, xlab="PC1", ylab="PC2", 
+           alpha=0.8, size=1.2, width=20, height=16, force_bold=T, save=T)
 
 
 file = sprintf("%s/PCA_GSVA.csv", dir)
@@ -394,7 +397,7 @@ write.csv(SANGER_TCGA_GSVA_PCA, file=file, row.names=T)
 # identical(rownames(SANGER_TCGA_RNA), rownames(SANGER_TCGA_RNA_CB1))
 # identical(colnames(SANGER_TCGA_RNA), colnames(SANGER_TCGA_RNA_CB1))
 # identical(SANGER_TCGA_RNA[idx, ], SANGER_TCGA_RNA_CB1[idx, ])   # T
-# TCGA_RNA_GSVA_CB1 = SANGER_TCGA_RNA_CB1[-idx, ] %>% gsva_def(KEGG_List, method="gsva", cores=cores)
+# TCGA_RNA_GSVA_CB1 = SANGER_TCGA_RNA_CB1[-idx, ] %>% gsva_def(Path_List, method="gsva", cores=cores)
 # 
 # identical(colnames(SANGER_RNA_GSVA), colnames(TCGA_RNA_GSVA_CB1))   # T
 # SANGER_TCGA_GSVA_PCA_CB1 = rbind(SANGER_RNA_GSVA, TCGA_RNA_GSVA_CB1) %>% 
@@ -437,7 +440,7 @@ write.csv(SANGER_TCGA_GSVA_PCA, file=file, row.names=T)
 # identical(rownames(SANGER_TCGA_RNA), rownames(SANGER_TCGA_RNA_CB2))
 # identical(colnames(SANGER_TCGA_RNA), colnames(SANGER_TCGA_RNA_CB2))
 # identical(SANGER_TCGA_RNA[idx, ], SANGER_TCGA_RNA_CB2[idx, ])   # T
-# TCGA_RNA_GSVA_CB2 = SANGER_TCGA_RNA_CB2[-idx, ] %>% gsva_def(KEGG_List, method="gsva", cores=cores)
+# TCGA_RNA_GSVA_CB2 = SANGER_TCGA_RNA_CB2[-idx, ] %>% gsva_def(Path_List, method="gsva", cores=cores)
 # 
 # identical(colnames(SANGER_RNA_GSVA), colnames(TCGA_RNA_GSVA_CB2))   # T
 # SANGER_TCGA_GSVA_PCA_CB2 = rbind(SANGER_RNA_GSVA, TCGA_RNA_GSVA_CB2) %>% 
@@ -467,7 +470,7 @@ write.csv(SANGER_TCGA_GSVA_PCA, file=file, row.names=T)
 
 ### 4. PCA Plot [GSVA]
 
-# dir = "../../processed_data/KEGG/GSVA_Analysis/SANGER & TCGA"
+# dir = "../../processed_data/BIOCARTA/GSVA_Analysis/SANGER & TCGA"
 
 # file1 = sprintf("%s/SANGER_TCGA_RNA.csv", dir)
 # file2 = sprintf("%s/SANGER_TCGA_RNA_CB1.csv", dir)
@@ -670,8 +673,10 @@ TCGA_Resp = TCGA_Resp %>% subset(Patient %in% pat_rna) %>%
 # Match RNA-Seq Samples-Patients
 col = c("cases", "sample_type", "cases.submitter_id")
 TCGA_Resp = left_join(TCGA_Resp, TCGA_Info[, col], by=c("Patient"="cases.submitter_id"))
-TCGA_Resp = TCGA_Resp %>% mutate(Sample=cases, Sample_Type=sample_type) %>% 
-  relocate(Patient, Sample, Sample_Type, .before=everything()) %>% 
+
+TCGA_Resp = TCGA_Resp %>% 
+  mutate(Sample=cases, Sample_Type=sample_type) %>% 
+  relocate(Patient, Sample, Sample_Type, TCGA_Code, .before=everything()) %>% 
   select(subset=-c(cases, sample_type)) %>% as.data.frame   # 414
 
 class_resp = c("Complete Response", "Partial Response")
@@ -743,7 +748,7 @@ write.csv(Anno_Drugs_TCGA, row.names=F, file=file)
 
 
 if (supplementary) {
-  ### Supplementary Data 11
+  ### Supplementary Data 9
   col = c("Drug_Name", "Drug_CID", "GDSC", "Inchi_Key", "SMILES_Can")
   TCGA_Drug_Info_ = TCGA_Drug_Info[, col]
   colnames(TCGA_Drug_Info_)[3:5] = c("GDSC_Drug", "InCHI_Key", "Canonical_SIMLES")
@@ -759,15 +764,17 @@ if (supplementary) {
     left_join(TCGA_Resp_Num, by="Drug_CID") %>% 
     relocate(Num_CR, Num_PR, Num_SD, Num_PD, .after=GDSC_Drug) %>% as.data.frame
   
-  sheet = "Supplementary Data 11"
-  dir = "../../processed_data/cell_data/TCGA"
-  file = sprintf("%s/%s.xlsx", dir, sheet)
+  sheet = "Supplementary Data 9"
+  file = sprintf("%s.xlsx", sheet)
   write.xlsx(TCGA_Drug_Info_, file=file, rowNames=F)
   
   
-  ### Supplementary Data 12
-  sheet = "Supplementary Data 12"
-  dir = "../../processed_data/cell_data/TCGA"
-  file = sprintf("%s/%s.xlsx", dir, sheet)
-  write.xlsx(TCGA_Resp, file=file, sheetName=sheet, rowNames=F)
+  ### Supplementary Data 10
+  TCGA_Resp_ = TCGA_Resp %>% 
+    rename(Cancer_Type=TCGA_Code) %>% 
+    relocate(Cancer_Type, .after=Sample_Type)
+  
+  sheet = "Supplementary Data 10"
+  file = sprintf("%s.xlsx", sheet)
+  write.xlsx(TCGA_Resp_, file=file, sheetName=sheet, rowNames=F)
 }

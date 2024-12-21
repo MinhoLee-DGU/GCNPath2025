@@ -126,8 +126,6 @@ calc_perf = function(Pred, sum_seed=F, test_db=F, cells_no=NULL, drugs_no=NULL, 
     group_by(across(all_of(col_by))) %>% 
     summarize(N_Test = n(),
               RMSE = RMSE(LN_IC50, Prediction),
-              MAE = MAE(LN_IC50, Prediction), 
-              R2 = R2(LN_IC50, Prediction),
               PCC = cor(LN_IC50, Prediction), 
               SCC = cor(LN_IC50, Prediction, method="spearman"))
   
@@ -136,7 +134,7 @@ calc_perf = function(Pred, sum_seed=F, test_db=F, cells_no=NULL, drugs_no=NULL, 
   return(Perf)
 }
 
-pattern = "pred_chembl_([0-9]+).csv"
+pattern = "pred_chembl_seed([0-9]+).csv"
 pattern_tcnns = "pred_chembl_seed([0-9]+)_([0-9]+).csv"
 
 dir = "../tCNNS/Results/IC50_GDSC/Normal"
@@ -230,14 +228,50 @@ count_num = function(Pred, seed_ex=2030) {
 
 Pred_ChEMBL = Pred_ChEMBL %>% filter_pair(model_list=model_list)   # 29855890 > 26432340
 Pred_ChEMBL = Pred_ChEMBL %>% subset(SANGER_MODEL_ID %in% cells_train & !Drug_GDSC)   # 26432340 > 26141060
-Pred_Num = Pred_ChEMBL %>% count_num(seed_ex=2030)   # 237646
+Pred_Num = Pred_ChEMBL %>% count_num(seed_ex=2030)   # 237646 IC50 for each model
+
+
+# cf. Duplicated synonyms of SIDM00210 [A2780/A2780S]
+# In SANGER Passports, two cell lines were considered as identified ones...
+# For simplicity, we chose A2780...
+
+col = c("Cell_ChEMBL_ID", "SANGER_MODEL_ID", "BROAD_ID", "COSMIC_ID", "Cell_Line_Name")
+Anno_Cells_ChEMBL = Pred_ChEMBL[, col, with=F] %>% distinct   # 404 x 3
+Anno_Cells_ChEMBL$Cell_ChEMBL_ID %>% unique %>% length        # 405
+Anno_Cells_ChEMBL$SANGER_MODEL_ID %>% unique %>% length       # 404
+Anno_Cells_ChEMBL %>% group_by(SANGER_MODEL_ID) %>% filter(n()>1)
+# CHEMBL3308421  SIDM00210       ACH-000657    906804 A2780         
+# CHEMBL4295440  SIDM00210       ACH-000657    906804 A2780S
+
+# dir = "../../processed_data/cell_data/SANGER_Passports"
+# file = sprintf("%s/Anno_Cells.csv", dir)
+# Anno_Cells = read.csv(file)
+# 
+# col = c("SANGER_MODEL_ID", "MODEL_NAME", "SYNONYMS")
+# Anno_Cells[, col] %>% subset(MODEL_NAME=="A2780")
+# # SANGER_MODEL_ID MODEL_NAME SYNONYMS
+# #       SIDM00210      A2780   A2780S
+# 
+# dir = "../../raw_data/SANGER_Passports"
+# file = sprintf("%s/model_list_20230517.csv", dir)
+# Anno_Cells_SANGER = read.csv(file)
+# 
+# col = c("model_id", "model_name", "synonyms")
+# Anno_Cells_SANGER[, col] %>% subset(model_name=="A2780")
+# #  model_id model_name synonyms
+# # SIDM00210      A2780   A2780S
+
+# For simplicity, we chose A2780...
+# IC50_GDSC %>% subset(grepl("A2780", CELL_LINE_NAME, ignore.case=T)) %>% pull(CELL_LINE_NAME) %>% unique   # A2780
+Pred_ChEMBL = Pred_ChEMBL %>% subset(Cell_ChEMBL_ID!="CHEMBL4295440")   # 26141060 > 26133800
+Pred_Num = Pred_ChEMBL %>% count_num(seed_ex=2030)   # 237580 IC50 for each model
 
 
 
 ##### 3. Performance [Regression]
 
 Perf_ChEMBL = Pred_ChEMBL %>% calc_perf(sum_seed=F)
-col = c("RMSE", "MAE", "R2", "PCC", "SCC")
+col = c("RMSE", "PCC", "SCC")
 avg_plus_sd = function(x) sprintf("%.3f±%.3f", mean(x), sd(x))
 Perf_ChEMBL_Avg = Perf_ChEMBL %>% group_by(Model) %>%
   reframe(N_Test=max(N_Test), across(all_of(col), avg_plus_sd)) %>% distinct %>% as.data.frame
@@ -260,7 +294,7 @@ select_best_seed = function(Pred, Perf_Best, test_db=F) {
 }
 
 Perf_ChEMBL_Best = Perf_ChEMBL %>% group_by(Model) %>% filter(RMSE==min(RMSE)) %>% as.data.frame
-Pred_ChEMBL_Best = Pred_ChEMBL %>% select_best_seed(Perf_Best=Perf_ChEMBL_Best)   # 2614106
+Pred_ChEMBL_Best = Pred_ChEMBL %>% select_best_seed(Perf_Best=Perf_ChEMBL_Best)   # 2613380
 
 draw_pred = F
 dir = mkdir("Performance")
@@ -294,12 +328,16 @@ is_inf_def = function(x) {
 }
 
 Pred_ChEMBL %>% subset(Model=="tCNNS") %>% pull(Prediction) %>% is_inf_def
-# Infinite (+) : 221745
-# Infinite (-) : 162343
+# Total : 2375800
+# Infinite (+) : 221708
+# Infinite (-) : 162319
+# Infinite (Total) : 384027
 
 Pred_ChEMBL_Best %>% subset(Model=="tCNNS") %>% pull(Prediction) %>% is_inf_def
-# Infinite (+) : 29234
+# Total : 237580
+# Infinite (+) : 29231
 # Infinite (-) : 2
+# Infinite (Total) : 29233
 
 
 
@@ -375,11 +413,11 @@ Pred_ChEMBL_C$Test_DB = "CCLE"
 Pred_ChEMBL_S$Test_DB = "SANGER"
 
 # Get only Cell x Drug combinations from original test
-tag_ref = Pred_ChEMBL %>% with(paste0(Cell_ChEMBL_ID, "@", Molecule_ChEMBL_ID)) %>% unique   # 237646
+tag_ref = Pred_ChEMBL %>% with(paste0(Cell_ChEMBL_ID, "@", Molecule_ChEMBL_ID)) %>% unique   # 237580
 
-Pred_ChEMBL_G = Pred_ChEMBL_G %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 20275690 > 19011680
-Pred_ChEMBL_C = Pred_ChEMBL_C %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 16065540 > 14258760
-Pred_ChEMBL_S = Pred_ChEMBL_S %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 10989110 > 9505840
+Pred_ChEMBL_G = Pred_ChEMBL_G %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 20275690 > 19006400
+Pred_ChEMBL_C = Pred_ChEMBL_C %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 16065540 > 14254800
+Pred_ChEMBL_S = Pred_ChEMBL_S %>% filter_pair(model_list=NULL, tag_ref=tag_ref)   # 10989110 > 9503200
 
 count_num_db = function(Pred, seed_ex=2030) {
   ulen = function(x) length(unique(x))
@@ -394,7 +432,7 @@ count_num_db = function(Pred, seed_ex=2030) {
   return(Stat_Num)
 }
 
-Pred_ChEMBL_Ext = Reduce(rbind, list(Pred_ChEMBL_G, Pred_ChEMBL_C, Pred_ChEMBL_S))   # 42776280
+Pred_ChEMBL_Ext = Reduce(rbind, list(Pred_ChEMBL_G, Pred_ChEMBL_C, Pred_ChEMBL_S))   # 42764400
 Pred_Num_Ext = Pred_ChEMBL_Ext %>% count_num_db(seed_ex=2030)
 
 levels = c("GDSC", "CCLE", "SANGER")
@@ -404,8 +442,8 @@ Pred_Num_Ext = Pred_Num_Ext %>%
   arrange(Model, Test_DB) %>% as.data.frame
 
 # Fortunately, All cell x drug combinations from original test exist in external test
-Pred_Num$IC50 %>% unique       # 237646
-Pred_Num_Ext$IC50 %>% unique   # 237646
+Pred_Num$IC50 %>% unique       # 237580 IC50 for each model
+Pred_Num_Ext$IC50 %>% unique   # 237580 IC50 for each model
 
 
 
@@ -414,7 +452,7 @@ Pred_Num_Ext$IC50 %>% unique   # 237646
 Perf_ChEMBL_Ext = Pred_ChEMBL_Ext %>% 
   calc_perf(sum_seed=F, test_db=T)   # 180 [9 x 2 x 10]
 
-col = c("RMSE", "MAE", "R2", "PCC", "SCC")
+col = c("RMSE", "PCC", "SCC")
 avg_plus_sd = function(x) sprintf("%.3f±%.3f", mean(x), sd(x))
 Perf_ChEMBL_Ext_Avg = Perf_ChEMBL_Ext %>% group_by(Model, Test_DB) %>%
   reframe(N_Test=max(N_Test), across(all_of(col), avg_plus_sd)) %>% distinct %>% as.data.frame   # 18
@@ -422,7 +460,7 @@ Perf_ChEMBL_Ext_Avg = Perf_ChEMBL_Ext %>% group_by(Model, Test_DB) %>%
 Perf_ChEMBL_Ext_Best = Perf_ChEMBL_Ext %>% 
   group_by(Model, Test_DB) %>% filter(RMSE==min(RMSE)) %>% as.data.frame   # 18
 Pred_ChEMBL_Ext_Best = Pred_ChEMBL_Ext %>% 
-  select_best_seed(Perf_Best=Perf_ChEMBL_Ext_Best, test_db=T)   # 42776280 > 4277628
+  select_best_seed(Perf_Best=Perf_ChEMBL_Ext_Best, test_db=T)   # 42764400 > 4276440
 
 
 # Boxplot
@@ -456,11 +494,11 @@ append_def = function(A, ...) {
 }
 
 plot_perf = function(Perf_List, score="RMSE", dir=".", models_no=NULL, 
-                     col_highlight="firebrick2", test_db=T, scale_y=F, 
+                     col_highlight="firebrick3", test_db=T, ymax=NULL,
                      axis_tl=36, axis_tx=24, legend_tl=27, legend_tx=27, size_point=5,
                      alpha=0.9, margin=0.6, pos_dodge=0.8, width=30, height=20, save=F) {
   
-  # [score] RMSE, PCC, R2
+  # [score] RMSE, PCC, SCC
   suppressMessages(library(ggtext))
   pos = position_dodge(pos_dodge)
   if (!is.null(models_no)) models_no = paste(models_no, collapse=" & ")
@@ -471,8 +509,27 @@ plot_perf = function(Perf_List, score="RMSE", dir=".", models_no=NULL,
     ifelse(grepl(pattern, x), glue("<b style='font-family:{family}; color:{color}'>{x}</b>"), x)
   }
   
+  if (!test_db) col_highlight = "#206ba3"
   highlight_x = function(x) highlight(x, "GCNPath", color=col_highlight, family="bold")
   add_common = list(scale_x_discrete(labels=highlight_x), theme(axis.text.x=element_markdown()))
+  
+  if (!is.null(ymax)) {
+    # Outliers more than ymax are ignored in boxplots...
+    group = "Model"
+    if (test_db) group = group %>% c("Test_DB")
+    Perf_List = Perf_List %>% group_by(across(all_of(group))) %>%
+      mutate(All_Filter = all(!!sym(score) > ymax)) %>% ungroup() %>%
+      filter(!!sym(score) <= ymax | All_Filter) %>%
+      mutate(RMSE = ifelse(All_Filter, ymax*100, RMSE)) %>% 
+      group_by(Model) %>% filter(!all(All_Filter))
+    
+    y = Perf_List[[score]]
+    ylim = c(min(y)-0.01, max(y[y <= ymax]+0.01))
+    add_ylim = coord_cartesian(ylim=ylim)
+    add_common = add_common %>% c(add_ylim)
+  }
+  
+  Perf_List = Perf_List %>% mutate(Model=droplevels(Model)) %>% as.data.frame
   
   if (test_db) {
     Perf_Sum = Perf_List %>% group_by(Model, Test_DB, Train_DB) %>% 
@@ -485,26 +542,23 @@ plot_perf = function(Perf_List, score="RMSE", dir=".", models_no=NULL,
     pl_mark2 = geom_point(data=Perf_Sum, aes(Model, Median, fill=Test_DB),
                           color="springgreen", shape=17, size=size_point-1, position=pos_mark, show.legend=F)
     
-    ylim = range(Perf_List[, score])
-    ylim = c(ylim[1]-0.1, ylim[2]+0.1)
     color = RColorBrewer::brewer.pal(8, "Reds")[c(8, 6, 2)]
-    scale_y_axis = coord_trans(y="sqrt", ylim=ylim)
     
-    pos_legend = theme(legend.position="bottom")
     margin1 = margin(0, 1.0, 0, 1.0, unit="cm")
     margin2 = margin(0, 0.5, 0, 0.25, unit="cm")
-    margin_lg = theme(legend.title=element_text(size=legend_tl, margin=margin1), 
-                      legend.text=element_text(size=legend_tx, margin=margin2))
+    theme_lg = theme(legend.position="bottom",
+                     legend.key.size=unit(1.25, 'cm'),
+                     legend.title=element_text(size=legend_tl, margin=margin1), 
+                     legend.text=element_text(size=legend_tx, margin=margin2))
     
-    add = list(scale_fill_manual(values=color), pl_mark1, pl_mark2, pos_legend, margin_lg)
+    add = list(scale_fill_manual(values=color), pl_mark1, pl_mark2, theme_lg)
     add = add %>% c(add_common)
-    if (scale_y) add = add %>% append_def(scale_y_axis)
     
     if (is.null(models_no)) {
       main = sprintf("%s/Performances [%s, RNA Batch Effect]", dir, score)
     } else main = sprintf("%s/Performances [%s, RNA Batch Effect, Except %s]", dir, score, models_no)
     
-    Perf_List %>% boxplot_def(Model, object(score), fill=Test_DB,
+    Perf_List %>% boxplot_def(Model, object(score), fill=Test_DB, 
                               main=main, ylab=score, alpha=alpha, pos=pos, legend="Dataset",
                               axis_tl=axis_tl, axis_tx=axis_tx, vjust=1, hjust=1, add=add,
                               legend_tl=legend_tl, legend_tx=legend_tx, margin=margin,
@@ -515,105 +569,17 @@ plot_perf = function(Perf_List, score="RMSE", dir=".", models_no=NULL,
       main = sprintf("%s/Performances [%s]", dir, score)
     } else main = sprintf("%s/Performances [%s, Except %s]", dir, score, models_no)
     
-    Perf_List %>% boxplot_def(Model, object(score), legend=F,
-                              main=main, ylab=score, alpha=alpha, pos=pos, add=add_common,
-                              axis_tl=axis_tl, axis_tx=axis_tx, vjust=1, hjust=1, margin=margin,
-                              width=width, height=height, save=save, save_svg=T)
-  }
-}
-
-plot_perf_bar = function(Perf_List, score="RMSE", col_highlight="firebrick2",  
-                         dir=NULL, test_db=T, point=F, pos_dodge=0.8, 
-                         axis_tl=36, axis_tx=24, legend_tl=22.5, legend_tx=22.5, 
-                         size_point=4.5, width=18, height=15, reorder_score=F, models_no=NULL, save=T) {
-  
-  # width=30, height=18
-  suppressMessages(library(ggtext))
-  suppressMessages(library(ggpubr))
-  
-  highlight = function(x, pattern, color="black", family="") {
-    suppressMessages(library(glue))
-    suppressMessages(library(ggtext))
-    ifelse(grepl(pattern, x), glue("<b style='font-family:{family}; color:{color}'>{x}</b>"), x)
-  }
-  
-  pos = position_dodge(pos_dodge)
-  if (!is.null(models_no)) models_no = paste(models_no, collapse=" & ")
-  
-  font1 = font("ylab", size=axis_tl, margin=margin(r=10, unit="pt"))
-  font2 = font("x.text", color="grey30", size=axis_tx, margin=margin(t=10, unit="pt"))
-  font3 = font("y.text", color="grey30", size=axis_tx, margin=margin(r=10, unit="pt"))
-  font4 = font("legend.title", size=legend_tl)
-  font5 = font("legend.text", size=legend_tx)
-  
-  font = font1 + font2 + font3 + font4 + font5
-  color = RColorBrewer::brewer.pal(8, "Reds")[c(8, 6, 2)]
-  main = sprintf("%s/Performance [%s]", dir, score)
-  # levels(Perf_List$Model)[levels(Perf_List$Model)=="GCNPath"] = "<b>GCNPath</b>"
-  
-  if (!is.null(models_no)) {
-    Perf_List = Perf_List %>% subset(!(Model %in% models_no))
-    Perf_List$Model = Perf_List$Model %>% base::droplevels()
-    main = sprintf("%s/Performance [%s, (Except)]", dir, score)
-  }
-  
-  if (reorder_score) {
-    lvl_models = Perf_List %>% group_by(Model) %>%
-      summarise(Mean=mean(object(score), na.rm=T)) %>%
-      arrange(desc(Mean)) %>% pull(Model)
-    if (!(score %in% c("RMSE", "MAE"))) {
-      lvl_models = lvl_models %>% rev
-    }
-    Perf_List$Model = Perf_List$Model %>% factor(levels=lvl_models)
-  }
-  
-  yval = Perf_List[[score]]
-  highlight_x = function(x) highlight(x, "GCNPath", color=col_highlight, family="bold")
-  # sd_max = Perf_List %>% group_by(Model) %>%
-  #   summarise(Mean=mean(object(score), na.rm=T),
-  #             SD=sd(object(score)), na.rm=T) %>%
-  #   filter(Mean==max(Mean)) %>% pull(SD)
-  
-  if (score %in% c("RMSE", "MAE")) {
-    ymin = min(yval, na.rm=T)-0.002
-    ymax = max(yval, na.rm=T)+0.002
-  } else {
-    ymin = max(min(yval, na.rm=T)-0.002, -1)
-    ymax = min(max(yval, na.rm=T)+0.002, 1)
-  }
-  
-  if (test_db) {
-    Perf_Sum = Perf_List %>% group_by(Model, Test_DB, Train_DB) %>% 
-      summarise(Median=median(object(score))) %>% as.data.frame
-    Perf_Sum$Median[!Perf_Sum$Train_DB] = NA
+    models = Perf_List$Model %>% unique %>% as.character
+    color = rep("#66b3ed", length(models)-1) %>% c("royalblue3")
+    names(color) = c(models[models!="GCNPath"], "GCNPath")
+    add = list(scale_fill_manual(values=color))
+    add = add %>% c(add_common)
     
-    pos_mark = position_dodge2(width=pos_dodge, preserve="single")
-    pl_mark1 = geom_point(data=Perf_Sum, aes(Model, Median, fill=Test_DB), 
-                          color="grey30", shape=17, size=size_point, position=pos_mark, show.legend=F)
-    pl_mark2 = geom_point(data=Perf_Sum, aes(Model, Median, fill=Test_DB),
-                          color="springgreen", shape=17, size=size_point-1, position=pos_mark, show.legend=F)
-    
-    pl = Perf_List %>%
-      ggbarplot(x="Model", y=score, color="black", fill="Test_DB",
-                xlab=F, add="mean_se", position=pos) +
-      scale_fill_manual(values=color) + pl_mark1 + pl_mark2
-  } else {
-    pl = Perf_List %>%
-      ggbarplot(x="Model", y=score, color="black", fill="#539ed6",
-                xlab=F, add="mean_se", position=pos)
-    # [V0] fill=color[1]
-    # [V1] fill="#ff4d59"
-    # [V2] fill="#539ed6"
+    Perf_List %>% boxplot_def(Model, object(score), fill=Model, legend=F,
+                              main=main, ylab=score, alpha=alpha, pos=pos, add=add,
+                              axis_tl=axis_tl, axis_tx=axis_tx, vjust=1, hjust=1, 
+                              margin=margin, width=width, height=height, save=save, save_svg=T)
   }
-  
-  pl = pl + font + rotate_x_text(30)
-  pl = pl %>% ggpar(ylim=c(ymin, ymax))
-  pl = pl + scale_x_discrete(labels=highlight_x) + theme(axis.text.x=element_markdown())
-  if (point) pl = pl + geom_point(alpha=0.5)
-  
-  if (save) {
-    pl %>% save_fig_ggpubr(main=main, width=width, height=height, svg=T)
-  } else print(pl)
 }
 
 score = c("RMSE", "PCC", "SCC")
@@ -626,77 +592,21 @@ Perf_ChEMBL %>% plot_perf(score=score[2], dir=dir, save=T, test_db=F,
 Perf_ChEMBL %>% plot_perf(score=score[3], dir=dir, save=T, test_db=F, 
                           axis_tl=27, axis_tx=16.5, width=20, height=15)
 
-# dir = mkdir("Performances [Total, Barplot]")
-# Perf_ChEMBL %>% plot_perf_bar(score=score[1], dir=dir, save=T, test_db=F, width=20, height=15)
-# Perf_ChEMBL %>% plot_perf_bar(score=score[2], dir=dir, save=T, test_db=F, width=20, height=15)
-# Perf_ChEMBL %>% plot_perf_bar(score=score[3], dir=dir, save=T, test_db=F, width=20, height=15)
-
-
-models_no = c("tCNNS", "PaccMann_SG")
-models_no_ = paste(models_no, collapse=" & ")
-dir = mkdir(sprintf("Performances [Total, Except %s]", models_no_))
-
-Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[1], dir=dir, save=T, test_db=F, 
-            models_no=models_no, axis_tl=27, axis_tx=18, width=20, height=15)
-Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[2], dir=dir, save=T, test_db=F, 
-            models_no=models_no, axis_tl=27, axis_tx=18, width=20, height=15)
-Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[3], dir=dir, save=T, test_db=F, 
-            models_no=models_no, axis_tl=27, axis_tx=18, width=20, height=15)
-
-# dir = mkdir(sprintf("Performances [Total, Except %s, Barplot]", models_no_))
-# 
-# Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-#   plot_perf_bar(score=score[1], dir=dir, save=T, test_db=F, 
-#                 models_no=models_no, width=20, height=15)
-# Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-#   plot_perf_bar(score=score[2], dir=dir, save=T, test_db=F, 
-#                 models_no=models_no, width=20, height=15)
-# Perf_ChEMBL %>% subset(!(Model %in% models_no)) %>%
-#   plot_perf_bar(score=score[3], dir=dir, save=T, test_db=F, 
-#                 models_no=models_no, width=20, height=15)
-
+dir = mkdir("Performances [Total, RMSE<5]")
+Perf_ChEMBL %>% 
+  plot_perf(score=score[1], dir=dir, test_db=F, ymax=5,
+            axis_tl=27, axis_tx=16.5, width=20, height=15, save=T)
 
 dir = mkdir("Performances [RNA Batch Effect]")
 Perf_ChEMBL_Total %>% plot_perf(score=score[1], dir=dir, width=27, height=20, save=T, test_db=T)
 Perf_ChEMBL_Total %>% plot_perf(score=score[2], dir=dir, width=27, height=20, save=T, test_db=T)
 Perf_ChEMBL_Total %>% plot_perf(score=score[3], dir=dir, width=27, height=20, save=T, test_db=T)
 
-# dir = mkdir("Performances [RNA Batch Effect, Barplot]")
-# Perf_ChEMBL_Total %>% plot_perf_bar(score=score[1], axis_tl=24, axis_tx=20, dir=dir, save=T, test_db=T)
-# Perf_ChEMBL_Total %>% plot_perf_bar(score=score[2], axis_tl=24, axis_tx=20, dir=dir, save=T, test_db=T)
-# Perf_ChEMBL_Total %>% plot_perf_bar(score=score[3], axis_tl=24, axis_tx=20, dir=dir, save=T, test_db=T)
+dir = mkdir("Performances [RNA Batch Effect, RMSE<5]")
+Perf_ChEMBL_Total %>% 
+  plot_perf(score=score[1], dir=dir, width=27, height=20, ymax=5, save=T, test_db=T)
 
-# models_no = c("HiDRA", "PaccMann_SG")
-models_no = "PaccMann_SG"
-models_no_ = paste(models_no, collapse=" & ")
-dir = mkdir(sprintf("Performances [RNA Batch Effect, Except %s]", models_no_))
-
-Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[1], dir=dir, save=T, test_db=T, 
-            width=32, axis_tx=30, models_no=models_no, size_point=6)
-Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[2], dir=dir, save=T, test_db=T, 
-            width=32, axis_tx=30, models_no=models_no, size_point=6)
-Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>%
-  plot_perf(score=score[3], dir=dir, save=T, test_db=T, 
-            width=32, axis_tx=30, models_no=models_no, size_point=6)
-
-# dir = mkdir(sprintf("Performances [RNA Batch Effect, Except %s, Barplot]", models_no_))
-# 
-# Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>% 
-#   plot_perf_bar(score=score[1], dir=dir, save=T, test_db=T, 
-#                 width=24, axis_tl=24, axis_tx=24, models_no=models_no, size_point=6)
-# Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>% 
-#   plot_perf_bar(score=score[2], dir=dir, save=T, test_db=T, 
-#                 width=24, axis_tl=24, axis_tx=24, models_no=models_no, size_point=6)
-# Perf_ChEMBL_Total %>% subset(!(Model %in% models_no)) %>% 
-#   plot_perf_bar(score=score[3], dir=dir, save=T, test_db=T, 
-#                 width=24, axis_tl=24, axis_tx=24, models_no=models_no, size_point=6)
-
-col = c("RMSE", "MAE", "R2", "PCC", "SCC")
+col = c("RMSE", "PCC", "SCC")
 avg_plus_sd = function(x) sprintf("%.3f±%.3f", mean(x), sd(x))
 Perf_ChEMBL_Total_Avg = Perf_ChEMBL_Total %>% group_by(Model, Test_DB) %>%
   reframe(N_Test=max(N_Test), across(all_of(col), avg_plus_sd)) %>% distinct %>% as.data.frame   # 18
@@ -797,10 +707,6 @@ wilcox_model_grid = function(Perf_UTest, fdr_adjust=T, models=NULL, main=NULL, l
     legend2 = bquote(atop("-Log"["10"](FDR), p(PCC["y"]>PCC["x"])))
     legend3 = bquote(atop("-Log"["10"](FDR), p(SCC["y"]>SCC["x"])))
     
-    # legend1 = bquote(bold(atop(-log["10"](FDR), p(RMSE["y"]<RMSE["x"]))))
-    # legend2 = bquote(bold(atop(-log["10"](FDR), p(PCC["y"]>PCC["x"]))))
-    # legend3 = bquote(bold(atop(-log["10"](FDR), p(SCC["y"]>SCC["x"]))))
-    
     Perf_UTest = Perf_UTest %>% 
       mutate(Pval_RMSE_Log=-log(FDR_RMSE, 10), 
              Pval_PCC_Log=-log(FDR_PCC, 10), 
@@ -809,10 +715,6 @@ wilcox_model_grid = function(Perf_UTest, fdr_adjust=T, models=NULL, main=NULL, l
     legend1 = bquote(atop("-Log"["10"](Pval), p(RMSE["y"]<RMSE["x"])))
     legend2 = bquote(atop("-Log"["10"](Pval), p(PCC["y"]>PCC["x"])))
     legend3 = bquote(atop("-Log"["10"](Pval), p(SCC["y"]>SCC["x"])))
-    
-    # legend1 = bquote(bold(atop(-log["10"](Pval), p(RMSE["y"]<RMSE["x"]))))
-    # legend2 = bquote(bold(atop(-log["10"](Pval), p(PCC["y"]>PCC["x"]))))
-    # legend3 = bquote(bold(atop(-log["10"](Pval), p(SCC["y"]>SCC["x"]))))
     
     Perf_UTest = Perf_UTest %>% 
       mutate(Pval_RMSE_Log=-log(Pval_RMSE, 10), 
@@ -917,18 +819,25 @@ Cell_Drug_Pair = data.frame(
   Drug_ChEMBL_ID = gsub("(.*)@(.*)", "\\2", tag_ref)
 )
 
+col = c("Cell_ChEMBL_ID", "SANGER_MODEL_ID", "BROAD_ID", "COSMIC_ID")
+Anno_Cells_ChEMBL = Pred_ChEMBL[, col, with=F] %>% distinct   # 404 x 3
+
 file = "Cell_Drug_Pair.csv"
 fwrite(Cell_Drug_Pair, file=file)
+
+file = "Anno_Cells_ChEMBL.csv"
+fwrite(Anno_Cells_ChEMBL, file=file)
 
 dir = "Performance"
 file = sprintf("%s/Prediction.csv", dir)
 fwrite(Pred_ChEMBL, file=file)
 
-# Cf. PaccMann
-dir = "../PaccMann/data/gene_expression"
-file = sprintf("%s/gdsc-rnaseq_gene-expression.csv", dir)
-cells_paccmann = fread_def(file) %>% rownames
-Pred_ChEMBL[Model=="GCNPath" & Seed==2021 & Cell_Line_Name %in% cells_paccmann, ] %>% nrow   # 60539
+# # Cf. PaccMann
+# dir = "../PaccMann/data/gene_expression"
+# file = sprintf("%s/gdsc-rnaseq_gene-expression.csv", dir)
+# cells_paccmann = fread_def(file) %>% rownames
+# Pred_ChEMBL[Model=="GCNPath" & Seed==2021 & Cell_Line_Name %in% cells_paccmann, ] %>% nrow   # 60539
+
 
 
 supplementary = T
@@ -968,13 +877,12 @@ if (supplementary) {
   
   
   ### [Source Data] Fig. 4
-  Perf_ChEMBL_ = Perf_ChEMBL
-  Perf_ChEMBL_ = Perf_ChEMBL_ %>% 
+  Perf_ChEMBL_ = Perf_ChEMBL %>% 
     rename(Train_Seed=Seed, Num_Test=N_Test)
   
-  Perf_ChEMBL_Total_ = Perf_ChEMBL_Total
-  Perf_ChEMBL_Total_ = Perf_ChEMBL_Total_ %>% 
-    rename(Train_Seed=Seed, Train_DB_Cell=Train_DB, Test_DB_Cell=Test_DB, Num_Test=N_Test)
+  Perf_ChEMBL_Total_ = Perf_ChEMBL_Total %>% 
+    rename(Train_Seed=Seed, Train_DB_Cell=Train_DB, 
+           Test_DB_Cell=Test_DB, Num_Test=N_Test)
   
   Perf_ChEMBL_List_ = list(Performance=Perf_ChEMBL_, 
                            Performance_RNA=Perf_ChEMBL_Total_)
@@ -983,8 +891,8 @@ if (supplementary) {
   Perf_ChEMBL_List_ %>% save_for_nc(num=4, suppl=F, num_fig=num_fig)
   
   
-  ### [Source Data] Supplementary Fig. 24
-  # [Warning] Too large volumn (2.22GB, 23,896,950 rows)
+  ### [Source Data] Supplementary Fig. 21
+  # [Warning] Too large volumn (2.x GB, ~26,000,000 rows)
   # Write the file in CSV format with data.table::fwrite (without sheet names)
   col = c("Assay_ChEMBL_ID", "Cell_ChEMBL_ID", "SANGER_MODEL_ID", 
           "Molecule_ChEMBL_ID", "Drug_CID", "LN_IC50", "Prediction", "Seed", "Model")
@@ -994,18 +902,16 @@ if (supplementary) {
   fwrite(Pred_ChEMBL_, file=file, row.names=F)
   
   
-  ### [Source Data] Supplementary Fig. 25
+  ### [Source Data] Supplementary Fig. 23
   UTest_ChEMBL_ = list(Perf_UTest, Perf_UTest_G, Perf_UTest_C, Perf_UTest_S)
   UTest_ChEMBL_RMSE_ = UTest_ChEMBL_ %>% lapply(function(df) df %>% process_utest(score="RMSE"))
-  UTest_ChEMBL_RMSE_ %>% save_for_nc(num=25, suppl=T)
+  UTest_ChEMBL_RMSE_ %>% save_for_nc(num=23, suppl=T)
   
-  
-  ### [Source Data] Supplementary Fig. 26
+  ### [Source Data] Supplementary Fig. 24
   UTest_ChEMBL_PCC_ = UTest_ChEMBL_ %>% lapply(function(df) df %>% process_utest(score="PCC"))
-  UTest_ChEMBL_PCC_ %>% save_for_nc(num=26, suppl=T)
+  UTest_ChEMBL_PCC_ %>% save_for_nc(num=24, suppl=T)
   
-  
-  ### [Source Data] Supplementary Fig. 27
+  ### [Source Data] Supplementary Fig. 25
   UTest_ChEMBL_SCC_ = UTest_ChEMBL_ %>% lapply(function(df) df %>% process_utest(score="SCC"))
-  UTest_ChEMBL_SCC_ %>% save_for_nc(num=27, suppl=T)
+  UTest_ChEMBL_SCC_ %>% save_for_nc(num=25, suppl=T)
 }

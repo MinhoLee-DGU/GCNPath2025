@@ -325,26 +325,26 @@ plot_with_tpm = function(Pred, TPM, gene, marker=NULL, xlab=NULL,
   }
   
   if (anno_subtype) {
-    add = add %>% append_def(labs(color="SubType"))
+    add = add %>% append_def(labs(color="Subtype"))
     if (!is.null(SubType_List)) {
       add = add %>% append_def(guides(shape=NULL))
-      SubType = stack(SubType_List) %>% setNames(c("Cell", "SubType"))
-      Pred = full_join(Pred, SubType, by="Cell", relationship="many-to-many")
+      Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
+      Pred = full_join(Pred, Subtype, by="Cell", relationship="many-to-many")
       
       if (exclude_else) {
-        Pred = Pred %>% subset(!is.na(SubType))
+        Pred = Pred %>% subset(!is.na(Subtype))
       } else {
-        levels = c(levels(Pred$SubType), name_else)
-        Pred$SubType = Pred$SubType %>% as.character
-        Pred$SubType[is.na(Pred$SubType)] = name_else
-        Pred$SubType = Pred$SubType %>% factor(levels=levels)
+        levels = c(levels(Pred$Subtype), name_else)
+        Pred$Subtype = Pred$Subtype %>% as.character
+        Pred$Subtype[is.na(Pred$Subtype)] = name_else
+        Pred$Subtype = Pred$Subtype %>% factor(levels=levels)
       }
     }
     
     Pred = Pred %>% 
       mutate(GDSC_Cell=!Rest) %>% 
       subset(select=-Rest) %>% 
-      relocate(SubType, .after=Cell) %>% 
+      relocate(Subtype, .after=Cell) %>% 
       relocate(Drug_Name, .after=Drug) %>%
       rename(Drug_CID=Drug, IC50_Missing=Missing) %>% 
       relocate(GDSC_Cell, .after=IC50_Missing) %>% as.data.frame
@@ -369,10 +369,10 @@ plot_with_tpm = function(Pred, TPM, gene, marker=NULL, xlab=NULL,
   if (length(add)==0) add = NULL
   if (anno_subtype & !is.null(marker)) {
     Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, color=SubType, shape=SubType, size=Marker, ...)
+                      margin=0.5, add=add, color=Subtype, shape=Subtype, size=Marker, ...)
   } else if (anno_subtype & is.null(marker)) {
     Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, color=SubType, shape=SubType, size=2.5, ...)
+                      margin=0.5, add=add, color=Subtype, shape=Subtype, size=2.5, ...)
   } else if (!anno_subtype & !is.null(marker)) {
     Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
                       margin=0.5, add=add, size=Marker, ...)
@@ -446,22 +446,20 @@ main = sprintf("%s/TPM Histogram [%s]", dir, markers)
 median_tpm = SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, markers_ori] %>% sapply(median)
 
 xlab = sprintf("Expression of %s", markers)
-# xlab = sprintf('bquote(bold(log["2"]~("TPM+1")~"[%s]"))', markers)
-# xlab = xlab %>% lapply(function(x) eval(parse(text=x)))
 
 # median_tpm %>% round(2)
 # ASCL1   NEUROD1   POU2F3   CD274   PDCD1 
 # 9.69    2.30      0.11     1.00    0.00 
 
 SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_a] %>% 
-  hist_def(main=main[1], xlab=xlab[1], margin=0.4, margin_pl=0.8,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)
+  hist_def(main=main[1], xlab=xlab[1], margin=0.4, margin_pl=0.8, size_line=1,
+           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[1])
 SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_n] %>% 
-  hist_def(main=main[2], xlab=xlab[2], margin=0.4, margin_pl=0.8,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)
+  hist_def(main=main[2], xlab=xlab[2], margin=0.4, margin_pl=0.8, size_line=1,
+           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[2])
 SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_p] %>% 
-  hist_def(main=main[3], xlab=xlab[3], margin=0.4, margin_pl=0.8,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)
+  hist_def(main=main[3], xlab=xlab[3], margin=0.4, margin_pl=0.8, size_line=1,
+           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[3])
 SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, "CD274"] %>% 
   hist_def(main=main[4], xlab=xlab[4], margin=0.4, margin_pl=0.8,
            axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)   # PD1 [SCLC-I]
@@ -489,24 +487,24 @@ SCLC_Type %>% venn_def(main=main, labels=F, text_size=8.4,
 pca_subtype = function(TPM, SubType_List, main=main, thr_sd=0.01, name_else="The Others",
                        exclude_else=F, width=20, height=16, return_val=T, save=F, ...) {
   
-  SubType = stack(SubType_List) %>% setNames(c("Cell", "SubType"))
-  if (exclude_else) TPM = TPM[rownames(TPM) %in% SubType$Cell, ]
+  Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
+  if (exclude_else) TPM = TPM[rownames(TPM) %in% Subtype$Cell, ]
   cond_sd = sapply(TPM, sd)>=thr_sd
   TPM_PCA = TPM[, cond_sd] %>% prcomp(center=T, scale=T, rank=2)
   TPM_PCA = TPM_PCA$x %>% as.data.frame
   
   TPM_PCA$Cell = rownames(TPM_PCA)
-  TPM_PCA = full_join(TPM_PCA, SubType, by="Cell", relationship="many-to-many")
+  TPM_PCA = full_join(TPM_PCA, Subtype, by="Cell", relationship="many-to-many")
   
   if (!exclude_else) {
-    levels = c(levels(TPM_PCA$SubType), name_else)
-    TPM_PCA$SubType = TPM_PCA$SubType %>% as.character
-    TPM_PCA$SubType[is.na(TPM_PCA$SubType)] = name_else
-    TPM_PCA$SubType = TPM_PCA$SubType %>% factor(levels=levels)
+    levels = c(levels(TPM_PCA$Subtype), name_else)
+    TPM_PCA$Subtype = TPM_PCA$Subtype %>% as.character
+    TPM_PCA$Subtype[is.na(TPM_PCA$Subtype)] = name_else
+    TPM_PCA$Subtype = TPM_PCA$Subtype %>% factor(levels=levels)
   }
   
   TPM_PCA = TPM_PCA %>% relocate(PC1, PC2, .after=everything()) %>% as.data.frame
-  TPM_PCA %>% plot_def(PC1, PC2, main=main, color=SubType, shape=SubType,
+  TPM_PCA %>% plot_def(PC1, PC2, main=main, color=Subtype, shape=Subtype,
                        size=3, stroke=1.5, alpha=0.8, margin=0.4, 
                        axis_tl=30, axis_tx=25, legend_tl=22.5, legend_tx=20,
                        width=width, height=height, save=save, ...)
@@ -514,27 +512,26 @@ pca_subtype = function(TPM, SubType_List, main=main, thr_sd=0.01, name_else="The
   if (return_val) return(TPM_PCA)
 }
 
-boxplot_subtype = function(Pred, SubType_List, name_else="The Others",
-                           main=NULL, pos_anova=0.95, width=20, height=18,
-                           size_psig=6, exclude_else=T, use_ggpubr=T, save=F, ...) {
-
+boxplot_subtype = function(Pred, SubType_List, name_else="The Others", main=NULL, 
+                           width=20, height=18, size_psig=6, exclude_else=T, use_ggpubr=T, save=F, ...) {
+  
   suppressMessages(library(ggpubr))
-  SubType = stack(SubType_List) %>% setNames(c("Cell", "SubType"))
-  Pred = full_join(Pred, SubType, by="Cell", relationship="many-to-many")
-
+  Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
+  Pred = full_join(Pred, Subtype, by="Cell", relationship="many-to-many")
+  
   if (exclude_else) {
-    Pred = Pred %>% subset(!is.na(SubType))
+    Pred = Pred %>% subset(!is.na(Subtype))
   } else {
-    levels = c(levels(Pred$SubType), name_else)
-    Pred$SubType = Pred$SubType %>% as.character
-    Pred$SubType[is.na(Pred$SubType)] = name_else
-    Pred$SubType = Pred$SubType %>% factor(levels=levels)
+    levels = c(levels(Pred$Subtype), name_else)
+    Pred$Subtype = Pred$Subtype %>% as.character
+    Pred$Subtype[is.na(Pred$Subtype)] = name_else
+    Pred$Subtype = Pred$Subtype %>% factor(levels=levels)
   }
-
+  
   Pred = Pred %>% 
     mutate(GDSC_Cell=!Rest) %>% 
     subset(select=-Rest) %>% 
-    relocate(SubType, .after=Cell) %>% 
+    relocate(Subtype, .after=Cell) %>% 
     relocate(Drug_Name, .after=Drug) %>%
     rename(Drug_CID=Drug, IC50_Missing=Missing) %>% 
     relocate(GDSC_Cell, .after=IC50_Missing) %>% as.data.frame
@@ -549,17 +546,13 @@ boxplot_subtype = function(Pred, SubType_List, name_else="The Others",
   
   if (!use_ggpubr) {
     Pred %>% subset(!is.na(Prediction)) %>%
-      boxplot_def(SubType, Prediction, legend=F, force_bold=F,
+      boxplot_def(Subtype, Prediction, legend=F, force_bold=F,
                   width=widt, height=height, save=save, ...)
   } else {
     section = function(x, quant=0.5, na.rm=T) {
       if (na.rm) x = x %>% na.omit %>% as.numeric
       min(x)+(max(x)-min(x))*quant
     }
-
-    # ylab = bquote(Predicted~ln(IC[50]))
-    # pos_anova = unlist(Pred$Prediction) %>% section(quant=pos_anova, na.rm=T)
-    # stat_compare_means(method="anova", label.y=pos_anova)
     
     ylab = bquote(ln(IC[50]))
     pos = position_dodge(width=0.8)
@@ -570,18 +563,18 @@ boxplot_subtype = function(Pred, SubType_List, name_else="The Others",
     
     # add.params = list(alpha=0.5, size=2)
     # ylab = bquote(Predicted~ln(IC[50]))
-
+    
     font1 = font(object="ylab", size=30, margin=margin1)
     font2 = font(object="axis.text", size=22.5, margin=margin2, color="grey30")
     font3 = font(object="legend.title", size=25, margin=margin3)
     font4 = font(object="legend.text", size=25, margin=margin4)
     font = font1 + font2 + font3 + font4
-
+    
     # pl = Pred %>% subset(!is.na(Prediction)) %>%
-    #   ggboxplot(x="SubType", y="Prediction", fill="SubType", outlier.shape=NA,
+    #   ggboxplot(x="Subtype", y="Prediction", fill="Subtype", outlier.shape=NA,
     #             add="point", size=1, alpha=0.9, xlab=F, add.params=add.params, ...) +
     #   labs(y=ylab) + font + rotate_x_text(angle=30, hjust=1, vjust=1)
-
+    
     col = c("LN_IC50", "Prediction")
     col_af = c("Response_Type", "Response_Value")
     color = RColorBrewer::brewer.pal(8, "Reds")[c(8, 3)]
@@ -596,7 +589,7 @@ boxplot_subtype = function(Pred, SubType_List, name_else="The Others",
       mutate(Response_Type=Response_Type %>% factor(levels=labels))
     
     pl = Pred_ %>% 
-      ggboxplot(x="SubType", y="Response_Value", fill="Response_Type",
+      ggboxplot(x="Subtype", y="Response_Value", fill="Response_Type",
                 outlier.shape=NA, size=1, alpha=0.9, xlab=F, ...) +
       geom_point(aes(group=Response_Type), size=2, alpha=0.5, position=pos) + 
       labs(y=ylab, fill="Response") +
@@ -615,7 +608,7 @@ boxplot_subtype = function(Pred, SubType_List, name_else="The Others",
     
     pl = pl %>% ggpar(legend="bottom") + theme(legend.key.size=unit(1, "cm"))
     # pl = pl %>% ggpar(legend="none")
-
+    
     if (save) {
       save_fig(pl, main, width=width, height=height, units="cm", svg=T)
     } else print(pl) ; return(Pred)
@@ -690,58 +683,6 @@ for (drug in drug_parp) {
     boxplot_subtype(SCLC_Type, main=main, exclude_else=F, name_else="NSCLC", save=T)
 }
 
-# Bcl-2 [SCLC-A]
-# Venetoclax, Navitoclax, Obatoclax, Sabutoclax
-dir_ex = mkdir(sprintf("%s [Example]", dir[1]))
-main1 = sprintf("%s/Venetoclax-BCL2-ASCL1", dir_ex)
-main2 = sprintf("%s/Navitoclax-BCL2-ASCL1", dir_ex)
-main3 = sprintf("%s/Venetoclax-BCL2-Apoptosis", dir_ex)
-main4 = sprintf("%s/Navitoclax-BCL2-Apoptosis", dir_ex)
-
-shape = c(22, 23, 24, 25, 21)
-color = c("brown1", "gold", "seagreen3", "royalblue1", "mediumorchid")
-
-add = list(scale_color_manual(values=color), 
-           scale_shape_manual(values=shape), 
-           theme(legend.key.size=unit(0.9, "cm")))
-
-xlab = "Expression of BCL2"
-
-Pred_Ve_BCL2 = Pred_Lung$Pred %>% 
-  subset(Drug_Name=="Venetoclax") %>% 
-  plot_with_tpm(SANGER_RNA_TPM, gene="BCL2", marker="ASCL1", xlab=xlab, add=add,
-                SubType_List=SCLC_Type, anno_subtype=T, exclude_else=F,
-                main=main1, name_else="NSCLC", width=20, height=16, 
-                axis_tl=30, axis_tx=22.5, legend_tl=20, legend_tx=18, save=T)
-# [BCL2] -0.759, [ASCL1] -0.603
-
-Pred_Na_BCL2 = Pred_Lung$Pred %>% 
-  subset(Drug_Name=="Navitoclax") %>% 
-  plot_with_tpm(SANGER_RNA_TPM, gene="BCL2", marker="ASCL1", xlab=xlab, add=add,
-                SubType_List=SCLC_Type, anno_subtype=T, exclude_else=F,
-                main=main2, name_else="NSCLC", width=20, height=16, 
-                axis_tl=30, axis_tx=22.5, legend_tl=20, legend_tx=18, save=T)
-# [BCL2] -0.735, [ASCL1] -0.665
-
-path = "BIOCARTA_DEATH_PATHWAY"
-xlab = "BIOCARTA Apoptosis"
-
-Pred_Ve_Apop = Pred_Lung$Pred %>% 
-  subset(Drug_Name=="Venetoclax") %>% 
-  plot_with_tpm(SANGER_RNA_GSVA, gene=path, xlab=xlab, add=add, 
-                SubType_List=SCLC_Type, anno_subtype=T, exclude_else=F,
-                main=main3, name_else="NSCLC", width=20, height=15, 
-                axis_tl=30, axis_tx=22.5, legend_tl=20, legend_tx=20, save=T)
-# [Apoptosis] 0.408
-
-Pred_Na_Apop = Pred_Lung$Pred %>% 
-  subset(Drug_Name=="Navitoclax") %>% 
-  plot_with_tpm(SANGER_RNA_GSVA, gene=path, xlab=xlab, add=add, 
-                SubType_List=SCLC_Type, anno_subtype=T, exclude_else=F,
-                main=main4, name_else="NSCLC", width=20, height=15, 
-                axis_tl=30, axis_tx=22.5, legend_tl=20, legend_tx=20, save=T)
-# [Apoptosis] 0.429
-
 
 supplementary = T
 if (supplementary) {
@@ -765,31 +706,20 @@ if (supplementary) {
   }
   
   
-  ### [Source Data] Fig. 6
+  ### [Source Data] Fig. 7
+  Pred_Lung_Ex = list(Pred_Lung_BCL2$Venetoclax, Pred_Lung_AURKA$Alisertib, 
+                      Pred_Lung_IGF1R$Linsitinib, Pred_Lung_PARP$Niraparib)
   
-  Pred_Ve = Pred_Ve_BCL2 %>% 
-    rename(BCL2=Gene, ASCL1=Marker, 
-           Drug_Target_Pathway=Drug_Pathway) %>% 
-    mutate(BIOCARTA_Apoptosis=Pred_Ve_Apop$Gene)
-  
-  Pred_Na = Pred_Na_BCL2 %>% 
-    rename(BCL2=Gene, ASCL1=Marker, 
-           Drug_Target_Pathway=Drug_Pathway) %>% 
-    mutate(BIOCARTA_Apoptosis=Pred_Na_Apop$Gene)
-  
-  Pred_Ve_Na_ = list(Pred_Ve, Pred_Na)
-  
-  num_fig = c("a-c", "d-f")
-  Pred_Ve_Na_ %>% save_for_nc(num=6, suppl=F, num_fig=num_fig)
+  Pred_Lung_Ex %>% save_for_nc(num=7, suppl=F)
   
   
-  ### [Source Data] Supplementary Fig. 34
-  SCLC_Type_ = SCLC_Type %>% stack %>% setNames(c("Cell", "SubType"))
+  ### [Source Data] Supplementary Fig. 28
+  SCLC_Type_ = SCLC_Type %>% stack %>% setNames(c("Cell", "Subtype"))
   cells_lung = rownames(SANGER_RNA_TPM) %in% unique(Pred_Lung$Pred$Cell)
   cells_lung = rownames(SANGER_RNA_TPM)[cells_lung]   # 202
   
-  cells_nsclc = cells_lung[!(cells_lung %in% SCLC_Type_$Cell)]
-  NSCLC_Type_ = data.frame(Cell=cells_nsclc, SubType="NSCLC")
+  cells_nsclc = cells_lung[!(cells_lung %in% SCLC_Type_$Cell)]   # 130
+  NSCLC_Type_ = data.frame(Cell=cells_nsclc, Subtype="NSCLC")
   Lung_Type = rbind(SCLC_Type_, NSCLC_Type_)
   
   idx = match(Lung_Type$Cell, Anno_Cells$SANGER_MODEL_ID)
@@ -805,21 +735,22 @@ if (supplementary) {
   SCLC_Feature_ = list(Lung_Type, PC2_IC50, PC2_TPM, PC2_GSVA, TPM_Marker)
   
   num_fig = c(letters[1:4], "e-i")
-  SCLC_Feature_ %>% save_for_nc(num=34, suppl=T, num_fig=num_fig, rowNames=c(F, F, F, F, T))
+  SCLC_Feature_ %>% save_for_nc(num=28, suppl=T, num_fig=num_fig, rowNames=c(F, F, F, F, T))
   
+  ### [Source Data] Supplementary Fig. 29
+  Pred_Lung_BCL2 %>% save_for_nc(num=29, suppl=T)
   
-  ### [Source Data] Supplementary Fig. 35
-  Pred_Lung_BCL2 %>% save_for_nc(num=35, suppl=T)
+  ### [Source Data] Supplementary Fig. 30
+  Pred_Lung_AURKA %>% save_for_nc(num=30, suppl=T)
   
+  ### [Source Data] Supplementary Fig. 31
+  Pred_Lung_IGF1R %>% save_for_nc(num=31, suppl=T)
   
-  ### [Source Data] Supplementary Fig. 36
-  Pred_Lung_AURKA %>% save_for_nc(num=36, suppl=T)
+  ### [Source Data] Supplementary Fig. 32
+  Pred_Lung_PARP %>% save_for_nc(num=32, suppl=T)
   
-  
-  ### [Source Data] Supplementary Fig. 37
-  Pred_Lung_IGF1R %>% save_for_nc(num=37, suppl=T)
-  
-  
-  ### [Source Data] Supplementary Fig. 38
-  Pred_Lung_PARP %>% save_for_nc(num=38, suppl=T)
+  # Cf. Cells trained vs not-trained?
+  col = c("Cell", "Rest")
+  Pred_Lung$Pred[, col] %>% distinct %>% subset(Cell %in% cells_sclc & Rest) %>% nrow    # 11 [from 72]
+  Pred_Lung$Pred[, col] %>% distinct %>% subset(Cell %in% cells_nsclc & Rest) %>% nrow   # 30 [from 130]
 }

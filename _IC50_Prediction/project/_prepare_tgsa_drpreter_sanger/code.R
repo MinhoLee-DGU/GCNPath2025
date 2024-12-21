@@ -101,30 +101,28 @@ colnames(MUT_TGSA) = col
 # Total copy number and categorical CNA calls derived from WES data processed through PureCN
 # cell-line & organoid data were processed in SANGER Passports with PureCN [WES] & PURPLE [WGS], respectively
 # https://depmap.sanger.ac.uk/documentation/datasets/copy-number
-
+# 
 # CCLE DepMap calculates CNV as log2(CN ratio + 1) [OmicsCNGene.csv]
 # "Values are calculated by mapping genes onto the segment level calls and computing a weighted average along the genomic coordinate"
-# Instead, we simplified the CNV processing by log2(gene_mean**2+1)
 # https://depmap.org/portal/download/all/?releasename=DepMap+Public+23Q2&filename=OmicsCNGene.csv
 # https://github.com/broadinstitute/depmap_omics/blob/master/depmapomics/copynumbers.py
+# 
+# In PureCN, CN ratio is given in log2
+# Therefore, we converted the CNV into log2(2**gene_mean+1) values (see Table 2)
+# 
+# Table 2: callAlterations output columns.
+# "Gene copy number log2-ratios (not adjusted for purity/ploidy).
+# gene.mean is weighted by interval weights when these are available."
+# https://bioconductor.org/packages/release/bioc/vignettes/PureCN/inst/doc/PureCN.pdf
 
 xlab = "Gene Mean\n[gene_mean]"
-ylab1 = "Gene Mean\n[gatk_mean_log2_copy_ratio]"
-ylab2 = "Segment Mean\n[seg_mean]"
-main1 = "CNV [706 CGC Genes, Gene Mean & Gene Mean GATK]"
-main2 = "CNV [706 CGC Genes, Gene Mean & Segment Mean]"
-
+ylab = "Gene Mean\n[gatk_mean_log2_copy_ratio]"
+main = "CNV [706 CGC Genes, Gene Mean & Gene Mean GATK]"
 CNV_TGSA = CNV[gene_id %in% Anno_Genes_TGSA$GENE_ID]   # 24488104 > 938543
 
 CNV_TGSA[!is.na(gene_mean) & !is.na(gatk_mean_log2_copy_ratio)] %>% 
-  plot_def(gene_mean, gatk_mean_log2_copy_ratio, main=main1, 
-           size=1.2, alpha=0.5, xlab=xlab, ylab=ylab1, 
-           force_bold=T, xy_line=T, save=T)
-
-CNV_TGSA[!is.na(gene_mean) & !is.na(seg_mean)] %>% 
-  plot_def(gene_mean, seg_mean, main=main2, 
-           size=1.2, alpha=0.5, xlab=xlab, ylab=ylab2, 
-           force_bold=T, xy_line=T, save=T)
+  plot_def(gene_mean, gatk_mean_log2_copy_ratio, main=main, size=1.2, 
+           alpha=0.5, xlab=xlab, ylab=ylab, xy_line=T, raster=T, save=T)
 
 CNV_TGSA$gene_mean %>% mean(na.rm=T)   # -0.04359442
 CNV_TGSA = dcast(CNV_TGSA, model_id~gene_id, value.var="gene_mean", fun.agg=mean, fill=0)

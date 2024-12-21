@@ -69,28 +69,20 @@ read_pred_all = function(dir_list, pattern, sep=",") {
 }
 
 calc_perf = function(Pred) {
-  
   Perf = Pred %>% group_by(Model, Dataset, Test_Type) %>%
-    summarize(N_Test = n(),
-              RMSE = RMSE(LN_IC50, Prediction),
-              R2 = R2(LN_IC50, Prediction),
-              Corr = cor(LN_IC50, Prediction)) %>% as.data.frame
+    summarize(N_Test = n(), RMSE = RMSE(LN_IC50, Prediction)) %>% as.data.frame
   
-  lvl = c("GDSC2 x Normal", "GDSC2 x Strict_Blind", "GDSC x Strict_Blind")
+  lvl = c("GDSC2 x Normal", "GDSC2 x Strict_Blind")
   Perf = Perf %>% mutate(Test = sprintf("%s x %s", Dataset, Test_Type))
   Perf$Test = Perf$Test %>% factor(levels=lvl)
   return(Perf)
 }
 
 calc_perf_fold = function(Pred) {
-  
   Perf = Pred %>% group_by(Model, Dataset, Test_Type, Fold) %>%
-    summarize(N_Test = n(),
-              RMSE = RMSE(LN_IC50, Prediction),
-              R2 = R2(LN_IC50, Prediction),
-              Corr = cor(LN_IC50, Prediction)) %>% as.data.frame
+    summarize(N_Test = n(), RMSE = RMSE(LN_IC50, Prediction)) %>% as.data.frame
   
-  lvl = c("GDSC2 x Normal", "GDSC2 x Strict_Blind", "GDSC x Strict_Blind")
+  lvl = c("GDSC2 x Normal", "GDSC2 x Strict_Blind")
   Perf = Perf %>% mutate(Test=sprintf("%s x %s", Dataset, Test_Type))
   Perf$Test = Perf$Test %>% factor(levels=lvl)
   return(Perf)
@@ -111,18 +103,18 @@ to_dir_list = function(dir, dir1, dir2) {
 #   Perf_Fold %>% boxplot_def(Model, RMSE, fill=Test, main=main, width=width, height=height, save=save)
 # }
 
-boxplot_perf = function(Perf_Fold, main=NULL, re_label=NULL, 
-                        width=48, height=13.5, axis_tl=30, axis_tx=18, save=T) {
+boxplot_perf = function(Perf_Fold, x="Model", y="RMSE", fill="Model", 
+                        main=NULL, mark_def=T, color_def="royalblue3",
+                        add=NULL, hide_legend=T, width=32, height=12, 
+                        axis_tl=30, axis_tx=18, legend_tl=20, legend_tx=18, save=T) {
   
   # legend = "Parameters"
   # p1 = Perf_Fold %>% subset(Test=="GDSC2 x Normal") %>% 
   #   boxplot_def(Model, RMSE, fill=Model, main=main, legend=legend, width=width/5.2, height=height, save=F)
   # p2 = Perf_Fold %>% subset(Test=="GDSC2 x Strict_Blind") %>% 
   #   boxplot_def(Model, RMSE, fill=Model, main=main, legend=legend, width=width/5.2, height=height, save=F)
-  # p3 = Perf_Fold %>% subset(Test=="GDSC x Strict_Blind") %>% 
-  #   boxplot_def(Model, RMSE, fill=Model, main=main, legend=legend, width=width/5.2, height=height, save=F)
   
-  add.params = list(alpha=0.5)
+  add.params = list(alpha=0.2, color="black")
   margin = margin(8, 8, 8, 8, unit="pt")
   font1 = font("ylab", color="grey30", size=axis_tl, margin=margin)
   font2 = font("axis.text", color="grey30", size=axis_tx, margin=margin)
@@ -130,20 +122,46 @@ boxplot_perf = function(Perf_Fold, main=NULL, re_label=NULL,
   font = font1 + font2
   margin_pl = margin(0.2, 0.4, 0.2, 0.4, "cm")
   margin_pl = theme(plot.margin=margin_pl)
+  # fill = ifelse(mark_def, "Model", "white")
   
+  # color="Model"
   p1 = Perf_Fold %>% subset(Test=="GDSC2 x Normal") %>% 
-    ggboxplot("Model", y="RMSE", fill="Model", add="point", 
+    ggboxplot(x, y, fill=fill, add="point", outlier.shape=NA,
               xlab=F, add.params=add.params) + font + margin_pl + rotate_x_text(45)
   p2 = Perf_Fold %>% subset(Test=="GDSC2 x Strict_Blind") %>% 
-    ggboxplot("Model", y="RMSE", fill="Model", add="point", 
-              xlab=F, add.params=add.params) + font + margin_pl + rotate_x_text(45)
-  p3 = Perf_Fold %>% subset(Test=="GDSC x Strict_Blind") %>% 
-    ggboxplot("Model", y="RMSE", fill="Model", add="point", 
+    ggboxplot(x, y, fill=fill, add="point", outlier.shape=NA,
               xlab=F, add.params=add.params) + font + margin_pl + rotate_x_text(45)
   
-  no_lg = function(pl) pl %>% ggpar(legend="none")
-  pl = ggarrange(no_lg(p1), no_lg(p2), no_lg(p3), ncol=3)
-  # common.legend=T, legend="right"
+  if (mark_def) {
+    param_list = Perf_Fold$Model %>% unique %>% as.character
+    param_def = grep("\\[DE\\]", param_list, value=T)
+    fill = c(color_def, rep("#66b3ed", length(param_list)-1))
+    names(fill) = c(param_def, param_list[param_list!=param_def])
+    p1 = p1 + scale_fill_manual(values=fill)
+    p2 = p2 + scale_fill_manual(values=fill)
+  } 
+  
+  if (!is.null(add)) {
+    for (i in 1:length(add)) {
+      p1 = p1 + add[[i]]
+      p2 = p2 + add[[i]]
+    }
+  }
+  
+  if (hide_legend) {
+    no_lg = function(pl) pl %>% ggpar(legend="none")
+    pl = ggarrange(no_lg(p1), no_lg(p2), ncol=2)
+    # common.legend=T, legend="right"
+  } else {
+    margin_lg = 0.4
+    margin_lgl = margin(b=margin_lg, unit="cm")
+    margin_lgx = margin(b=margin_lg, l=margin_lg, unit="cm")
+    theme_ = theme(legend.title = element_text(size=legend_tl, margin=margin_lgl),
+                   legend.text = element_text(size=legend_tx, margin=margin_lgx))
+    
+    add_lg = function(pl) pl + theme_
+    pl = ggarrange(add_lg(p1), add_lg(p2), ncol=2, common.legend=T, legend="right")
+  }
   
   if (save) {
     save_fig(pl, main=main, width=width, height=height, units="cm", svg=T)
@@ -187,7 +205,7 @@ summary_pred = function(dir_list, lvl_param=NULL, re_label=NULL) {
   return(Pred_List)
 }
 
-  perf_avg_sd = function(Perf_Fold, space_cols=F) {
+perf_avg_sd = function(Perf_Fold, space_cols=F) {
   
   avg_plus_sd = function(x_mean, x_sd) sprintf("%.3f±%.3f", x_mean, x_sd)
   Perf_Fold_Avg = Perf_Fold %>% acast(Model~Test, value.var="RMSE", fun.aggregate=mean)
@@ -203,205 +221,70 @@ summary_pred = function(dir_list, lvl_param=NULL, re_label=NULL) {
   return(Perf_Fold_Sum)
 }
 
-valid_test = c("Valid", "Test")
-dir_test = c("IC50_GDSC2/Normal", "IC50_GDSC2/Strict_Blind", "IC50_GDSC/Strict_Blind")
-
 dir_res = "../results"
 dir_fig = mkdir("Ablation Test")
-
-Abl_Test = list()
-Abl_Valid = list()
-
-
-
-# Ablation Test [Network Type]
-network_no = "Linear_GAT"
-network_uni = c("STR7", "STR9", "Reg", "Corr", "Random")
-network_uni = sprintf("GAT_%s", network_uni)
-network_multi = c("", "_Inv", "_KNN3", "_KNN7", "_UD")
-network_multi = sprintf("RGCN%s", network_multi)
-network = c(network_no, network_uni, network_multi)
-
-re_label = list("RGCN"="RGCN [DE]", "Linear_GAT"="Linear")
-dir_list = to_dir_list(dir_res, dir_test, network)
-Pred_Net = summary_pred(dir_list, lvl_param=network, re_label=re_label)
-
-main = sprintf("%s/Ablation [Network, %s]", dir_fig, valid_test)
-Pred_Net$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-Pred_Net$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
-
-Abl_Valid$Network = perf_avg_sd(Pred_Net$Perf_Val_Fold, space_cols=T)
-Abl_Test$Network = perf_avg_sd(Pred_Net$Perf_Test_Fold, space_cols=T)
-
-
-# Ablation Test [Architecture]
-attn = c("Attn_v1", "Attn_v2")
-attn_param = c("", "_C16", "_AL3", "_A64", "_AH8")
-architecture = expand.grid(attn, attn_param) %>% arrange(Var1)
-architecture = sprintf("%s%s", architecture$Var1, architecture$Var2)
-architecture = "RGCN" %>% c(architecture)
-
-re_label = list("RGCN"="No Attn [DE]")
-dir_list = to_dir_list(dir_res, dir_test, architecture)
-Pred_Arch = summary_pred(dir_list, lvl_param=architecture, re_label=re_label)
-
-main = sprintf("%s/Ablation [Architecture, %s]", dir_fig, valid_test)
-Pred_Arch$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, axis_tx=16.5, save=T)
-Pred_Arch$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, axis_tx=16.5, save=T)
-
-Abl_Valid$Architect = perf_avg_sd(Pred_Arch$Perf_Val_Fold, space_cols=T)
-Abl_Test$Architect = perf_avg_sd(Pred_Arch$Perf_Test_Fold, space_cols=T)
-
-
-# # Ablation Test [Architecture, SSI-DDI]
-# attn = c("SSI_Attn")
-# attn_param = c("", "_AL1", "_A32", "_AL1_A32", "_DL5", "_DL5_AL1_A32")
-# architecture = expand.grid(attn, attn_param) %>% arrange(Var1)
-# architecture = sprintf("%s%s", architecture$Var1, architecture$Var2)
-# architecture = "RGCN" %>% c(architecture)
-# 
-# re_label = list("RGCN"="No Attn [DE]")
-# dir_list = to_dir_list(dir_res, dir_test, architecture)
-# Pred_SSI = summary_pred(dir_list, lvl_param=architecture, re_label=re_label)
-# 
-# main = sprintf("%s/Ablation [Architecture (SSI-DDI), %s]", dir_fig, valid_test)
-# Pred_SSI$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-# Pred_SSI$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
-# 
-# Abl_Valid$Architect_SSI = perf_avg_sd(Pred_SSI$Perf_Val_Fold, space_cols=T)
-# Abl_Test$Architect_SSI = perf_avg_sd(Pred_SSI$Perf_Test_Fold, space_cols=T)
-
-
-# # Ablation Test [Architecture, SA-DDI]
-# attn = c("SA_Attn")
-# attn_param = c("", "_A32", "_DL5", "_DL5_A32")
-# architecture = expand.grid(attn, attn_param) %>% arrange(Var1)
-# architecture = sprintf("%s%s", architecture$Var1, architecture$Var2)
-# architecture = "RGCN" %>% c(architecture)
-# 
-# re_label = list("RGCN"="No Attn [DE]")
-# dir_list = to_dir_list(dir_res, dir_test, architecture)
-# Pred_SA = summary_pred(dir_list, lvl_param=architecture, re_label=re_label)
-# 
-# main = sprintf("%s/Ablation [Architecture (SA-DDI), %s]", dir_fig, valid_test)
-# Pred_SA$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-# Pred_SA$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
-# 
-# Abl_Valid$Architect_SA = perf_avg_sd(Pred_SA$Perf_Val_Fold, space_cols=T)
-# Abl_Test$Architect_SA = perf_avg_sd(Pred_SA$Perf_Test_Fold, space_cols=T)
-
-
-# Ablation Test [Pathway]
-pathway = c("RGCN", "KEGG", "PID", "WikiPathways", "C4CM")
-
-re_label = list("RGCN"="BIOCARTA [DE]")
-dir_list = to_dir_list(dir_res, dir_test, pathway)
-Pred_Pathway = summary_pred(dir_list, lvl_param=pathway, re_label=re_label)
-
-main = sprintf("%s/Ablation [Pathway, %s]", dir_fig, valid_test)
-Pred_Pathway$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=45, save=T)
-Pred_Pathway$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=45, save=T)
-
-Abl_Valid$Pathway = perf_avg_sd(Pred_Pathway$Perf_Val_Fold, space_cols=T)
-Abl_Test$Pathway = perf_avg_sd(Pred_Pathway$Perf_Test_Fold, space_cols=T)
-
+dir_test = c("IC50_GDSC2/Normal", "IC50_GDSC2/Strict_Blind")
 
 
 # Ablation Test [GNN vs Linear]
-gnn_lin = c("RGCN", "RGAT", "RGCN_GIN", "RGCN_GINE", 
-            "RGCN_MF256", "RGCN_MF512", "RGCN_SMILESVec", "Linear_GAT", "Linear_MF256")
+gnn_lin = c("RGCN", "RGCN_MF256", "RGCN_MF512", 
+            "RGCN_SMILESVec", "Linear_GAT", "Linear_MF256")
 
-re_label = list("RGCN"="RGCN_GAT [DE]", "RGAT"="RGAT_GAT")
+re_label = list("RGCN"="RGCN_GAT")
 dir_list = to_dir_list(dir_res, dir_test, gnn_lin)
 Pred_GNN_Lin = summary_pred(dir_list, lvl_param=gnn_lin, re_label=re_label)
 
-main = sprintf("%s/Ablation [GNN vs Linear, %s]", dir_fig, valid_test)
-Pred_GNN_Lin$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-Pred_GNN_Lin$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
+group = c("GCN_C_D", "GCN_C", "GCN_C", "GCN_C", "GCN_D", "NULL")
+df_col = data.frame(Model=gnn_lin, Group=group)
+df_col$Model[df_col$Model=="RGCN"] = "RGCN_GAT"
 
-Abl_Valid$GNN_Lin = perf_avg_sd(Pred_GNN_Lin$Perf_Val_Fold, space_cols=T)
-Abl_Test$GNN_Lin = perf_avg_sd(Pred_GNN_Lin$Perf_Test_Fold, space_cols=T)
+lvl_group = c("GCN_C_D", "GCN_C", "GCN_D", "NULL")
+idx = match(Pred_GNN_Lin$Perf_Test_Fold$Model, df_col$Model)
+Pred_GNN_Lin$Perf_Test_Fold$Group = df_col$Group[idx] %>% factor(levels=lvl_group)
 
+# color = RColorBrewer::brewer.pal(8, "Blues")[c(8, 6, 4, 2)]
+color1 = c("royalblue3", "#66b3ed")
+color2 = RColorBrewer::brewer.pal(8, "Reds")[c(7, 4)]
+color = c(color1, color2)
+names(color) = lvl_group
 
+labels = c(bquote(GCN[C] ~ "×" ~ GCN[D]), 
+           bquote(GCN[C] ~ "×" ~ FCN[D]), 
+           bquote(FCN[C] ~ "×" ~ GCN[D]), 
+           bquote(FCN[C] ~ "×" ~ FCN[D]))
 
-# # Ablation Test [GNN Stack]
-# gnn_stack = c("RGCN", "Plain", "ResNet", "ResNet+", "JK_Concat")
-# dim_drug = c("", "_D256")
-# gnn_stack = expand.grid(gnn_stack, dim_drug) %>% arrange(Var1)
-# gnn_stack = sprintf("%s%s", gnn_stack$Var1, gnn_stack$Var2)
-# 
-# re_label = list("RGCN"="DenseNet [DE]", "RGCN_D256"="DenseNet_D256")
-# dir_list = to_dir_list(dir_res, dir_test, gnn_stack)
-# Pred_GNN_Stack = summary_pred(dir_list, lvl_param=gnn_stack, re_label=re_label)
-# 
-# main = sprintf("%s/Ablation [GNN Stack, %s]", dir_fig, valid_test)
-# Pred_GNN_Stack$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-# Pred_GNN_Stack$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
-# 
-# Abl_Valid$GNN_Stack = perf_avg_sd(Pred_GNN_Stack$Perf_Val_Fold, space_cols=T)
-# Abl_Test$GNN_Stack = perf_avg_sd(Pred_GNN_Stack$Perf_Test_Fold, space_cols=T)
+names(labels) = lvl_group
+add = list(scale_fill_manual(values=color, labels=labels))
 
+main = sprintf("%s/Ablation [GNN vs Linear]", dir_fig)
+Pred_GNN_Lin$Perf_Test_Fold %>% boxplot_perf(main=main, width=32, save=T, fill="Group", add=add, hide_legend=F)
+Perf_GNN_Lin = perf_avg_sd(Pred_GNN_Lin$Perf_Test_Fold, space_cols=T)
 
-# Ablation Test [Cell Dimension & Layer]
-dim = c("", "_C4", "_C16", "_D64", "_D256", "_P256")
-layer = c("_CL5", "_DL5", "_PL4")
-dim_layer = sprintf("RGCN%s", c(dim, layer))
-
-re_label = list("RGCN"="RGCN [DE]")
-dir_list = to_dir_list(dir_res, dir_test, dim_layer)
-Pred_DimLayer = summary_pred(dir_list, lvl_param=dim_layer, re_label=re_label)
-
-main = sprintf("%s/Ablation [Dimension & Layer, %s]", dir_fig, valid_test)
-Pred_DimLayer$Perf_Val_Fold %>% boxplot_perf(main=main[1], width=48, save=T)
-Pred_DimLayer$Perf_Test_Fold %>% boxplot_perf(main=main[2], width=48, save=T)
-
-Abl_Valid$Dim_Layer = perf_avg_sd(Pred_DimLayer$Perf_Val_Fold, space_cols=T)
-Abl_Test$Dim_Layer = perf_avg_sd(Pred_DimLayer$Perf_Test_Fold, space_cols=T)
 
 
 ### Save all files...
 
 suppressMessages(library(openxlsx))
-file = sprintf("%s/Ablation Summary [%s].xlsx", dir_fig, valid_test)
-
-write.xlsx(Abl_Valid, file=file[1], rowNames=T, colNames=T, sheetName=names(Abl_Valid))
-write.xlsx(Abl_Test, file=file[2], rowNames=T, colNames=T, sheetName=names(Abl_Test))
-
-file = "Ablation.RData"
-save(Pred_Net, Pred_Arch, Pred_DimLayer, 
-     Pred_GNN_Lin, Pred_Pathway, Abl_Valid, Abl_Test, file=file)
-
-# rm(list=grep("Pred_", ls(), value=T))
+file = sprintf("%s/Ablation Summary.xlsx", dir_fig)
+write.xlsx(Perf_GNN_Lin, file=file, rowNames=T, colNames=T)
 
 
 supplementary = T
 if (supplementary) {
   
   process_perf = function(Perf) {
-    
-    Perf_Val = Perf$Perf_Val_Fold %>% 
-      subset(select=-c(Test, R2, Corr)) %>% 
-      rename(Parameter=Model, Train_Fold=Fold, Num_Test=N_Test)
-    
     Perf_Test = Perf$Perf_Test_Fold %>% 
       subset(select=-c(Test, R2, Corr)) %>% 
       rename(Parameter=Model, Train_Fold=Fold, Num_Test=N_Test)
     
-    Perf_Val_G2N = Perf_Val %>% subset(Dataset=="GDSC2" & Test_Type=="Normal")
-    Perf_Val_G2S = Perf_Val %>% subset(Dataset=="GDSC2" & Test_Type=="Strict_Blind") 
-    Perf_Val_G0S = Perf_Val %>% subset(Dataset=="GDSC" & Test_Type=="Strict_Blind") 
-    
     Perf_Test_G2N = Perf_Test %>% subset(Dataset=="GDSC2" & Test_Type=="Normal")
     Perf_Test_G2S = Perf_Test %>% subset(Dataset=="GDSC2" & Test_Type=="Strict_Blind") 
-    Perf_Test_G0S = Perf_Test %>% subset(Dataset=="GDSC" & Test_Type=="Strict_Blind") 
     
-    Perf_List = list(Perf_Val_G2N, Perf_Val_G2S, Perf_Val_G0S, 
-                     Perf_Test_G2N, Perf_Test_G2S, Perf_Test_G0S) %>% 
+    Perf_List = list(Perf_Test_G2N, Perf_Test_G2S) %>% 
       lapply(function(df) df %>% subset(select=-c(Dataset, Test_Type)))
     
-    params = unique(as.character(Perf_Val_G2N$Parameter))
-    sprintf("# Num [Val] : %s, %s, %s", nrow(Perf_Val_G2N), nrow(Perf_Val_G2S), nrow(Perf_Val_G0S)) %>% print
-    sprintf("# Num [Test] : %s, %s, %s", nrow(Perf_Test_G2N), nrow(Perf_Test_G2S), nrow(Perf_Test_G0S)) %>% print
+    params = unique(as.character(Perf_Test_G2N$Parameter))
+    sprintf("# Num [Test] : %s, %s", nrow(Perf_Test_G2N), nrow(Perf_Test_G2S)) %>% print
     sprintf("# Param : %s", paste0(params, collapse=", ")) %>% print
     return(Perf_List)
   }
@@ -422,24 +305,9 @@ if (supplementary) {
     write.xlsx(df_list, file=file, sheetName=sheets, rowNames=rowNames)
   }
   
-  
-  ### [Source Data] Supplementary Fig. 29
-  Perf_Net_ = Pred_Net %>% process_perf
-  Perf_Net_ %>% save_for_nc(num=29, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 30
-  Perf_GNN_Lin_ = Pred_GNN_Lin %>% process_perf
-  Perf_GNN_Lin_ %>% save_for_nc(num=30, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 31
-  Perf_DimLayer_ = Pred_DimLayer %>% process_perf
-  Perf_DimLayer_ %>% save_for_nc(num=31, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 32
-  Perf_Pathway_ = Pred_Pathway %>% process_perf
-  Perf_Pathway_ %>% save_for_nc(num=32, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 33
-  Perf_Attn_ = Pred_Arch %>% process_perf
-  Perf_Attn_ %>% save_for_nc(num=33, suppl=T)
+  ### [Source Data] Fig. 2
+  Perf_GNN_Lin_ = Pred_GNN_Lin_ %>% process_perf
+  Perf_GNN_Lin_[[1]]$Group = NULL
+  Perf_GNN_Lin_[[2]]$Group = NULL
+  Perf_GNN_Lin_ %>% save_for_nc(num=2, suppl=F)
 }
