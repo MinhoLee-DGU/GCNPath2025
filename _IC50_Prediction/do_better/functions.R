@@ -142,11 +142,16 @@ h = function(x, what=6) {
 
 sh = h
 
-fread_def = function(file, check_names=F, ...) {
+fread_def = function(file, check_names=F, col_numeric=F, ...) {
   # fread the file into data.frame
   df = fread(file, check.names=check_names, ...)
   df = df %>% data.frame(row.names=df[[1]], check.names=check_names)
   df = df[, -1]
+  
+  if (col_numeric) {
+    colnames(df) = unlist(df[1, ])
+    df = df[-1, ]
+  }
   return(df)
 }
 
@@ -389,9 +394,10 @@ plot_def = function(df, x, y, main=NULL, xlab=NULL, ylab=NULL, xlim=NULL, ylim=N
   }
   
   mapping = aes(x={{x}}, y={{y}})
-  size = deparse(substitute(size))
+  # size = deparse(substitute(size))
   color = deparse(substitute(color)) %>% filt_dash
   shape = deparse(substitute(shape)) %>% filt_dash
+  size = if (is.numeric(size)) size else as.numeric(deparse(substitute(size)))
   size = tryCatch(as.numeric(size), warning=function(e) return(size))
   shape = tryCatch(as.numeric(shape), warning=function(e) return(shape))
   

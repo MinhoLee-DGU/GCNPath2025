@@ -142,11 +142,16 @@ h = function(x, what=6) {
 
 sh = h
 
-fread_def = function(file, check_names=F, ...) {
+fread_def = function(file, check_names=F, col_numeric=F, ...) {
   # fread the file into data.frame
   df = fread(file, check.names=check_names, ...)
   df = df %>% data.frame(row.names=df[[1]], check.names=check_names)
   df = df[, -1]
+  
+  if (col_numeric) {
+    colnames(df) = unlist(df[1, ])
+    df = df[-1, ]
+  }
   return(df)
 }
 
@@ -276,7 +281,7 @@ hist_def = function(df, x=NULL, main=NULL, breaks=NULL, scale_x=NULL,
                     xlab=NULL, ylab=NULL, text=NULL, add=NULL, legend=F, pos_legend=NULL,
                     plot_tl=22.5, axis_tl=18, axis_tx=15, text_tx=15, legend_tl=10, legend_tx=10, 
                     margin=0.5, margin_pl=0.25, margin_lg=0.4, text_round=3, dist=1, 
-                    alpha=1, alpha_dist=0.25, width=16, height=13.5, dpi=400, text_ratio=1, 
+                    alpha=1, alpha_dist=0.25, width=16, height=13.5, dpi=400, text_ratio=1, size_line=1,
                     plot_face="plain", axis_face="plain", legend_face="plain", 
                     color="black", fill="grey", color_dist="black", fill_dist="red", 
                     text_info=T, hist=T, vline=F, show_title=F, force_bold=F, save=F, save_svg=T) {
@@ -359,7 +364,8 @@ hist_def = function(df, x=NULL, main=NULL, breaks=NULL, scale_x=NULL,
   }
   
   if (!is.null(scale_x)) pl = pl + scale_x_continuous(breaks=scale_x)
-  if (is.numeric(vline)) pl = pl + sapply(vline, function(x) geom_vline(xintercept=x, color="red", linetype=2))
+  if (is.numeric(vline)) pl = pl + 
+    sapply(vline, function(x) geom_vline(xintercept=x, color="red", linetype=2, linewidth=size_line))
   
   if (legend==F) pl = pl + theme(legend.position = "none")
   if (!is.null(add)) for (i in 1:length(add)) pl = pl + add[[i]]
@@ -389,7 +395,7 @@ plot_def = function(df, x, y, main=NULL, xlab=NULL, ylab=NULL, xlim=NULL, ylim=N
   }
   
   mapping = aes(x={{x}}, y={{y}})
-  size = deparse(substitute(size))
+  size = deparse(substitute(size)) %>% filt_dash
   color = deparse(substitute(color)) %>% filt_dash
   shape = deparse(substitute(shape)) %>% filt_dash
   size = tryCatch(as.numeric(size), warning=function(e) return(size))
@@ -701,9 +707,13 @@ venn_def = function(..., main=NULL, labels=NULL, col=NULL, add=NULL,
   if (length(Args)==1) Args = Args[[1]]
   Args = Args %>% lapply(unique)
   
-  if (is.null(labels) & is.null(names(Args))) {
-    labels = sprintf("Set%s", 1:length(Args))
+  if (!is.null(labels)) {
     names(Args) = labels
+  } else {
+    if (is.null(names(Args))) {
+      labels = sprintf("Set%s", 1:length(Args))
+      names(Args) = labels
+    }
   }
   
   if (is.null(col)) {
