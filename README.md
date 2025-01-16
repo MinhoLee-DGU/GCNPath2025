@@ -1,10 +1,10 @@
-# GCNPath2024
+# GCNPath2025
 
 ![_GCNPath](https://github.com/user-attachments/assets/13d9a4da-4efa-4548-bec6-91459141d176)
 
 GCNPath is a graph-based deep learning model designed for predicting anticancer drug response. This model leverages pathway-pathway association (PPA) graphs, which are compressed from STRING and RegNetwork, as well as a GSVA pathway correlation network. The training of GCNPath is conducted using transcriptome data from the SANGER Cell Model Passports.
 
-The GCNPath2024 directory is originally the subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory of the GCNPath project, encompassing the benchmark tests, as well as the preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
+The GCNPath2025 directory is originally the subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory of the GCNPath project, encompassing the benchmark tests, as well as the preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
 
 # Quick start
 ```
