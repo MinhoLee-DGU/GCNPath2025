@@ -3,4 +3,4 @@
 * ```_performance_chembl``` : Evaluates performance in ChEMBL for models trained from scratch using GDSC
 * ```_performance_pretrain``` : Evaluates performance in GDSC for models pre-trained by developers
 * ```functions.R``` : List of functions for processing data in R
-* ```[Model]``` : Contains weight parameters and prediction results for each model
+* ```[Model]``` : Contains codes for training and testing each model
