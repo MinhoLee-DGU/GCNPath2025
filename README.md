@@ -2,9 +2,9 @@
 
 ![_GCNPath](https://github.com/user-attachments/assets/13d9a4da-4efa-4548-bec6-91459141d176)
 
-GCNPath is a graph-based deep learning model designed for predicting anticancer drug response. This model leverages pathway-pathway association (PPA) graphs, which are compressed from STRING and RegNetwork, as well as a GSVA pathway correlation network. The training of GCNPath is conducted using transcriptome data from the SANGER Cell Model Passports.
+GCNPath is a graph-based deep learning model designed for predicting anticancer drug responses. The model utilizes pathway crosstalk network (PCN) graphs, which are compressed from STRING and RegNetwork, along with a GSVA pathway correlation network. GCNPath is trained using transcriptome data from the SANGER Cell Model Passports.
 
-The GCNPath2025 directory is originally the subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory of the GCNPath project, encompassing the benchmark tests, as well as the preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
+The GCNPath2025 directory was originally a subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory for the GCNPath project, containing benchmark tests as well as preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
 
 # Quick start
 ```
@@ -18,11 +18,14 @@ bash test_ccle.sh
 ```
 
 # Requirement
-You can install the Conda environment with the following command:
-```conda env create -f GCNPath.yaml```
+To install the Conda environment, run:
+```
+conda env create -f GCNPath.yaml
+```
 
-If the command above does not work, please install the necessary packages manually. The success of the installation and model training may depend on the compatibility between PyTorch, PyTorch Geometric, CUDA toolkit, and your GPU and operating system. We trained and tested our model on Ubuntu 20.04.5 LTS using an NVIDIA GeForce RTX 3090.
-
+If the above command doesn't work, manually install the required packages. Installation and model training success depend on the compatibility between PyTorch, PyTorch Geometric, the CUDA toolkit, your GPU, and your operating system. We trained and tested the model on Ubuntu 20.04.5 LTS using an NVIDIA GeForce RTX 3090.
+Required packages:
+```
 * python (3.8.18)
 * numpy (1.24.4)
 * pandas (2.0.3)
@@ -42,26 +45,27 @@ If the command above does not work, please install the necessary packages manual
 * r-base (4.2.3)
 * r-matrixstats (1.1.0)
 * bioconductor-gsva (1.46.0)
+```
 
 # Implementation
 
-## 1. Processing of cell data
+## 1. Cell Data Processing
 ```
 bash process_cell.sh
 
-1-1. Compress RNA data from gene- to pathway-level using GSVA
+1-1. Compress RNA data from gene-level to pathway-level using GSVA.
 # Rscript process_cell_gsva.R \
 #     data/cell_data/SANGER_RNA_TPM_Filt.csv \
 #     data/path_data/c2.cp.biocarta.v2023.1.Hs.entrez.gmt \
 #     processed/cell_data_biocarta/SANGER_RNA_GSVA.csv
 
-1-2. Transform GSVA pathway data into graph form
+1-2. Transform GSVA pathway data into graph format.
 # python process_cell.py \
 #     -omics processed/cell_data_biocarta/SANGER_RNA_GSVA.csv \
 #     -net data/net_data_biocarta/STR9_Reg_Corr_KNN5.csv \
 #     -out processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle
 
-1-2. Process external data with the scaler fitted by train data (parameter -train)
+1-2. Process external data with the scaler fitted to training data (using the -train parameter).
 # python process_cell.py \
 #     -omics processed/cell_data_biocarta/CCLE_RNA_GSVA_BROAD.csv \
 #     -net data/net_data_biocarta/STR9_Reg_Corr_KNN5.csv \
@@ -69,7 +73,7 @@ bash process_cell.sh
 #     -train processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle
 ```
 
-## 2. Processing of drug data
+## 2. Drug Data Processing
 ```
 bash process_drug.sh
 # python process_drug.py \
@@ -81,7 +85,7 @@ bash process_drug.sh
 ## 3. Model Training
 
 ### 3-1. Model Training in Various Test Scenarios
-Model training in outer cross-validation across different test scenarios is handled by the ```train.sh```, which sequentially executes ```train_write.sh``` and ```train.py```. The file ```train.sh``` contains the list of input file paths and hyperparameters. In a meanwhile, ```train_write.sh``` contains the resource management parameters of CPU, RAM and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g. ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If you utilize SLURM with ```use_slurm``` as 1 within  ```train.sh```, all log files will be created in the ```out``` folder.
+Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to 1 within ```train.sh```), log files will be created in the ```out``` folder.
 
 The columns for a cell line, drug, and ln(IC<sub>50</sub>) can be specified using the ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold in cross-validation is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
 IC<sub>50</sub> data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
@@ -100,7 +104,7 @@ bash train.sh 0 0
 ```
 
 ### 3-2. Model Training with Whole Dataset without Splitting Data
-Training a model using the entire GDSC1+2 dataset without data splitting is managed by the ```retrain_total.sh```, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The overall process is similar to the one described in **Section 3-1**. 
+Training a model using the entire GDSC1+2 dataset without splitting data is managed by the ```retrain_total.sh``` script, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The overall process is similar to that described in **Section 3-1**. Since the GDSC1+2 dataset is not split into training, validation, and test sets, early stopping is not applied when training models for 100 epochs by default.
 
 ```
 bash retrain_total.sh
@@ -113,7 +117,7 @@ bash retrain_total.sh
 ```
 
 ## 4. Model Testing
-Model testing is conducted using test bash scripts (e.g. ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially executes ```test_write.sh``` and ```test.py```. The process is similar to that described in **Section 3-1**. If you want to only output predicted response values without calculating performance metrics, set the parameter ```-col_ic50 0```.
+Model testing is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
 
 ```
 bash test_ccle.sh
