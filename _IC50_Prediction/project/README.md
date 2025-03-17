@@ -1,4 +1,4 @@
-File Structure – ```project```
+**File Structure – ```project```**
 * ```1-1_process_rna``` : Processes cell TPM data from SANGER Cell Model Passports
 * ```1-2_process_net``` : Processes gene-level networks from STRING and RegNetwork
 * ```1-3_gsva_ppa``` : Creates pathway graphs and examines batch correction via GSVA
