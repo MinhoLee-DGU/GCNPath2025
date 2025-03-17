@@ -26,7 +26,6 @@ conda env create -f GCNPath.yaml
 If the above command doesn't work, manually install the required packages. Installation and model training success depend on the compatibility between PyTorch, PyTorch Geometric, the CUDA toolkit, your GPU, and your operating system. We trained and tested the model on Ubuntu 20.04.5 LTS using an NVIDIA GeForce RTX 3090.
 
 Required packages:
-```
 * python (3.8.18)
 * numpy (1.24.4)
 * pandas (2.0.3)
@@ -46,7 +45,6 @@ Required packages:
 * r-base (4.2.3)
 * r-matrixstats (1.1.0)
 * bioconductor-gsva (1.46.0)
-```
 
 # Implementation
 
@@ -91,18 +89,15 @@ Model training in outer cross-validation across different test scenarios is hand
 The columns for cell lines, drugs, and ln(IC</sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
 IC</sub>50</sub> data : 
-```
 * 0 [GDSC1+2]
 * 1 [GDSC1]
 * 2 [GDSC2]
-```
+
 Test type : 
-```
 * 0 [Unblinded]
 * 1 [Cell-Blind]
 * 2 [Drug-Blind]
 * 3 [Strict-Blind]
-```
 
 You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
