@@ -87,9 +87,18 @@ bash process_drug.sh
 ### 3-1. Model Training in Various Test Scenarios
 Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to 1 within ```train.sh```), log files will be created in the ```out``` folder.
 
-The columns for a cell line, drug, and ln(IC<sub>50</sub>) can be specified using the ```-col_cell```, ```-col_drug``` and ```-col_ic50```, respectively. The train fold in cross-validation is corresponding to ```-nth```, whose range is [0, 24] in strict-blind tests or [0, 9] in the rest ones. ```train.sh``` takes the following two parameters.  
-IC<sub>50</sub> data : 0 [GDSC1+2], 1 [GDSC1], 2 [GDSC2]  
-Test type : 0 [Normal], 1 [Cell-Blind], 2 [Drug-Blind], 3 [Strict-Blind]
+The columns for cell lines, drugs, and ln(IC</sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
+```
+* IC</sub>50</sub> data : 
+** 0 [GDSC1+2]
+** 1 [GDSC1]
+** 2 [GDSC2]
+* Test type : 
+** 0 [Unblinded]
+** 1 [Cell-Blind]
+** 2 [Drug-Blind]
+** 3 [Strict-Blind]
+```
 
 You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
