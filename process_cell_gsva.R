@@ -22,7 +22,7 @@ Path_List = read_gmt(dir_path)
 RNA = read.csv(dir_rna, row.names=1, check.names=F)
 RNA[is.na(RNA)] = fill_na
 
-RNA_GSVA = gsva_def(RNA, Path_List, filt_genes=F, method="gsva", cores=cores, cell_row=cell_row)
+RNA_GSVA = gsva_def(RNA, Path_List, filt_genes=T, method="gsva", cores=cores, cell_row=cell_row)
 
 dir_out_ = strsplit(dir_out, "/")[[1]]
 dir_out_ = paste0(dir_out_[1:(length(dir_out_)-1)], collapse="/")
