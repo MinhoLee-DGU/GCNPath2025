@@ -97,9 +97,9 @@ bash process_drug.sh
 ### 3-1. Model Training in Various Test Scenarios
 Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to 1 within ```train.sh```), log files will be created in the ```out``` folder.
 
-The columns for cell lines, drugs, and ln(IC</sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
+The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
-IC</sub>50</sub> data : 
+IC<sub>50</sub> data : 
 * 0 [GDSC1+2]
 * 1 [GDSC1]
 * 2 [GDSC2]
