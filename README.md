@@ -51,7 +51,7 @@ Required packages:
 ## 1. Cell Data Processing
 Cell data processing is performed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```.
 
-The script ```process_cell_gsva.R``` compresses RNA data from the gene level to the pathway level using GSVA, generating output in CSV format. It requires (1) RNA cell data and (2) a pathway list in GMT format as inputs. By default, the input RNA data is structured with cells in rows and genes in columns (controlled by the fourth parameter, cell_row=T). Genes that are not included in any pathway are filtered out by default.
+The script ```process_cell_gsva.R``` compresses RNA data from the gene level to the pathway level using GSVA, generating output in CSV format. It requires (1) RNA cell data and (2) a pathway list in GMT format as inputs. By default, the input RNA data is structured with cells in rows and genes in columns (controlled by the fourth parameter, ```cell_row=T```). Genes that are not included in any pathway are filtered out by default.
 
 The script ```process_cell.py``` standardizes RNA pathway data using ```RobustScaler``` and formats them into PCN graphs in Pickle format. It requires (1) RNA pathway data processed by ```process_cell_gsva.R``` (```-omics``` parameter) and (2) PCN graphs (```-net``` parameter). When processing external cell data, (3) RNA pathway data used for training is also required to apply the standardization scaler for transforming the external data (```-train``` parameter).
 
