@@ -55,6 +55,8 @@ The script ```process_cell_gsva.R``` compresses RNA data from the gene level to 
 
 The script ```process_cell.py``` standardizes RNA pathway data using ```RobustScaler``` and formats them into PCN graphs in Pickle format. It requires (1) RNA pathway data processed by ```process_cell_gsva.R``` (```-omics``` parameter) and (2) PCN graphs (```-net``` parameter). When processing external cell data, (3) RNA pathway data used for training is also required to apply the standardization scaler for transforming the external data (```-train``` parameter).
 
+When PCN graphs were not given (```-net``` None), the pathway data is not formatted in graph, which can be implemented by the script ```process_cell_lin.sh```.
+
 ```
 bash process_cell.sh
 
@@ -79,6 +81,9 @@ bash process_cell.sh
 ```
 
 ## 2. Drug Data Processing
+Drug data processing is performed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs in Pickle format. For input drug structures, you can specify the column names for SMILES structures (```-col_smi``` parameter) and drug IDs (```-col_name``` parameter). If ```-col_name``` is not provided, the SMILES strings themselves are used as drug IDs. 
+
+When graph featurization option is deactivated (```-drug_feat 0```), the drug data is not formatted in graph, which can be implemented by the script ```process_drug_lin.sh```.
 ```
 bash process_drug.sh
 # python process_drug.py \
