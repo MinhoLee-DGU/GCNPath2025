@@ -99,12 +99,12 @@ Model training in outer cross-validation across different test scenarios is hand
 
 The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
-IC<sub>50</sub> data : 
+IC<sub>50</sub> Data (1st positional) : 
 * 0 [GDSC1+2]
 * 1 [GDSC1]
 * 2 [GDSC2]
 
-Test type : 
+Test Type (2nd positional) : 
 * 0 [Unblinded]
 * 1 [Cell-Blind]
 * 2 [Drug-Blind]
