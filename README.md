@@ -49,7 +49,7 @@ Required packages:
 # Implementation
 
 ## 1. Processing Cell Data
-Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```.
+Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway score data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```.
 
 ### ```process_cell_gsva.R```
 This script compresses RNA data from the gene level to the pathway level using GSVA. By default, genes not included in any pathway are filtered out.
@@ -76,7 +76,7 @@ bash process_cell.sh
 #     data/path_data/c2.cp.biocarta.v2023.1.Hs.entrez.gmt \
 #     processed/cell_data_biocarta/SANGER_RNA_GSVA.csv
 
-1-2. Transform GSVA pathway data into graph format.
+1-2. Transform GSVA pathway score data into graph format.
 # python process_cell.py \
 #     -omics processed/cell_data_biocarta/SANGER_RNA_GSVA.csv \
 #     -net data/net_data_biocarta/STR9_Reg_Corr_KNN5.csv \
