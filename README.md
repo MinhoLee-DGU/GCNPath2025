@@ -56,15 +56,15 @@ This script compresses RNA data from the gene level to the pathway level using G
 
 * [```1st argument```] Gene-level transcriptome data in (input, CSV)
 * [```2nd argument```] Pathway list (input, GMT)
-* [```3rd argument```] Pathway-level transcriptome data. The file is structured with ```cell × pathway``` in row × column (output, CSV)
+* [```3rd argument```] Pathway score data. The file is structured with ```cell × pathway``` in row × column (output, CSV)
 * [```4th argument```] Whether ```1st argument``` is structured with ```cell × gene``` in row × column (Default: TRUE)
 
 ### ```process_cell.py```
-This script standardizes RNA pathway data using ```RobustScaler``` and formats it into PCN graphs. When processing external cell data not used during training, pathway-level data utilized in training stage must be provided to apply the standardization scaler for transforming the external data (```-train``` parameter).
+This script standardizes pathway score data using ```RobustScaler``` and formats them into PCN graph[s]. When processing external cell data not used during training, pathway score data utilized in training stage must be provided to apply the standardization scaler for transforming these external data (```-train``` parameter).
 
-* [```-omics```] Pathway-level transcriptome data processed in the previous step (input, CSV)
+* [```-omics```] Pathway score data processed in the previous step (input, CSV)
 * [```-net```] PCN graphs containing at least two columns (```Pathway1```, ```Pathway2```, [```Edge_Type```]) (input, CSV)
-* [```-out```] Pathway-level data formatted as PCN graph[s] (output, Pickle)
+* [```-out```] Pathway score data formatted as PCN graph[s] (output, Pickle)
 * [```-train```] Output file containing the standardization scaler (optional input, Pickle)
 
 ```
@@ -111,25 +111,23 @@ bash process_drug.sh
 ## 3. Training Model
 
 ### 3-1. Training Models in Various Test Scenarios
-Training models in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder.
-
-The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
+Training models in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder. The training fold in cross-validation corresponds to ```-nth```, with a range of [```0, 24```] for strict-blind tests or [```0, 9```] for others. The ```train.sh``` script takes the following parameters:
 
 ### train.sh
 * [```1st argument```] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
 * [```2nd argument```] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
 
-In ```train.py```, You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
+In ```train.py```, the columns for cell lines, drugs, and ln(IC<sub>50</sub>) in IC<sub>50</sub> data can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
 ### train.py
-* [```-cell```] Pathway-level data formatted as a PCN graph (output, Pickle)
+* [```-cell```] Pathway score data formatted as PCN graph[s] (output, Pickle)
 * [```-drug```] Drug structure data in graph format (output, Pickle)
 * [```-ic50```] IC50 data containing at least three columns (```-col_cell```, ```-col_drug```, ```-col_ic50```) (input, TXT or CSV)
 * [```-out_dir```] Directory to save hyperparameter, weight parameter and prediction results (output, Directory)
 * [```-nth```] Fold index for outer cross validation (choose one of ```0-24``` in Strict-Blind or ```0-9``` in the other test types)
 * [```-col_cell```] Column name of cell in ```-ic50``` file (Default: ```Cell```)
 * [```-col_drug```] Column name of drug in ```-ic50``` file (Default: ```Drug```)
-* [```-col_ic50```] Column name of IC50 in ```-ic50``` file (Default: ```LN_IC50```)
+* [```-col_ic50```] Column name of IC<sub>50</sub> in ```-ic50``` file (Default: ```LN_IC50```)
 * [```-seed_model```] Seed number for model weight initialization (Default: ```2021```)
 * [```-e```] Maximum epochs for training model (Default: ```300```)
 * [```-p```] Patience of early stopping in training model (Default: ```10```)
@@ -162,9 +160,9 @@ bash retrain_total.sh
 Testing a model is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
 
 ### test_XXX.py
-[```-dir_param```] Model weight parameters (input, pth)
-[```-dir_hparam```] Model hyperparameters (input, Pickle)
-[```-out_file```] Prediction results (output, CSV)
+* [```-dir_param```] Model weight parameters (input, pth)
+* [```-dir_hparam```] Model hyperparameters (input, Pickle)
+* [```-out_file```] Prediction results (output, CSV)
 
 ```
 bash test_ccle.sh
