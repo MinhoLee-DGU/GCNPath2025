@@ -96,9 +96,10 @@ Drug data are processed using ```process_drug.sh```, which executes ```process_d
 ### ```process_drug.py```
 * [```-smi```] Drug structure data in SMILES format containing at least one columns (```-col_smi```, [```-col_name```]) (input, CSV)
 * [```-out_dir```] Drug structure data in graph format (output, Pickle)
-* [```-col_smi```] Column name of drug structure in ```-smi``` file (Default: ```Drug_CID```)
-* [```-col_name```] Column name of drug name in ```-smi``` file. If not provided (```None```), the SMILES strings themselves are used as drug IDs. (Default: ```Drug_CID```, optional)
-* [```-drug_feat```] Whether drug data are processed in graph format? (Default: ```1``` [True])
+* [```-col_smi```] Column name of drug structures in ```-smi``` file (Default: ```Drug_CID```)
+* [```-col_name```] Column name of drug IDs or names in ```-smi``` file. If not provided (```None```), the SMILES strings themselves are used as drug IDs. (Default: ```SMILES_CAN```, optional)
+* [```-drug_feat```] Whether drug data are processed in graph format? (Default: ```3```)
+
 ```
 bash process_drug.sh
 # python process_drug.py \
@@ -107,10 +108,10 @@ bash process_drug.sh
 #    -out_dir processed/drug_data/GDSC_Drug_Custom.pickle \
 ```
 
-## 3. Model Training
+## 3. Training Model
 
-### 3-1. Model Training in Various Test Scenarios
-Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder.
+### 3-1. Training Models in Various Test Scenarios
+Training models in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder.
 
 The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
@@ -118,17 +119,21 @@ The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified usin
 * [```1st argument```] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
 * [```2nd argument```] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
 
-You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
+In ```train.py```, You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
-### train.py and test_XXX.py
+### train.py
 * [```-cell```] Pathway-level data formatted as a PCN graph (output, Pickle)
 * [```-drug```] Drug structure data in graph format (output, Pickle)
-* [```-ic50```] IC50 data containing at least two columns (```-col_cell```, ```-col_drug```, [```-col_ic50```]) (input, TXT or CSV)
-* [```-out_dir```] Directory to save hyperparameter, weight parameter and prediction results (output)
-* [```-cpu```] Number of workers for data loading (Default: ```4```).
+* [```-ic50```] IC50 data containing at least three columns (```-col_cell```, ```-col_drug```, ```-col_ic50```) (input, TXT or CSV)
+* [```-out_dir```] Directory to save hyperparameter, weight parameter and prediction results (output, Directory)
+* [```-nth```] Fold index for outer cross validation (choose one of ```0-24``` in Strict-Blind or ```0-9``` in the other test types)
 * [```-col_cell```] Column name of cell in ```-ic50``` file (Default: ```Cell```)
 * [```-col_drug```] Column name of drug in ```-ic50``` file (Default: ```Drug```)
-* [```-col_ic50```] Column name of IC50 in ```-ic50``` file (Default: ```LN_IC50```, optional in test_XXX.py)
+* [```-col_ic50```] Column name of IC50 in ```-ic50``` file (Default: ```LN_IC50```)
+* [```-seed_model```] Seed number for model weight initialization (Default: ```2021```)
+* [```-e```] Maximum epochs for training model (Default: ```300```)
+* [```-p```] Patience of early stopping in training model (Default: ```10```)
+* [```-cpu```] Number of workers for data loading (Default: ```4```).
 
 ```
 bash train.sh 0 0
@@ -140,8 +145,8 @@ bash train.sh 0 0
 #    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4
 ```
 
-### 3-2. Model Training with Whole Dataset without Splitting Data
-Training a model using the entire GDSC1+2 dataset without splitting data is managed by the ```retrain_total.sh``` script, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The overall process is similar to that described in **Section 3-1**. Since the GDSC1+2 dataset is not split into training, validation, and test sets, early stopping is not applied when training models for 100 epochs by default.
+### 3-2. Training Models using Whole GDSC1+2 Dataset without Splitting Data
+Training models using the entire GDSC1+2 as target label dataset without splitting data is managed by the ```retrain_total.sh``` script, which sequentially executes ```train_write.sh``` and ```retrain_total.py```. The overall process is similar to that described in **Section 3-1**. Since the GDSC1+2 dataset is not split into training, validation, and test sets, early stopping is not applied when training models for 100 epochs by default.
 
 ```
 bash retrain_total.sh
@@ -153,8 +158,13 @@ bash retrain_total.sh
 #    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4 -seed_model 2021
 ```
 
-## 4. Model Testing
-Model testing is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
+## 4. Testing Model
+Testing a model is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
+
+### test_XXX.py
+[```-dir_param```] Model weight parameters (input, pth)
+[```-dir_hparam```] Model hyperparameters (input, Pickle)
+[```-out_file```] Prediction results (output, CSV)
 
 ```
 bash test_ccle.sh
