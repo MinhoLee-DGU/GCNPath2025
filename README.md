@@ -49,22 +49,22 @@ Required packages:
 # Implementation
 
 ## 1. Cell Data Processing
-Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway data is not formatted as a graph, which can be implemented by the script ```process_cell_lin.sh```.
+Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```.
 
 ### ```process_cell_gsva.R```
 This script compresses RNA data from the gene level to the pathway level using GSVA. By default, genes not included in any pathway are filtered out.
 
 * [```1st argument```] Gene-level transcriptome data in (input, CSV)
 * [```2nd argument```] Pathway list (input, GMT)
-* [```3rd argument```] Pathway-level transcriptome data. The file is structured with cell × pathway in row × column (output, CSV)
-* [```4th argument```] Whether gene-level transcriptome data is structured with cell × gene in row × column (Default: TRUE)
+* [```3rd argument```] Pathway-level transcriptome data. The file is structured with ```cell × pathway``` in row × column (output, CSV)
+* [```4th argument```] Whether ```1st argument``` is structured with ```cell × gene``` in row × column (Default: TRUE)
 
 ### ```process_cell.py```
-This script standardizes RNA pathway data using ```RobustScaler``` and formats it into PCN graphs. When processing external cell data not used during training, pathway-level data utilized in training stage must be provided to apply the standardization scaler for transforming the external data (```-train parameter```).
+This script standardizes RNA pathway data using ```RobustScaler``` and formats it into PCN graphs. When processing external cell data not used during training, pathway-level data utilized in training stage must be provided to apply the standardization scaler for transforming the external data (```-train``` parameter).
 
 * [```-omics```] Pathway-level transcriptome data processed in the previous step (input, CSV)
-* [```-net```] PCN graphs containing two or three columns (```Pathway1```, ```Pathway2```, [```Edge_Type```]) (input, CSV)
-* [```-out```] Pathway-level data formatted as a PCN graph (output, Pickle)
+* [```-net```] PCN graphs containing at least two columns (```Pathway1```, ```Pathway2```, [```Edge_Type```]) (input, CSV)
+* [```-out```] Pathway-level data formatted as PCN graph[s] (output, Pickle)
 * [```-train```] Output file containing the standardization scaler (optional input, Pickle)
 
 ```
@@ -110,22 +110,25 @@ bash process_drug.sh
 ## 3. Model Training
 
 ### 3-1. Model Training in Various Test Scenarios
-Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to 1 within ```train.sh```), log files will be created in the ```out``` folder.
+Model training in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder.
 
 The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
-IC<sub>50</sub> Data (1st positional) : 
-* 0 [GDSC1+2]
-* 1 [GDSC1]
-* 2 [GDSC2]
-
-Test Type (2nd positional) : 
-* 0 [Unblinded]
-* 1 [Cell-Blind]
-* 2 [Drug-Blind]
-* 3 [Strict-Blind]
+### train.sh
+* [1st argument] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
+* [2nd argument] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
 
 You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
+
+### train.py and test_XXX.py
+* [```-cell```] Pathway-level data formatted as a PCN graph (output, Pickle)
+* [```-drug```] Drug structure data in graph format (output, Pickle)
+* [```-ic50```] IC50 data containing at least two columns (```-col_cell```, ```-col_drug```, [```-col_ic50```]) (input, TXT or CSV)
+* [```-out_dir```] Directory to save hyperparameter, weight parameter and prediction results (output)
+* [```-cpu```] Number of workers for data loading (Default: ```4```).
+* [```-col_cell```] Column name of cell in ```-ic50``` file (Default: ```Cell```)
+* [```-col_drug```] Column name of drug in ```-ic50``` file (Default: ```Drug```)
+* [```-col_ic50```] Column name of IC50 in ```-ic50``` file (Default: ```LN_IC50```, optional in test_XXX.py)
 
 ```
 bash train.sh 0 0
