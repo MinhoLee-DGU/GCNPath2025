@@ -48,7 +48,7 @@ Required packages:
 
 # Implementation
 
-## 1. Cell Data Processing
+## 1. Processing Cell Data
 Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```.
 
 ### ```process_cell_gsva.R```
@@ -90,7 +90,7 @@ bash process_cell.sh
 #     -train processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle
 ```
 
-## 2. Drug Data Processing
+## 2. Processing Drug Data
 Drug data are processed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs. When graph featurization is deactivated (```-drug_feat 0```), drug data are processed in Morgan Fingerprints (256-bit, radius 2), which can be implemented by the script ```process_drug_lin.sh```.
 
 ### ```process_drug.py```
@@ -115,8 +115,8 @@ Model training in outer cross-validation across different test scenarios is hand
 The columns for cell lines, drugs, and ln(IC<sub>50</sub>) can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. The training fold in cross-validation corresponds to ```-nth```, with a range of [0, 24] for strict-blind tests or [0, 9] for others. The ```train.sh``` script takes the following parameters:
 
 ### train.sh
-* [1st argument] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
-* [2nd argument] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
+* [```1st argument```] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
+* [```2nd argument```] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
 
 You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
