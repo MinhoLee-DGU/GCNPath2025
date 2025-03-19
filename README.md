@@ -108,7 +108,7 @@ bash process_drug.sh
 #    -out_dir processed/drug_data/GDSC_Drug_Custom.pickle \
 ```
 
-## 3. Training Model
+## 3. Training Models
 
 ### 3-1. Training Models in Various Test Scenarios
 Training models in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder. The training fold in cross-validation corresponds to ```-nth```, with a range of [```0, 24```] for strict-blind tests or [```0, 9```] for others. The ```train.sh``` script takes the following parameters:
@@ -156,8 +156,8 @@ bash retrain_total.sh
 #    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4 -seed_model 2021
 ```
 
-## 4. Testing Model
-Testing a model is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
+## 4. Testing Models
+Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
 
 ### test_XXX.py
 * [```-dir_param```] Model weight parameters (input, pth)
