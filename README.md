@@ -49,13 +49,23 @@ Required packages:
 # Implementation
 
 ## 1. Cell Data Processing
-Cell data processing is performed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```.
+Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway data is not formatted as a graph, which can be implemented by the script ```process_cell_lin.sh```.
 
-The script ```process_cell_gsva.R``` compresses RNA data from the gene level to the pathway level using GSVA, generating output in CSV format. It requires (1) RNA cell data and (2) a pathway list in GMT format as inputs. By default, the input RNA data is structured with cells in rows and genes in columns (controlled by the fourth parameter, ```cell_row=T```). Genes that are not included in any pathway are filtered out by default.
+### ```process_cell_gsva.R```
+This script compresses RNA data from the gene level to the pathway level using GSVA. By default, genes not included in any pathway are filtered out.
 
-The script ```process_cell.py``` standardizes RNA pathway data using ```RobustScaler``` and formats them into PCN graphs in Pickle format. It requires (1) RNA pathway data processed by the previous step (```-omics``` parameter) and (2) PCN graphs (```-net``` parameter). When processing external cell data, (3) RNA pathway data used for training is also required to apply the standardization scaler for transforming the external data (```-train``` parameter).
+* [```1st argument```] Gene-level transcriptome data in (input, CSV)
+* [```2nd argument```] Pathway list (input, GMT)
+* [```3rd argument```] Pathway-level transcriptome data. The file is structured with cell × pathway in row × column (output, CSV)
+* [```4th argument```] Whether gene-level transcriptome data is structured with cell × gene in row × column (Default: TRUE)
 
-When PCN graphs were not given (```-net``` None), the pathway data is not formatted in graph, which can be implemented by the script ```process_cell_lin.sh```.
+### ```process_cell.py```
+This script standardizes RNA pathway data using ```RobustScaler``` and formats it into PCN graphs. When processing external cell data not used during training, pathway-level data utilized in training stage must be provided to apply the standardization scaler for transforming the external data (```-train parameter```).
+
+* [```-omics```] Pathway-level transcriptome data processed in the previous step (input, CSV)
+* [```-net```] PCN graphs containing two or three columns (```Pathway1```, ```Pathway2```, [```Edge_Type```]) (input, CSV)
+* [```-out```] Pathway-level data formatted as a PCN graph (output, Pickle)
+* [```-train```] Output file containing the standardization scaler (optional input, Pickle)
 
 ```
 bash process_cell.sh
@@ -81,9 +91,14 @@ bash process_cell.sh
 ```
 
 ## 2. Drug Data Processing
-Drug data processing is performed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs in Pickle format. For input drug structures, you can specify the column names for SMILES structures (```-col_smi``` parameter) and drug IDs (```-col_name``` parameter). If ```-col_name``` is not provided, the SMILES strings themselves are used as drug IDs. 
+Drug data are processed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs. When graph featurization is deactivated (```-drug_feat 0```), drug data are processed in Morgan Fingerprints (256-bit, radius 2), which can be implemented by the script ```process_drug_lin.sh```.
 
-When graph featurization option is deactivated (```-drug_feat 0```), the drug data is not formatted in graph, which can be implemented by the script ```process_drug_lin.sh```.
+### ```process_drug.py```
+* [```-smi```] Drug structure data in SMILES format containing at least one columns (```-col_smi```, [```-col_name```]) (input, CSV)
+* [```-out_dir```] Drug structure data in graph format (output, Pickle)
+* [```-col_smi```] Column name of drug structure in ```-smi``` file (Default: ```Drug_CID```)
+* [```-col_name```] Column name of drug name in ```-smi``` file. If not provided (```None```), the SMILES strings themselves are used as drug IDs. (Default: ```Drug_CID```, optional)
+* [```-drug_feat```] Whether drug data are processed in graph format? (Default: ```1``` [True])
 ```
 bash process_drug.sh
 # python process_drug.py \
