@@ -157,8 +157,7 @@ bash retrain_total.sh
 ```
 
 ## 4. Testing Models
-Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0.
-[TODO] Enhancing model interpretability with Grad-CAM
+Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0. We will enhancing model interpretability with Grad-CAM in near future.
 
 ### test_XXX.py
 * [```-dir_param```] Model weight parameters (input, pth)
