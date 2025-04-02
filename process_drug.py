@@ -157,7 +157,7 @@ def parse_drug():
     import argparse
     parser = argparse.ArgumentParser()
     smi_ = "data/drug_data/SMILES_GDSC.csv"
-    out_dir_="processed/drug_data/GDSC_Drug_Custom.pickle"
+    out_dir_="processed/drug_data/GDSC_Drug_Graph.pickle"
 
     parser.add_argument("-smi", type=str, default=smi_)
     parser.add_argument("-out_dir", type=str, default=out_dir_)
@@ -190,6 +190,8 @@ if __name__ == '__main__':
     
     smiles = drug_data[col_smiles]
     drug_data = process_drug(smiles, drugs, drug_feat=drug_feat, coord_3d=coord_3d)
+    # drug_data = process_drug(smiles, drugs, drug_feat=drug_feat, coord_3d=coord_3d, nBits=1024)
+    # drug_data = process_drug(smiles, drugs, drug_feat=drug_feat, coord_3d=coord_3d, radius=3)
     
     with open(output_dir, 'wb') as (f):
         pickle.dump(drug_data, f)

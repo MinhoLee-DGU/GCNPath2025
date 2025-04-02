@@ -26,7 +26,7 @@ esac
 case $gnn_drug in
     0) drug=${dir_drug}/GDSC_Drug_Morgan.pickle ;;
     # 0) drug=${dir_drug}/GDSC_Drug_SMILESVec.pickle ;;
-    *) drug=${dir_drug}/GDSC_Drug_Custom.pickle ;;
+    *) drug=${dir_drug}/GDSC_Drug_Graph.pickle ;;
     # *) drug=${dir_drug}/GDSC_Drug_SA.pickle ;;
 esac
 

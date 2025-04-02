@@ -8,16 +8,17 @@ model_type=RGCN
 ic50=data/ic50_data/TCGA_Response.csv
 cell=processed/cell_data_biocarta/TCGA_RNA_KNN5_STR9_Reg_Corr.pickle
 cell_cb=processed/cell_data_biocarta/TCGA_RNA_KNN5_STR9_Reg_Corr_CB.pickle
-drug=processed/drug_data/TCGA_Drug_Custom.pickle
+drug=processed/drug_data/TCGA_Drug_Graph.pickle
 dir_model=results/IC50_GDSC/$test_type/$model_type
-out_cam=None
 
+out_cam=None
 col_cell=Sample
 col_drug=Drug_CID
 col_ic50=0
-use_slurm=1
 
+use_slurm=1
 seed_list=$(seq 2021 2030)
+
 for seed in ${seed_list[@]}
 do
     # TCGA
