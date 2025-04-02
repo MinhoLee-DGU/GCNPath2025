@@ -99,7 +99,7 @@ class Logger_Perf :
     
     def set_column(self, no_valid=False) :
         col_info = "Epoch\tEarly_Stop"
-        metrics = ["MSE", "RMSE", "PCC", "SCC"]
+        metrics = ["MSE", "RMSE", "PCC", "SCC", "Time"]
         metrics_train = "\t".join(["Train_{}".format(m) for m in metrics])
         metrics_valid = "\t".join(["Valid_{}".format(m) for m in metrics])
         
@@ -261,6 +261,11 @@ def train_epoch(model, train_loader, device, optimizer) :
     y_pred = torch.Tensor()
     y_true = torch.Tensor()
     
+    if device!="cpu" :
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+    
     for batch, (cell, drug, ic50) in enumerate(tqdm(train_loader, desc="Train")) :
         cell = cell.to(device)
         drug = drug.to(device)
@@ -277,6 +282,13 @@ def train_epoch(model, train_loader, device, optimizer) :
         y_pred = torch.cat((y_pred, pred.cpu()))
         y_true = torch.cat((y_true, ic50.cpu()))
     
+    if device!="cpu" :
+        end.record()
+        torch.cuda.synchronize()
+        time = start.elapsed_time(end)
+    else :
+        time = 0
+    
     loss_epoch = loss_epoch / len(train_loader)
     y_pred = y_pred.detach().squeeze().numpy()
     y_true = y_true.detach().squeeze().numpy()
@@ -285,7 +297,7 @@ def train_epoch(model, train_loader, device, optimizer) :
     pcc = calc_pcc(y_pred, y_true, digit=3)
     scc = calc_scc(y_pred, y_true, digit=3)
     
-    return loss_epoch, rmse, pcc, scc
+    return loss_epoch, rmse, pcc, scc, time
 
 
 def valid_epoch(model, valid_loader, device) :
@@ -297,6 +309,11 @@ def valid_epoch(model, valid_loader, device) :
     
     y_pred = torch.Tensor()
     y_true = torch.Tensor()
+    
+    if device!="cpu" :
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
     
     with torch.no_grad() :
         for batch, (cell, drug, ic50) in enumerate(tqdm(valid_loader, desc="Valid")) :
@@ -311,6 +328,13 @@ def valid_epoch(model, valid_loader, device) :
             y_pred = torch.cat((y_pred, pred.cpu()))
             y_true = torch.cat((y_true, ic50.cpu()))
     
+    if device!="cpu" :
+        end.record()
+        torch.cuda.synchronize()
+        time = start.elapsed_time(end)
+    else :
+        time = 0
+        
     loss_epoch = loss_epoch / len(valid_loader)
     y_pred = y_pred.detach().squeeze().numpy()
     y_true = y_true.detach().squeeze().numpy()
@@ -319,7 +343,7 @@ def valid_epoch(model, valid_loader, device) :
     pcc = calc_pcc(y_pred, y_true, digit=3)
     scc = calc_scc(y_pred, y_true, digit=3)
     
-    return loss_epoch, rmse, pcc, scc
+    return loss_epoch, rmse, pcc, scc, time
 
 
 def train(model, train_loader, valid_loader, device, optimizer,
@@ -328,22 +352,25 @@ def train(model, train_loader, valid_loader, device, optimizer,
     if dir_log is not None : 
         Logger = Logger_Perf(dir_log)
         Logger.set_column()
+    
+    time_list = []
     early_stopping = EarlyStopping(patience=patience, path=dir_param, verbose=False)
     
     for epoch in range(1, epochs+1) :
-        train_loss, train_rmse, train_pcc, train_scc = train_epoch(model, train_loader, device, optimizer)
-        valid_loss, valid_rmse, valid_pcc, valid_scc = valid_epoch(model, valid_loader, device)
+        train_loss, train_rmse, train_pcc, train_scc, train_time = train_epoch(model, train_loader, device, optimizer)
+        valid_loss, valid_rmse, valid_pcc, valid_scc, valid_time = valid_epoch(model, valid_loader, device)
         if scheduler is not None : scheduler.step()
+        time_list.append(train_time+valid_time)
         
         epoch_str = str(epoch).zfill(3)
         early_stopping(valid_loss, model, optimizer, scheduler)
         print("# [Epoch {}] Train & Valid Loss : {} & {}".format(epoch_str, round(train_loss, 3), round(valid_loss, 3)))
         
         if dir_log is not None : 
-            train_perf = [train_loss, train_rmse, train_pcc, train_scc]
-            valid_perf = [valid_loss, valid_rmse, valid_pcc, valid_scc]
+            train_perf = [train_loss, train_rmse, train_pcc, train_scc, train_time]
+            valid_perf = [valid_loss, valid_rmse, valid_pcc, valid_scc, valid_time]
             Logger.info(epoch, early_stopping.early_stop, train_perf, valid_perf)
-        
+            
         if early_stopping.early_stop :
             print("### Early Stopping Occurred...")
             break
@@ -351,7 +378,7 @@ def train(model, train_loader, valid_loader, device, optimizer,
     # Load the last checkpoint with the best model
     checkpoint = torch.load(dir_param, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
-    return model
+    return model, time_list
 
 
 def train_wo_valid(model, train_loader, device, optimizer,
@@ -361,15 +388,17 @@ def train_wo_valid(model, train_loader, device, optimizer,
         Logger = Logger_Perf(dir_log)
         Logger.set_column(no_valid=True)
     
+    time_list = []
     for epoch in range(1, epochs+1) :
-        train_loss, train_rmse, train_pcc, train_scc = train_epoch(model, train_loader, device, optimizer)
+        train_loss, train_rmse, train_pcc, train_scc, train_time = train_epoch(model, train_loader, device, optimizer)
         if scheduler is not None : scheduler.step()
+        time_list.append(train_time)
         
         epoch_str = str(epoch).zfill(3)
         print("# [Epoch {}] Train Loss : {}".format(epoch_str, round(train_loss, 3)))
         
         if dir_log is not None : 
-            train_perf = [train_loss, train_rmse, train_pcc, train_scc]
+            train_perf = [train_loss, train_rmse, train_pcc, train_scc, train_time]
             Logger.info(epoch, False, train_perf)
         
         scheduler_ = None if scheduler is None else scheduler.state_dict()
@@ -380,7 +409,7 @@ def train_wo_valid(model, train_loader, device, optimizer,
     # Load the last checkpoint
     checkpoint = torch.load(dir_param, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
-    return model
+    return model, time_list
 
 
 def test(model, test_loader, device, return_attn=False) :
@@ -396,6 +425,11 @@ def test(model, test_loader, device, return_attn=False) :
     attn = torch.Tensor()
     attn_path = torch.Tensor()
     attn_subs = torch.Tensor()
+    
+    if device!="cpu" :
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
     
     with torch.no_grad() :
         for batch, (cell, drug, ic50) in enumerate(tqdm(test_loader, desc="Test")) :
@@ -418,6 +452,13 @@ def test(model, test_loader, device, return_attn=False) :
             loss_batch = loss_fn(pred, ic50)
             loss_epoch += loss_batch.item()
     
+    if device!="cpu" :
+        end.record()
+        torch.cuda.synchronize()
+        time = start.elapsed_time(end)
+    else :
+        time = 0
+    
     loss_epoch = loss_epoch / len(test_loader)
     y_pred = y_pred.detach().squeeze().numpy()
     y_true = y_true.detach().squeeze().numpy()
@@ -429,13 +470,14 @@ def test(model, test_loader, device, return_attn=False) :
     print("# Performance (RMSE) : {}".format(rmse))
     print("# Performance (PCC) : {}".format(pcc))
     print("# Performance (SCC) : {}".format(scc))
+    print("# Performance (SCC) : {}".format(time))
     
     if model.attn_mode in [1, 2] and return_attn :
-        return y_pred, attn
+        return y_pred, attn, time
     elif model.attn_mode in [3, 4] and return_attn :
-        return y_pred, attn_path, attn_subs
+        return y_pred, attn_path, attn_subs, time
     else :
-        return y_pred
+        return y_pred, time
 
 
 def test_no_labels(model, test_loader, device, return_attn=False) :
@@ -447,6 +489,11 @@ def test_no_labels(model, test_loader, device, return_attn=False) :
     attn = torch.Tensor()
     attn_path = torch.Tensor()
     attn_subs = torch.Tensor()
+    
+    if device!="cpu" :
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
     
     with torch.no_grad() :
         for batch, (cell, drug) in enumerate(tqdm(test_loader, desc="Test")) :
@@ -465,14 +512,21 @@ def test_no_labels(model, test_loader, device, return_attn=False) :
             
             pred_test = torch.cat((pred_test, pred.cpu()))
     
+    if device!="cpu" :
+        end.record()
+        torch.cuda.synchronize()
+        time = start.elapsed_time(end)
+    else :
+        time = 0
+    
     pred_test = pred_test.squeeze().numpy()
     
     if model.attn_mode in [1, 2] and return_attn :
-        return pred_test, attn
+        return pred_test, attn, time
     elif model.attn_mode in [3, 4] and return_attn :
-        return pred_test, attn_path, attn_subs
+        return pred_test, attn_path, attn_subs, time
     else :
-        return pred_test
+        return pred_test, time
 
 
 def grad_cam(model, cell_data, drug_data, ic50_data, args):

@@ -181,18 +181,21 @@ optimizer = Adam(model.parameters(), lr=learning_rate)
 scheduler = choose_scheduler(scheduler)   # 0 [None]
 
 print("\n### Train Start!!!")
-model = train(model, train_loader, valid_loader, optimizer=optimizer, device=device, 
-              epochs=epochs, patience=patience, scheduler=scheduler, 
-              dir_param=args.dir_param, dir_log=args.dir_log)
+model, train_time_list = train(model, train_loader, valid_loader, optimizer=optimizer, device=device, 
+                               epochs=epochs, patience=patience, scheduler=scheduler, 
+                               dir_param=args.dir_param, dir_log=args.dir_log)
 
 # Valid Prediction
 print("\n### Valid Performance...")
-pred_valid = test(model, valid_loader, device=device, return_attn=False)
+pred_valid, valid_time = test(model, valid_loader, device=device, return_attn=False)
 pred_to_csv(pred_valid, ic50_valid, args.dir_valid)
 
 # Test Prediction
 print("\n### Test Performance...")
-pred_test = test(model, test_loader, device=device, return_attn=False)
+pred_test, test_time = test(model, test_loader, device=device, return_attn=False)
 pred_to_csv(pred_test, ic50_test, args.dir_test)
+
+# Time Calculation
+time_to_csv(train_time_list, test_time, valid_time, dir_time=args.dir_time)
 
 print("\n### Train & Test Completed!!!")

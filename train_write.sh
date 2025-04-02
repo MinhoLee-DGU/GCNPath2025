@@ -14,7 +14,7 @@ ic50_th=$9
 seed=${10}
 retrain=${11}
 use_slurm=${12}
-RAM=4
+RAM=8
 
 case $gpu in
     0) CPU=2 ;;

@@ -19,6 +19,7 @@ dir_drug=processed/drug_data
 
 case $gnn_cell in
     0) cell=${dir_cell}/SANGER_RNA_Lin.pickle ;;
+    # *) cell=${dir_cell}/SANGER_RNA_KNN5_Pert2025.pickle ;;
     *) cell=${dir_cell}/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle ;;
 esac
 

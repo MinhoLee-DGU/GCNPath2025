@@ -121,6 +121,8 @@ args = choose_params(args)
 # Activation, GNN_Cell, GNN_Drug, Mode_Cell, Mode_Drug
 args = create_dir_out(args, dir_out=out_dir, suf_param="pt", retrain=True)
 
+args.dir_log = "{}/perf_log_seed_{}.txt".format(args.dir_out, args.seed_model)
+args.dir_time = "{}/perf_time_seed_{}.csv".format(args.dir_out, args.seed_model)
 args.dir_pred = "{}/pred_total_seed{}.csv".format(args.dir_out, args.seed_model)
 args.dir_param = "{}/param_retrain_seed{}.pt".format(args.dir_out, args.seed_model)
 args.dir_hparam = "{}/hyper_param_retrain_seed{}.pickle".format(args.dir_out, args.seed_model)
@@ -141,7 +143,7 @@ ic50_data = filt_ic50(ic50_data, cell_data, drug_data, args)
 
 no_labels = False
 args.pin_memory = args.pin_memory!=0 and device!="cpu"
-train_loader = load_data(ic50_data, cell_data, drug_data, args, no_labels, batch_size, num_workers, shuffle=True, fix_seed=True)
+train_loader = load_data(ic50_data, cell_data, drug_data, args, no_labels, batch_size, num_workers, shuffle=True)
 
 # Deep Learning Module & Dimension
 args.dim_cell = args.dim_cell if args.gnn_cell!="linear" else 256
@@ -181,14 +183,17 @@ optimizer = Adam(model.parameters(), lr=learning_rate)
 scheduler = choose_scheduler(scheduler)   # 0 [None]
 
 print("\n### Train Start!!!")
-model = train_wo_valid(model, train_loader, optimizer=optimizer, device=device, 
-                       epochs=epochs, scheduler=scheduler, 
-                       dir_param=args.dir_param, dir_log=args.dir_log)
+model, train_time_list = train_wo_valid(model, train_loader, optimizer=optimizer, 
+                                        device=device, epochs=epochs, scheduler=scheduler, 
+                                        dir_param=args.dir_param, dir_log=args.dir_log)
 
 # Test Prediction
 print("\n### Test Performance...")
-train_loader = load_data(ic50_data, cell_data, drug_data, args, no_labels, batch_size, num_workers, shuffle=False, fix_seed=True)
-pred_train = test(model, train_loader, device=device, return_attn=False)
+train_loader = load_data(ic50_data, cell_data, drug_data, args, no_labels, batch_size, num_workers, shuffle=False)
+pred_train, test_time = test(model, train_loader, device=device, return_attn=False)
 pred_to_csv(pred_train, ic50_data, args.dir_pred)
+
+# Time Calculation
+time_to_csv(train_time_list, test_time, dir_time=args.dir_time)
 
 print("\n### Train & Test Completed!!!")

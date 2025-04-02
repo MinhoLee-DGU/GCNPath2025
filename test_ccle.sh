@@ -22,8 +22,9 @@ do
     param=${dir_model}/param_retrain_seed${seed}.pt
     hparam=${dir_model}/hyper_param_retrain_seed${seed}.pickle
     out_file=${dir_model}/pred_ccle_seed${seed}.csv
+    out_cam=${dir_model}/pred_ccle_seed${seed}_gcam.csv
     bash test_write.sh $ic50 $cell $drug $param $hparam $out_file \
-        $col_cell $col_drug $col_ic50 $gpu $node $jname $use_slurm
+        $out_cam $col_cell $col_drug $col_ic50 $gpu $node $jname $use_slurm
 done
 
 # fold_list=$(seq 0 9)

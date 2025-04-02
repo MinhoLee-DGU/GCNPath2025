@@ -12,7 +12,7 @@ gnn_drug=2
 mode_cell=3
 mode_drug=3
 
-dir_out=RGCN
+dir_out=Ex
 dir_cell=processed/cell_data_biocarta
 dir_drug=processed/drug_data
 
