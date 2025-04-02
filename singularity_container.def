@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%post
+    apt-get update && apt-get install -y wget bzip2 git
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+    bash /tmp/miniconda.sh -b -p /opt/conda
+    rm /tmp/miniconda.sh
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%runscript
+    exec /bin/bash "$@"
