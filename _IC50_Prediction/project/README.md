@@ -1,7 +1,7 @@
-# **File Structure – ```project```**
+# File Description
 * ```1-1_process_rna``` : Processes cell TPM data from SANGER Cell Model Passports
 * ```1-2_process_net``` : Processes gene-level networks from STRING and RegNetwork
-* ```1-3_gsva_ppa``` : Creates pathway graphs and examines batch correction via GSVA
+* ```1-3_gsva_pcn``` : Creates pathway graphs and examines batch correction via GSVA
 * ```1-4_process_mut_cnv``` : Processes mutation and CNV data from SANGER Cell Model Passports for training TGSA
 * ```2-1_get_drug_cid``` : Retrieves PubChem CIDs and SMILES for drugs in GDSC
 * ```3-1_process_ic50``` : Processes IC50 data from GDSC, averaging duplicates
