@@ -189,8 +189,12 @@ def split_ic50(ic50_data, args, choice=0, nth=0, n_splits=10,
         return ic50_train, ic50_valid, ic50_test
 
 
-def pred_to_csv(pred_y, ic50_test, dir_pred) :
-    ic50_pred = pd.DataFrame(pred_y, columns=['Prediction'])
+def pred_to_csv(pred_y, ic50_test, dir_pred, grad_cam=False) :
+    if grad_cam :
+        ic50_pred = pred_y
+    else :
+        ic50_pred = pd.DataFrame(pred_y, columns=['Prediction'])
+    
     ic50_pred = ic50_pred.reset_index(drop=True)
     ic50_test = ic50_test.reset_index(drop=True)
     ic50_pred = pd.concat([ic50_test, ic50_pred], axis=1)

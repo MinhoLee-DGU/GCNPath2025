@@ -475,6 +475,29 @@ def test_no_labels(model, test_loader, device, return_attn=False) :
         return pred_test
 
 
+def grad_cam(model, cell_data, drug_data, ic50_data, args):
+    model.to(args.device)
+    model.eval()
+    importance = []
+    
+    for i in range(ic50_data.shape[0]) :
+        cell = ic50_data[args.col_cell][i]
+        drug = ic50_data[args.col_drug][i]
+        cell = Batch.from_data_list([cell_data[cell]]).to(args.device)
+        drug = Batch.from_data_list([drug_data[drug]]).to(args.device)
+        
+        pred, cell_explain = model(cell, drug, grad_cam=True)
+        pred.backward()
+        
+        imp_weight = torch.mean(cell_explain.grad, dim=0)
+        imp = ReLU()((cell_explain*imp_weight).sum(dim=1))
+        imp = imp / imp.sum()
+        importance.append(imp.detach().cpu())
+    
+    importance = torch.stack(importance).squeeze().numpy()
+    return importance
+
+
 class EarlyStopping :
 
     def __init__(self, patience=10, verbose=False, delta=0, path='checkpoint.pt') :
