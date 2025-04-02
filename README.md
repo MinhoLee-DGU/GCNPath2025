@@ -97,7 +97,7 @@ Drug data are processed using ```process_drug.sh```, which executes ```process_d
 * [```-smi```] Drug structure data in SMILES format containing at least one columns (```-col_smi```, [```-col_name```]) (input, CSV)
 * [```-out_dir```] Drug structure data in graph format (output, Pickle)
 * [```-col_smi```] Column name of drug structures in ```-smi``` file (Default: ```Drug_CID```)
-* [```-col_name```] Column name of drug IDs or names in ```-smi``` file. If not provided (```None```), the SMILES strings themselves are used as drug IDs. (Default: ```SMILES_CAN```, optional)
+* [```-col_name```] Column name of drug IDs or names in ```-smi``` file. If not provided (```None```), the SMILES strings themselves are used as drug IDs. (optional, Default: ```SMILES_CAN```)
 * [```-drug_feat```] Whether drug data are processed in graph format? (Default: ```3```)
 
 ```
