@@ -1,3 +1,4 @@
+# File Description
 ```Graph.pickle``` : Molecular structure data in graph format, used as input for GCNPath (e.g., ```GDSC_Drug_Graph.pickle```)
 
 ```Morgan.pickle``` : Molecular structure data represented as Morgan fingerprints, with configurable radius 
