@@ -23,7 +23,7 @@ To install the Conda environment, run:
 conda env create -f GCNPath.yaml
 ```
 
-If the above command doesn't work, manually install the required packages. Installation and model training success depend on the compatibility between PyTorch, PyTorch Geometric, the CUDA toolkit, your GPU and operating system. We trained and tested the model on Ubuntu 20.04.5 LTS using an NVIDIA GeForce RTX 3090.
+If the above command doesn't work, manually install the required packages. Installation and model training success depend on the compatibility between PyTorch, PyTorch Geometric, the CUDA toolkit, your GPU and operating system. We trained and tested the model on Ubuntu 20.04.5 LTS using an NVIDIA GeForce RTX 3090. We are in the process of developing Docker and Singularity configurations to facilitate the setup of an environment based on Ubuntu 20.04 with Conda.
 
 Required packages:
 * python (3.8.18)
