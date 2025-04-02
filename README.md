@@ -157,7 +157,7 @@ bash retrain_total.sh
 ```
 
 ## 4. Testing Models
-Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to 0. We will enhancing model interpretability with Grad-CAM in near future.
+Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to ```0```. We enhanced model interpretability with Grad-CAM.
 
 ### test_XXX.py
 * [```-dir_param```] Model weight parameters (input, pth)
@@ -181,5 +181,6 @@ bash test_ccle.sh
 #    -dir_param results/IC50_GDSC/Normal/RGCN/param_retrain_seed2021.pt \
 #    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_retrain_seed2021.pickle \
 #    -out_file results/IC50_GDSC/Normal/RGCN/pred_ccle_seed2021.csv \
+#    -out_grad_cam results/IC50_GDSC/Normal/RGCN/gcam_ccle_seed2021.csv \
 #    -col_cell Cell_BROAD_ID -col_drug Drug_CID -col_ic50 LN_IC50 -cpu 4
 ```
