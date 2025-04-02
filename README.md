@@ -166,11 +166,11 @@ Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, `
 * [```-out_grad_cam```] Pathway importance scores with Grad-CAM (optional output, CSV, Default: ```None```)
 
 ### File Description
-* test_ccle.sh: Predict IC<sub>50</sub> values in CCLE (toy example)
-* test_tcga.sh: Predict drug responses in TCGA (clinical application)
-* test_miss.sh: Predict missing IC<sub>50</sub> values in GDSC (case study)
-* test_rest.sh: Predict IC<sub>50</sub> values for cell lines listed in SANGER Cell Passports but not estimated in GDSC (case study)
-* test_chembl_total.sh: Predict IC<sub>50</sub> values in ChEMBL (external benchmark test)
+* ```test_ccle.sh``` : Predict IC<sub>50</sub> values in CCLE (toy example)
+* ```test_tcga.sh``` : Predict drug responses in TCGA (clinical application)
+* ```test_miss.sh``` : Predict missing IC<sub>50</sub> values in GDSC (case study)
+* ```test_rest.sh``` : Predict IC<sub>50</sub> values for cell lines listed in SANGER Cell Passports but not estimated in GDSC (case study)
+* ```test_chembl_total.sh``` : Predict IC<sub>50</sub> values in ChEMBL (external benchmark test)
 
 ```
 bash test_ccle.sh
