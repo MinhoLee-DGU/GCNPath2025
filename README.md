@@ -113,13 +113,13 @@ bash process_drug.sh
 ### 3-1. Training Models in Various Test Scenarios
 Training models in outer cross-validation across different test scenarios is handled by the ```train.sh``` script, which sequentially executes ```train_write.sh``` and ```train.py```. The ```train.sh``` file contains a list of input file paths and hyperparameters. Meanwhile, ```train_write.sh``` contains resource management parameters for CPU, RAM, and GPU via SLURM. This script generates new bash files in the ```exe``` folder (e.g., ```GCN0_N0_RGCN.sh```), incorporating all input file paths and hyperparameters, which are then used to execute the ```train.py``` script. If SLURM is used (with ```use_slurm``` set to ```1``` within ```train.sh```), log files will be created in the ```out``` folder. The training fold in cross-validation corresponds to ```-nth```, with a range of [```0, 24```] for strict-blind tests or [```0, 9```] for others. The ```train.sh``` script takes the following parameters:
 
-### train.sh
+### ```train.sh```
 * [```1st argument```] IC<sub>50</sub> data from GDSC1+2, GDSC1 or GDSC2 (choose one of ```0-2```)
 * [```2nd argument```] Test type of Unblinded, Cell-Blind, Drug-Blind, and Strict-Blind tests (choose one of ```0-3```)
 
 In ```train.py```, the columns for cell lines, drugs, and ln(IC<sub>50</sub>) in IC<sub>50</sub> data can be specified using ```-col_cell```, ```-col_drug```, and ```-col_ic50```, respectively. You can set the random seed for initializing model parameter weights using the ```-seed_model (default 2021)```. Note that the seed is used to assess the stability of model performance, rather than to reproduce the exact same prediction results. This is due to non-deterministic operations within PyTorch Geometric modules, such as ```torch_scatter```or when training models quickly using multiple workers for data loading with the ```-cpu```.
 
-### train.py
+### ```train.py```
 * [```-cell```] Pathway score data formatted as PCN graph[s] (output, Pickle)
 * [```-drug```] Drug structure data in graph format (output, Pickle)
 * [```-ic50```] IC50 data containing at least three columns (```-col_cell```, ```-col_drug```, ```-col_ic50```) (input, TXT or CSV)
@@ -159,7 +159,7 @@ bash retrain_total.sh
 ## 4. Testing Models
 Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, ```test_tcga.sh```, ```test_chembl.sh```), which sequentially execute ```test_write.sh``` and ```test.py```. The process is similar to **Section 3-1**. To output only predicted response values without calculating performance metrics, set the parameter ```-col_ic50``` to ```0```. We enhanced model interpretability with Grad-CAM.
 
-### test_XXX.py
+### ```test_XXX.py```
 * [```-dir_param```] Model weight parameters (input, pth)
 * [```-dir_hparam```] Model hyperparameters (input, Pickle)
 * [```-out_file```] Prediction results (output, CSV)
