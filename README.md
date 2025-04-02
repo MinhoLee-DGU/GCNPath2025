@@ -105,7 +105,7 @@ bash process_drug.sh
 # python process_drug.py \
 #    -smi data/drug_data/SMILES_GDSC.csv \
 #    -col_names Drug_CID -col_smi SMILES_CAN \
-#    -out_dir processed/drug_data/GDSC_Drug_Custom.pickle \
+#    -out_dir processed/drug_data/GDSC_Drug_Graph.pickle \
 ```
 
 ## 3. Training Models
@@ -137,7 +137,7 @@ In ```train.py```, the columns for cell lines, drugs, and ln(IC<sub>50</sub>) in
 bash train.sh 0 0
 # python train.py \
 #    -cell processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle \
-#    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
+#    -drug processed/drug_data/GDSC_Drug_Graph.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN -nth 0 \
 #    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4
@@ -150,7 +150,7 @@ Training models using the entire GDSC1+2 as target label dataset without splitti
 bash retrain_total.sh
 # python retrain_total.py \
 #    -cell processed/cell_data_biocarta/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle \
-#    -drug processed/drug_data/GDSC_Drug_Custom.pickle \
+#    -drug processed/drug_data/GDSC_Drug_Graph.pickle \
 #    -ic50 data/ic50_data/IC50_GDSC.txt \
 #    -out_dir results/IC50_GDSC/Normal/RGCN \
 #    -col_cell Cell -col_drug Drug -col_ic50 LN_IC50 -cpu 4 -seed_model 2021
@@ -176,7 +176,7 @@ Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, `
 bash test_ccle.sh
 # python test.py \
 #    -cell processed/cell_data_biocarta/CCLE_RNA_KNN5_STR9_Reg_Corr.pickle \
-#    -drug processed/drug_data/CCLE_Drug_Custom.pickle \
+#    -drug processed/drug_data/CCLE_Drug_Graph.pickle \
 #    -ic50 data/ic50_data/IC50_CCLE.txt \
 #    -dir_param results/IC50_GDSC/Normal/RGCN/param_retrain_seed2021.pt \
 #    -dir_hparam results/IC50_GDSC/Normal/RGCN/hyper_param_retrain_seed2021.pickle \
