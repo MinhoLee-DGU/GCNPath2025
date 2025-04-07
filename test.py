@@ -38,7 +38,8 @@ def parse_parameter() :
     parser.add_argument("-dir_hparam", type=str, default=dir_hparam_, help="Model hyper-parameter (Default: {})".format(dir_hparam_))
     parser.add_argument("-out_file", type=str, default=out_file_, help="Output file in CSV format, created if non-existig directory (Default: {})".format(out_file_))
     parser.add_argument("-out_grad_cam", type=str, default="", help="Pathway importance scores calculated with Grad-CAM in CSV format, created if non-existig directory (Default: None)")
-    
+    parser.add_argument("-out_time", type=str, default="", help="Log file for inference time with torch.cuda.Event when using GPU (Default: None)")
+
     parser.add_argument("-cell", type=str, default=cell_, help="Cell data in Pickle format (Default: {})".format(cell_))
     parser.add_argument("-drug", type=str, default=drug_, help="Drug data in Pickle format (Default: {})".format(drug_))
     parser.add_argument("-ic50", type=str, default=ic50_, help="IC50 data in CSV or TXT format (Default: {})".format(ic50_))
@@ -70,7 +71,6 @@ do_grad_cam = out_cam not in ["", "None", None]
 
 
 # Set output directory
-breakpoint()
 labels = args.col_ic50!="0"
 out_dir = "/".join(out_file.split("/")[:-1])
 os.makedirs(out_dir, exist_ok=True)
@@ -131,7 +131,8 @@ pred_test, test_time = test_(model, test_loader, device=device, return_attn=Fals
 pred_to_csv(pred_test, ic50_data, out_file)
 
 # Time Calculation
-time_to_csv(test_time=test_time, dir_time=args.dir_time)
+if args.out_time not in [None, "None", ""] and device!="cpu" :
+    time_to_csv(test_time=test_time, dir_time=args.out_time)
 
 if do_grad_cam :
     print("\n### Get pathway importance scores [Grad-CAM]")
