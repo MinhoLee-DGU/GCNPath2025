@@ -269,9 +269,6 @@ Pred_SCLC = Pred_SCLC %>%
   relocate(Prediction, .after=everything()) %>% arrange(Drug)
 
 
-# SIRT3, RHBDF1, GSDME
-# TUBA1A, TUBA1B, TUBA1C, TUBB1, TUBB2A
-
 dir = mkdir("Case Study [SCLC]")
 drugs = c("Etoposide", "Cisplatin", "Lurbinectedin", 
           "Pyrrolobenzodiazepine", "Deruxtecan", "Calicheamicin")
@@ -325,7 +322,7 @@ get_imp_by_drug = function(Importance, dname=NULL, n_cell=30, n_path=5, resistan
     subset(Drug_Name==dname) %>% 
     mutate(Z_Pred=as.numeric(scale(Prediction))) %>% 
     relocate(Z_Pred, .after=Prediction) %>% as.data.frame
-    
+  
   if (!resistant) {
     Importance = Importance %>% 
       slice_min(Prediction, n=n_cell) %>% 
@@ -351,78 +348,18 @@ get_imp_by_drug = function(Importance, dname=NULL, n_cell=30, n_path=5, resistan
 }
 
 GCAM_SCLC_Eto = Imp_SCLC %>% get_imp_by_drug(dname="Etoposide")
-# BIOCARTA_AGPCR_PATHWAY
-# BIOCARTA_GH_PATHWAY
-# > GHR Knockdown - MEK/ERK pathway down - poliferation down, apoptosis - sensitivity up (GBM)
-# > Zhang, Hongmei, et al. "The inhibition of GHR enhanced cytotoxic effects of etoposide on neuroblastoma." Cellular Signalling 86 (2021): 110081.
-# BIOCARTA_SLRP_PATHWAY
-# BIOCARTA_ERBB3_PATHWAY
-# BIOCARTA_BARRESTIN_PATHWAY 
-
 GCAM_SCLC_Cis = Imp_SCLC %>% get_imp_by_drug(dname="Cisplatin")
-# BIOCARTA_CIRCADIAN_PATHWAY
-# BIOCARTA_TNFR1_PATHWAY
-# > Release TNF-α - TNF-α & TNFR1/2 interaction - cell death, inflammation
-# > https://synapse.koreamed.org/articles/1050552
-# > TNFR1 Overexpression - Resistant [NSCLC]
-# > Zhen, Jie, et al. "EDN1 facilitates cisplatin resistance of non-small cell lung cancer cells by regulating the TNF signaling pathway." World Journal of Surgical Oncology 23.1 (2025): 71.
-# BIOCARTA_GATA3_PATHWAY
-# > GATA3 - Hippo down - Resistant [NB]
-# > Wang, Jing, Wang Dai, and Ming Zhang. "GATA3 positively regulates PAR1 to facilitate in vitro disease progression and decrease cisplatin sensitivity in neuroblastoma via inhibiting the hippo pathway." Anti-Cancer Drugs 34.1 (2023): 57-72.
-# BIOCARTA_ATM_PATHWAY
-# > ATM inhibition - JAK/STAT3, PD-L1 down - EMT reversal, metastasis in resistant cells [SCLC]
-# Shen, Mingjing, et al. "Inhibition of ATM reverses EMT and decreases metastatic potential of cisplatin-resistant lung cancer cells through JAK/STAT3/PD-L1 pathway." Journal of Experimental & Clinical Cancer Research 38 (2019): 1-14.
-# BIOCARTA_BCELLSURVIVAL_PATHWAY 
-
 GCAM_SCLC_Lur = Imp_SCLC %>% get_imp_by_drug(dname="Lurbinectedin")
-# BIOCARTA_CCR5_PATHWAY [drug-gene X, sclc-gene M]
-# > CCL5/CCR5 axis in SCLC and various cancer - progression, including angiogenesis, cell migration, and metastasis
-# > Zeng, Zhen, et al. "CCL5/CCR5 axis in human diseases and related treatments." Genes & diseases 9.1 (2022): 12-27.
-# BIOCARTA_IL12_PATHWAY
-# BIOCARTA_CARM_ER_PATHWAY [drug-gene X, sclc-gene O]
-# > ER - modulate ECM remodeling, cell adhesion - tumor progression, metastasis in SCLC
-# > Wang, Hong, et al. "Therapeutic targeting ERRγ suppresses metastasis via extracellular matrix remodeling in small cell lung cancer." Embo Molecular Medicine 16.9 (2024): 2043-2059.
-# BIOCARTA_SARS_PATHWAY
-# BIOCARTA_RHODOPSIN_PATHWAY
-
 GCAM_SCLC_PBD = Imp_SCLC %>% get_imp_by_drug(dname="Pyrrolobenzodiazepine")
-# BIOCARTA_SLRP_PATHWAY [drug-gene X, sclc-gene M]
-# > 
-# > Ao, Zhi, et al. "Tumor angiogenesis of SCLC inhibited by decreased expression of FMOD via downregulating angiogenic factors of endothelial cells." Biomedicine & Pharmacotherapy 87 (2017): 539-547.
-# BIOCARTA_HER2_PATHWAY
-# > 
-# BIOCARTA_REELIN_PATHWAY
-# BIOCARTA_IL7_PATHWAY
-# BIOCARTA_CCR5_PATHWAY [drug-gene M, sclc-gene M]
-# > CCL5 - 
-
 GCAM_SCLC_DXd = Imp_SCLC %>% get_imp_by_drug(dname="Deruxtecan")
-# BIOCARTA_CIRCADIAN_PATHWAY
-# BIOCARTA_TNFR1_PATHWAY
-# > "blocking TNFα may enhance the sensitivity of HER2-positive breast cancer to trastuzumab deruxtecan"
-# > https://pmc.ncbi.nlm.nih.gov/articles/PMC10016294
-# BIOCARTA_GABA_PATHWAY
-# BIOCARTA_PDZS_PATHWAY
-# BIOCARTA_RAC1_PATHWAY [drug-gene X, sclc-gene O]
-# > "inhibiting RAC1 can decrease SCLC cell viability and tumorigenicity, potentially enhancing the effectiveness of chemotherapy."
-# > RAC1 inhibition - Nur77 from nucleus to cytoplasm - Nur77 bind to BCL2 - apoptosis
-# > https://www.sciencedirect.com/science/article/pii/S2211124721014583
-
 GCAM_SCLC_Cal = Imp_SCLC %>% get_imp_by_drug(dname="Calicheamicin")
-# BIOCARTA_CCR5_PATHWAY
-# BIOCARTA_RHODOPSIN_PATHWAY
-# BIOCARTA_WNT_LRP6_PATHWAY [drug-gene X, sclc-gene O]
-# > Wnt is activate in chemoresistant SCLC...
-# > https://www.nature.com/articles/s41467-018-06162-9
-# BIOCARTA_CARM_ER_PATHWAY
-# BIOCARTA_FEEDER_PATHWAY
 
-GCAM_SCLC_Eto = GCAM_SCLC_Eto %>% subset(Cell_Name=="LB647-SCLC")   # BIOCARTA_P38MAPK_PATHWAY
-GCAM_SCLC_Cis = GCAM_SCLC_Cis %>% subset(Cell_Name=="NCI-H748")     # BIOCARTA_MET_PATHWAY
-GCAM_SCLC_Lur = GCAM_SCLC_Lur %>% subset(Cell_Name=="NCI-H847")     # X
-GCAM_SCLC_PBD = GCAM_SCLC_PBD %>% subset(Cell_Name=="COR-L279")     # BIOCARTA_EPONFKB_PATHWAY
-GCAM_SCLC_DXd = GCAM_SCLC_DXd %>% subset(Cell_Name=="NCI-H209")     # BIOCARTA_TNFR1_PATHWAY
-GCAM_SCLC_Cal = GCAM_SCLC_Cal %>% subset(Cell_Name=="IST-SL1")      # BIOCARTA_EPONFKB_PATHWAY
+GCAM_SCLC_Eto = GCAM_SCLC_Eto %>% subset(Cell_Name=="LB647-SCLC")
+GCAM_SCLC_Cis = GCAM_SCLC_Cis %>% subset(Cell_Name=="NCI-H748")
+GCAM_SCLC_Lur = GCAM_SCLC_Lur %>% subset(Cell_Name=="NCI-H847")
+GCAM_SCLC_PBD = GCAM_SCLC_PBD %>% subset(Cell_Name=="COR-L279")
+GCAM_SCLC_DXd = GCAM_SCLC_DXd %>% subset(Cell_Name=="NCI-H209")
+GCAM_SCLC_Cal = GCAM_SCLC_Cal %>% subset(Cell_Name=="IST-SL1")
 
 GCAM_SCLC = Reduce(rbind, list(GCAM_SCLC_Eto, GCAM_SCLC_Cis, GCAM_SCLC_Lur, 
                                GCAM_SCLC_PBD, GCAM_SCLC_DXd, GCAM_SCLC_Cal))
