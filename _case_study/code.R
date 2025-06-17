@@ -7,6 +7,7 @@ suppressMessages(library(openxlsx))
 suppressMessages(library(reshape2))
 
 source("../utils/functions.R")
+source("functions.R")
 loadings()
 
 
@@ -54,32 +55,6 @@ write.table(IC50_GDSC_Miss, file=file, row.names=F, sep="\t")
 
 
 ##### 2-1. Prediction of missing IC50 values (Interporation)
-
-read_pred = function(dir, pattern, sep=",") {
-  Pred = data.frame()
-  df_name_list = list.files(path=dir, pattern=pattern, full.names=T)
-  # [pattern] "Pred_.*([0-9]+$)\\.csv", "Pred_CCLE_.*([0-9]+)\\.csv"
-  
-  if (length(df_name_list)!=0) {
-    for (df_name in df_name_list) {
-      try({
-        Pred_TP = fread(df_name, header=T, sep=sep)
-        # Pred_TP = read.table(df_name, header=T, sep=sep)
-        df_name_ = strsplit(df_name, "/")[[1]] %>% tail(1)
-        nth = gsub(pattern, "\\1", df_name_) %>% as.numeric
-        model = strsplit(dir, "/")[[1]] %>% tail(1)
-        
-        # Pred_TP$Fold = nth
-        Pred_TP$Seed = nth
-        Pred_TP$Model = model
-        Pred = Pred %>% rbind(Pred_TP)
-      })
-    }
-    
-    sprintf("# Predictions : %s", nrow(Pred)) %>% print
-    return(Pred)
-  }
-}
 
 pattern = "pred_total_seed([0-9]+).csv"
 dir = "../results/IC50_GDSC/Normal/RGCN"
@@ -182,512 +157,302 @@ Anno_Cells$MODEL_NAME %>% is.na %>% sum   # 0
 
 
 
-##### Examine cells by subtypes [SCLC]
+##### Examine well-characterized cancer types
+# Anno_Cells$CANCER_TYPE %>% table %>% sort(decreasing=T) %>% head(10)
 
-filter_ic50 = function(Anno_Cells, filter=T) {
-  if (filter) {
-    Anno_Cells %>% subset(IC50)
-  } else Anno_Cells
+Pred_Test = get_anno_cd(Pred_Test, Anno_Cells, Anno_Drugs)
+identical(rownames(SANGER_RNA_GSVA), rownames(SANGER_RNA_TPM))   # T
+
+
+### COREAD
+# https://www.cancer.gov/about-cancer/treatment/drugs/colorectal
+# https://www.globalcca.org/learn/colorectal-cancer-targeted-therapy
+
+tissue = "Large Intestine"
+Pred_COREAD1 = list()
+Pred_COREAD2 = list()
+
+dir = mkdir("Case Study [Well-known, COREAD]")
+drugs = c("5-Fluorouracil", "Oxaliplatin", "Lapatinib", "Trametinib")
+targets = c("TP53", "TP53", "EGFR", "MAP2K1")
+pathways = c("BIOCARTA_P53_PATHWAY", "BIOCARTA_P53_PATHWAY", "BIOCARTA_HER2_PATHWAY", "BIOCARTA_MAPK_PATHWAY")
+
+for (i in 1:length(drugs)) {
+  main1 = sprintf("%s/%s [%s]", dir, drugs[i], targets[i])
+  main2 = sprintf("%s/%s [%s]", dir, drugs[i], pathways[i])
+  
+  sprintf("\n# %s [%s]", drugs[i], targets[i]) %>% cat
+  Pred_COREAD1[[drugs[i]]] = Pred_Test %>% 
+    subset(Tissue==tissue & Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_TPM, gene=targets[i], main=main1, save=T)
+  
+  sprintf("# %s [%s]", drugs[i], pathways[i]) %>% cat
+  Pred_COREAD2[[drugs[i]]] = Pred_Test %>% 
+    subset(Tissue==tissue & Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_GSVA, gene=pathways[i], main=main2, save=T)
 }
 
-filter_non_can = function(Anno_Cells, filter=T) {
-  if (filter) {
-    Anno_Cells %>% subset(CANCER_TYPE!="Non-Cancerous")
-  } else Anno_Cells
+
+
+### Breast
+# https://www.cancer.gov/about-cancer/treatment/drugs/breast
+# https://www.cancer.org/cancer/types/breast-cancer/treatment/targeted-therapy-for-breast-cancer.html
+
+tissue = "Breast"
+Pred_Breast1 = list()
+Pred_Breast2 = list()
+
+dir = mkdir("Case Study [Well-known, Breast]")
+drugs = c("Alpelisib", "AZD5363", "Docetaxel", "Palbociclib")
+targets = c("PIK3CA", "AKT1", "TUBA1C", "CDK6")
+pathways = c("BIOCARTA_AKT_PATHWAY", "BIOCARTA_AKT_PATHWAY", "BIOCARTA_DEATH_PATHWAY", "BIOCARTA_RB_PATHWAY")
+
+for (i in 1:length(drugs)) {
+  main1 = sprintf("%s/%s [%s]", dir, drugs[i], targets[i])
+  main2 = sprintf("%s/%s [%s]", dir, drugs[i], pathways[i])
+  
+  sprintf("\n# %s [%s]", drugs[i], targets[i]) %>% cat
+  Pred_Breast1[[drugs[i]]] = Pred_Test %>% 
+    subset(Tissue==tissue & Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_TPM, gene=targets[i], main=main1, save=T)
+  
+  sprintf("\n# %s [%s]", drugs[i], pathways[i]) %>% cat
+  Pred_Breast2[[drugs[i]]] = Pred_Test %>% 
+    subset(Tissue==tissue & Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_GSVA, gene=pathways[i], main=main2, save=T)
 }
 
-lookup_by_tissue = function(Anno_Cells, tissue, group="CANCER_TYPE", 
-                            filt_ic50=F, filt_nc=T, num_min=3) {
-  Anno_Cells %>%
-    filter_ic50(filter=filt_ic50) %>% 
-    filter_non_can(filter=filt_nc) %>% 
-    subset(RNA & TISSUE %in% tissue) %>%
-    group_by(across(all_of(group))) %>% summarise(Num=n()) %>%
-    arrange(desc(Num)) %>% subset(Num>=num_min) %>% as.data.frame
-}
 
-examine_subtype = function(Pred_Test, Anno_Cells, Anno_Drugs, cancer_type, 
-                           filt_ic50=F, filt_nc=F, num_min=3) {
-  
-  min_max_diff = function(x) max(x)-min(x)
-  
-  Anno_Cells_Sub = Anno_Cells %>% 
-    filter_ic50(filter=filt_ic50) %>% 
-    filter_non_can(filter=filt_nc) %>% 
-    subset(RNA & CANCER_TYPE %in% cancer_type) %>% 
-    group_by(CANCER_TYPE_DETAIL) %>% 
-    filter(n()>=num_min) %>% as.data.frame
-  
-  Pred_Test_Sub = Pred_Test %>% subset(Cell %in% Anno_Cells_Sub$SANGER_MODEL_ID)
-  idx1 = match(Pred_Test_Sub$Cell, Anno_Cells$SANGER_MODEL_ID)
-  idx2 = match(Pred_Test_Sub$Drug, Anno_Drugs$Drug_CID)
-  
-  Pred_Test_Sub = Pred_Test_Sub %>% 
-    mutate(TCGA_Code=Anno_Cells$TCGA_CODE[idx1], 
-           Cancer_Type=Anno_Cells$CANCER_TYPE[idx1], 
-           Cancer_Detail=Anno_Cells$CANCER_TYPE_DETAIL[idx1], 
-           Drug_Name=Anno_Drugs$Name[idx2],
-           Drug_Pathway=Anno_Drugs$Target_Pathway[idx2])
-  
-  # Summarize by Drug_Pathway
-  Pred_Median1 = Pred_Test_Sub %>% 
-    group_by(Drug_Pathway) %>% 
-    summarise(Median=median(Prediction)) %>% 
-    arrange(Median) %>% as.data.frame
-  
-  Pred_Median_SubT1 = Pred_Test_Sub %>% 
-    group_by(Cancer_Detail, Drug_Pathway) %>% 
-    summarise(Median=median(Prediction), Num=n()) %>% 
-    arrange(desc(Num)) %>% as.data.frame
-  
-  Pred_Median_Diff1 = Pred_Median_SubT1 %>% 
-    group_by(Drug_Pathway) %>% 
-    summarise(Median_Diff=min_max_diff(Median), 
-              Median_Min=min(Median), Median_Max=max(Median)) %>% 
-    arrange(desc(Median_Diff)) %>% as.data.frame
-  
-  # Summarize by Drug_Name
-  Pred_Median2 = Pred_Test_Sub %>% 
-    group_by(Drug_Name, Drug_Pathway) %>% 
-    summarise(Median=median(Prediction)) %>% 
-    arrange(Median) %>% as.data.frame
-  
-  Pred_Median_SubT2 = Pred_Test_Sub %>% 
-    group_by(Cancer_Detail, Drug_Name) %>% 
-    summarise(Median=median(Prediction), Num=n()) %>% 
-    arrange(desc(Num)) %>% as.data.frame
-  
-  Pred_Median_Diff2 = Pred_Median_SubT2 %>% 
-    group_by(Drug_Name) %>% 
-    summarise(Median_Diff=min_max_diff(Median), 
-              Median_Min=min(Median), Median_Max=max(Median)) %>% 
-    arrange(desc(Median_Diff)) %>% as.data.frame
-  
-  Pred_Pathway = left_join(Pred_Median1, Pred_Median_Diff1, by="Drug_Pathway")
-  Pred_Drug = left_join(Pred_Median2, Pred_Median_Diff2, by="Drug_Name")
-  
-  Pred_Drug = Pred_Drug %>% 
-    arrange(desc(Median_Diff)) %>% 
-    mutate(Top_Median = in_bottom(Median, 0.1),
-           Top_Median_Diff = in_top(Median_Diff, 0.1))
-  
-  Pred_Pathway = Pred_Pathway %>% 
-    arrange(desc(Median_Diff)) %>% 
-    mutate(Top_Median = in_bottom(Median, 5), 
-           Top_Median_Diff = in_top(Median_Diff, 5))
-  
-  Pred_Sum = list(Pred=Pred_Test_Sub, Pred_Drug=Pred_Drug, Pred_Pathway=Pred_Pathway)
-  
-  return(Pred_Sum)
-}
+##### Examine well-known therapies in SCLC
+# Etoposide [CID 36462]
+# Cisplatin [CID 5702198]
+# Lurbinectedin [Pol2, CID 57327016]
 
-in_rank = function(x, n, top=T) {
-  if (n<0) stop("Parameter prob not adequete...")
-  if (n>=length(x)) n = length(x)
-  if (n>=0 & n<1) n = floor(length(x)*n) 
-  cond = ifelse_def(top, x>=sort(x, decreasing=T)[n], x<=sort(x)[n])
-  if (n==0) cond = rep(F, length(x))
-  return(cond)
-}
-
-in_top = function(x, n) {
-  in_rank(x, n, top=T)
-}
-
-in_bottom = function(x, n) {
-  in_rank(x, n, top=F)
-}
-
-append_def = function(A, ...) {
-  add_list = list(...)
-  A = c(A, add_list)
-  return(A)
-}
-
-plot_with_tpm = function(Pred, TPM, gene, marker=NULL, xlab=NULL, 
-                         SubType_List=NULL, trend_line=T, anno_subtype=F, 
-                         exclude_else=T, name_else="The Others", add=NULL, ...) {
-  
-  if (is.null(add)) add = list()
-  idx = match(Pred$Cell, rownames(TPM))
-  Pred$Gene = TPM[idx, gene]
-  
-  if (is.null(xlab)) xlab = gene
-  ylab = bquote(Predicted~ln(IC[50]))
-  # ylab = bquote(bold(Predicted~ln(IC["50"])))
-  
-  corr = Pred %>% with(cor(Gene, Prediction))
-  sprintf("Cell : %s", nrow(Pred)) %>% print
-  sprintf("Corr [Gene] : %.3f", corr) %>% print
-  
-  if (trend_line) {
-    add = add %>% append_def(geom_smooth(method="lm"))
-  }
-  
-  if (anno_subtype) {
-    add = add %>% append_def(labs(color="Subtype"))
-    if (!is.null(SubType_List)) {
-      add = add %>% append_def(guides(shape=NULL))
-      Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
-      Pred = full_join(Pred, Subtype, by="Cell", relationship="many-to-many")
-      
-      if (exclude_else) {
-        Pred = Pred %>% subset(!is.na(Subtype))
-      } else {
-        levels = c(levels(Pred$Subtype), name_else)
-        Pred$Subtype = Pred$Subtype %>% as.character
-        Pred$Subtype[is.na(Pred$Subtype)] = name_else
-        Pred$Subtype = Pred$Subtype %>% factor(levels=levels)
-      }
-    }
-    
-    Pred = Pred %>% 
-      mutate(GDSC_Cell=!Rest) %>% 
-      subset(select=-Rest) %>% 
-      relocate(Subtype, .after=Cell) %>% 
-      relocate(Drug_Name, .after=Drug) %>%
-      rename(Drug_CID=Drug, IC50_Missing=Missing) %>% 
-      relocate(GDSC_Cell, .after=IC50_Missing) %>% as.data.frame
-  }
-  
-  # Annotation of cell names
-  anno_cells = T
-  if (anno_cells) {
-    idx = match(Pred$Cell, Anno_Cells$SANGER_MODEL_ID)
-    Pred = Pred %>% mutate(Cell_Name=Anno_Cells$MODEL_NAME[idx]) %>% 
-      relocate(Cell_Name, .after=Cell) %>% as.data.frame
-  }
-  
-  if (!is.null(marker)) {
-    add = add %>% append_def(labs(size=marker))
-    idx = match(Pred$Cell, rownames(TPM))
-    Pred$Marker = TPM[idx, marker]
-    corr_marker = Pred %>% with(cor(Marker, Prediction))
-    sprintf("Corr [Marker] : %.3f", corr_marker) %>% print
-  }
-  
-  if (length(add)==0) add = NULL
-  if (anno_subtype & !is.null(marker)) {
-    Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, color=Subtype, shape=Subtype, size=Marker, ...)
-  } else if (anno_subtype & is.null(marker)) {
-    Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, color=Subtype, shape=Subtype, size=2.5, ...)
-  } else if (!anno_subtype & !is.null(marker)) {
-    Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, size=Marker, ...)
-  } else {
-    Pred %>% plot_def(Gene, Prediction, xlab=xlab, ylab=ylab, alpha=0.8, 
-                      margin=0.5, add=add, ...)
-  }
-  return(Pred)
-}
-
-# Lung
-tissue = "Lung"
-Anno_Cells %>% lookup_by_tissue(tissue)
-Anno_Cells %>% lookup_by_tissue(tissue, group="CANCER_TYPE_DETAIL")
-cancer_type = Anno_Cells %>% lookup_by_tissue(tissue) %>% pull(CANCER_TYPE)
-
-except_type = c("Mesothelioma", "Other Solid Cancers")
-cancer_type = cancer_type %>% setdiff(except_type)
-
-Pred_Lung = examine_subtype(Pred_Test, Anno_Cells, Anno_Drugs, cancer_type)
-Pred_Lung$Pred_Drug %>% head
-Pred_Lung$Pred_Pathway %>% head
-
+##### Examine promising therapies in SCLC
+# Rovalpituzumab tesirine, Rova-T (target DLL3, pyrrolobenzodiazepine, CID 10030705)
+# DS-7300 & HER3-DXd (target B7-H3 & HER3, deruxtecan, CID 166041952)
+# ABBV-011 (target SEZ6, calicheamicin, CID 10953353)
+# https://pmc.ncbi.nlm.nih.gov/articles/PMC11294301
 
 # SCLC
-cancer = "Small Cell Lung Carcinoma"
-cells_sclc = Anno_Cells %>% subset(CANCER_TYPE_DETAIL==cancer) %>% pull(SANGER_MODEL_ID)
+tissue = "Lung"
+Anno_Cells %>% lookup_by_tissue(tissue)
 
-# SCLC is classified as SCLC-A/N/P/I
-# doi.org/10.3322/caac.21785
-# [Review, 2023] Clinical insights into small cell lung cancer
-# CD56 [NCAM1], LSD1 [KDM1A], PDL1 [CD274], PD1 [PDCD1], VISTA [VSIR]
-# LSH1 gene in SCLC-N markers was not found...
+sclc = "Small Cell Lung Carcinoma"
+cells_sclc = Anno_Cells %>% subset(CANCER_TYPE==sclc & RNA) %>% pull(SANGER_MODEL_ID)   # 72
+drugs = c("Etoposide", "Cisplatin", "Lurbinectedin", "Pyrrolobenzodiazepine", "Deruxtecan", "Calicheamicin")
+cids = c(36462, 5702198, 57327016, 10030705, 166041952, 10953353)
+
+Pred_SCLC = expand.grid(Cell=cells_sclc, Drug=cids)
+idx = match(Pred_SCLC$Drug, cids)
+Pred_SCLC$Drug_Name = drugs[idx]
+
+# Run the code "test_sclc.sh" to predict the Pred_SCLC
+dir = "../data/ic50_data"
+file = sprintf("%s/IC50_SCLC.txt", dir)
+write.table(Pred_SCLC, file=file, sep="\t", row.names=F, col.names=T, quote=F)
 
 
-sort_subtype = function(TPM, Marker_List, Weight_List=NULL,
-                        cells=NULL, quant=1/2, name_else="The Others") {
-  
-  Cell_List = list()
-  if (!is.null(cells)) TPM = TPM[rownames(TPM) %in% cells, ]
-  cells_else = rownames(TPM)
-  
-  for (i in 1:length(Marker_List)) {
-    weight = Weight_List[[i]]
-    markers = Marker_List[[i]]
-    
-    if (length(markers)>1) {
-      mean_w = function(x, ...) weighted.mean(x, w=weight, ...)
-      mean_ = ifelse_def(is.null(weight), mean, mean_w)
-      tpm = TPM[, markers] %>% scale %>% apply(1, mean_, na.rm=T)
-    } else tpm = setNames(TPM[, markers], rownames(TPM))
-    
-    idx = tpm>=quantile(tpm, quant, na.rm=T)
-    Cell_List[[i]] = idx[idx] %>% names
-    cells_else = cells_else %>% setdiff(Cell_List[[i]])
-  }
-  
-  names(Cell_List) = names(Marker_List)
-  Cell_List[[name_else]] = Cell_List[[name_else]] %>% c(cells_else)
-  return(Cell_List)
-}
+pattern = "pred_sclc_seed([0-9]+).csv"
+dir = "../results/IC50_GDSC/Normal/RGCN"
+Pred_SCLC = read_pred(dir, pattern=pattern)   # 6480 [648*10]
+Pred_SCLC$Drug = Pred_SCLC$Drug %>% as.character
 
-marker_a = "ASCL1"
-marker_n = "NEUROD1"
-marker_p = "POU2F3"
-markers = c(marker_a, marker_n, marker_p, "PD-1", "PD-L1")
-markers_ori = c(marker_a, marker_n, marker_p, "CD274", "PDCD1")
+Pred_SCLC = Pred_SCLC %>% group_by(Cell, Drug) %>% 
+  summarise(Prediction=mean(Prediction)) %>% as.data.frame   # 609
+
+idx1 = match(Pred_SCLC$Cell, Anno_Cells$SANGER_MODEL_ID)
+idx2 = match(Pred_SCLC$Drug, cids)
+
+Pred_SCLC = Pred_SCLC %>% 
+  mutate(Cell_Name=Anno_Cells$MODEL_NAME[idx1], Drug_Name=drugs[idx2]) %>% 
+  relocate(Prediction, .after=everything()) %>% arrange(Drug)
+
+
+# SIRT3, RHBDF1, GSDME
+# TUBA1A, TUBA1B, TUBA1C, TUBB1, TUBB2A
 
 dir = mkdir("Case Study [SCLC]")
-main = sprintf("%s/TPM Histogram [%s]", dir, markers)
-median_tpm = SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, markers_ori] %>% sapply(median)
+drugs = c("Etoposide", "Cisplatin", "Lurbinectedin", 
+          "Pyrrolobenzodiazepine", "Deruxtecan", "Calicheamicin")
 
-xlab = sprintf("Expression of %s", markers)
+targets = c("TOP2B", "AKT1", "POLR2A", "MCM2", "TOP1", "MCM2")
+pathways = c("BIOCARTA_MET_PATHWAY", "BIOCARTA_AKT_PATHWAY", "BIOCARTA_G1_PATHWAY", 
+             "BIOCARTA_MCM_PATHWAY", "BIOCARTA_AKT_PATHWAY", "BIOCARTA_G1_PATHWAY")
 
-# median_tpm %>% round(2)
-# ASCL1   NEUROD1   POU2F3   CD274   PDCD1 
-# 9.69    2.30      0.11     1.00    0.00 
+Pred_List_SCLC1 = list()
+Pred_List_SCLC2 = list()
 
-SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_a] %>% 
-  hist_def(main=main[1], xlab=xlab[1], margin=0.4, margin_pl=0.8, size_line=1,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[1])
-SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_n] %>% 
-  hist_def(main=main[2], xlab=xlab[2], margin=0.4, margin_pl=0.8, size_line=1,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[2])
-SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, marker_p] %>% 
-  hist_def(main=main[3], xlab=xlab[3], margin=0.4, margin_pl=0.8, size_line=1,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T, vline=median_tpm[3])
-SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, "CD274"] %>% 
-  hist_def(main=main[4], xlab=xlab[4], margin=0.4, margin_pl=0.8,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)   # PD1 [SCLC-I]
-SANGER_RNA_TPM[rownames(SANGER_RNA_TPM) %in% cells_sclc, "PDCD1"] %>% 
-  hist_def(main=main[5], xlab=xlab[5], margin=0.4, margin_pl=0.8,
-           axis_tl=27, axis_tx=22.5, dist=F, text_info=F, save=T)   # PDL1 [SCLC-I]
-
-labels = sprintf("SCLC-%s", c("A", "N", "P"))
-Marker_List = list(marker_a, marker_n, marker_p)
-names(Marker_List) = labels
-
-quant = 1/2
-SCLC_Type = SANGER_RNA_TPM %>%
-  sort_subtype(Marker_List, cells=cells_sclc, name_else="SCLC-I", quant=quant)
-
-main = sprintf("%s/Venn diagram of SCLC subtypes", dir)
-SCLC_Type %>% venn_def(main=main, set_size=7.5, text_size=8.4, 
-                       width=24, height=18, legend=F, save=T)
-
-main = sprintf("%s/Venn diagram of SCLC subtypes [No Labels]", dir)
-SCLC_Type %>% venn_def(main=main, labels=F, text_size=8.4, 
-                       width=24, height=18, legend=F, save=T)
-
-
-pca_subtype = function(TPM, SubType_List, main=main, thr_sd=0.01, name_else="The Others",
-                       exclude_else=F, width=20, height=16, return_val=T, save=F, ...) {
+for (i in 1:length(drugs)) {
+  main = sprintf("%s/%s [%s]", dir, drugs[i], targets[i])
+  sprintf("\n# %s [%s]", drugs[i], targets[i]) %>% cat
+  Pred_List_SCLC1[[drugs[i]]] = Pred_SCLC %>% 
+    subset(Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_TPM, gene=targets[i], main=main, save=T)
   
-  Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
-  if (exclude_else) TPM = TPM[rownames(TPM) %in% Subtype$Cell, ]
-  cond_sd = sapply(TPM, sd)>=thr_sd
-  TPM_PCA = TPM[, cond_sd] %>% prcomp(center=T, scale=T, rank=2)
-  TPM_PCA = TPM_PCA$x %>% as.data.frame
-  
-  TPM_PCA$Cell = rownames(TPM_PCA)
-  TPM_PCA = full_join(TPM_PCA, Subtype, by="Cell", relationship="many-to-many")
-  
-  if (!exclude_else) {
-    levels = c(levels(TPM_PCA$Subtype), name_else)
-    TPM_PCA$Subtype = TPM_PCA$Subtype %>% as.character
-    TPM_PCA$Subtype[is.na(TPM_PCA$Subtype)] = name_else
-    TPM_PCA$Subtype = TPM_PCA$Subtype %>% factor(levels=levels)
-  }
-  
-  TPM_PCA = TPM_PCA %>% relocate(PC1, PC2, .after=everything()) %>% as.data.frame
-  TPM_PCA %>% plot_def(PC1, PC2, main=main, color=Subtype, shape=Subtype,
-                       size=3, stroke=1.5, alpha=0.8, margin=0.4, 
-                       axis_tl=30, axis_tx=25, legend_tl=22.5, legend_tx=20,
-                       width=width, height=height, save=save, ...)
-  
-  if (return_val) return(TPM_PCA)
+  main = sprintf("%s/%s [%s]", dir, drugs[i], pathways[i])
+  sprintf("# %s [%s]", drugs[i], pathways[i]) %>% cat
+  Pred_List_SCLC2[[drugs[i]]] = Pred_SCLC %>% 
+    subset(Drug_Name==drugs[i]) %>% 
+    plot_with_tpm(SANGER_RNA_GSVA, gene=pathways[i], main=main, save=T)
 }
 
-boxplot_subtype = function(Pred, SubType_List, name_else="The Others", main=NULL, 
-                           width=20, height=18, size_psig=6, exclude_else=T, use_ggpubr=T, save=F, ...) {
-  
-  suppressMessages(library(ggpubr))
-  Subtype = stack(SubType_List) %>% setNames(c("Cell", "Subtype"))
-  Pred = full_join(Pred, Subtype, by="Cell", relationship="many-to-many")
-  
-  if (exclude_else) {
-    Pred = Pred %>% subset(!is.na(Subtype))
+
+
+### Grad-CAM [1st Layer]
+seed = 2021:2030
+dir = "../results/IC50_GDSC/Normal/RGCN"
+file = sprintf("%s/pred_sclc_seed%s_gcam.csv", dir, seed)
+
+Imp_SCLC = data.table()
+for (i in 1:length(file)) {
+  Importance = fread(file[i])
+  Imp_SCLC = Imp_SCLC %>% rbind(Importance)
+}
+
+Imp_SCLC = Imp_SCLC[, lapply(.SD, mean), by = .(Cell, Drug)]
+
+col = c("Cell", "Drug")
+Imp_SCLC$Drug = Imp_SCLC$Drug %>% as.character
+Imp_SCLC = left_join(Imp_SCLC, Pred_SCLC, by=col)
+
+Imp_SCLC = Imp_SCLC %>% 
+  relocate(Cell_Name, .after=Cell) %>% 
+  relocate(Drug_Name, Prediction, .after=Drug)
+
+get_imp_by_drug = function(Importance, dname=NULL, n_cell=30, n_path=5, resistant=F) {
+  Importance = Importance %>% 
+    subset(Drug_Name==dname) %>% 
+    mutate(Z_Pred=as.numeric(scale(Prediction))) %>% 
+    relocate(Z_Pred, .after=Prediction) %>% as.data.frame
+    
+  if (!resistant) {
+    Importance = Importance %>% 
+      slice_min(Prediction, n=n_cell) %>% 
+      subset(Z_Pred<0) %>% arrange(Prediction)
   } else {
-    levels = c(levels(Pred$Subtype), name_else)
-    Pred$Subtype = Pred$Subtype %>% as.character
-    Pred$Subtype[is.na(Pred$Subtype)] = name_else
-    Pred$Subtype = Pred$Subtype %>% factor(levels=levels)
+    Importance = Importance %>% 
+      slice_max(Prediction, n=n_cell) %>% 
+      subset(Z_Pred>0) %>% arrange(desc(Prediction))
   }
   
-  Pred = Pred %>% 
-    mutate(GDSC_Cell=!Rest) %>% 
-    subset(select=-Rest) %>% 
-    relocate(Subtype, .after=Cell) %>% 
-    relocate(Drug_Name, .after=Drug) %>%
-    rename(Drug_CID=Drug, IC50_Missing=Missing) %>% 
-    relocate(GDSC_Cell, .after=IC50_Missing) %>% as.data.frame
-  
-  # Annotation of cell names
-  anno_cells = T
-  if (anno_cells) {
-    idx = match(Pred$Cell, Anno_Cells$SANGER_MODEL_ID)
-    Pred = Pred %>% mutate(Cell_Name=Anno_Cells$MODEL_NAME[idx]) %>% 
-      relocate(Cell_Name, .after=Cell) %>% as.data.frame
+  pathway_list = c()
+  for (i in 1:n_cell) {
+    pathways = Importance[i, 7:ncol(Importance)] %>% 
+      unlist %>% sort(decreasing=T) %>% head(n_path)
+    pathway_list = pathway_list %>% c(pathways)
   }
   
-  if (!use_ggpubr) {
-    Pred %>% subset(!is.na(Prediction)) %>%
-      boxplot_def(Subtype, Prediction, legend=F, force_bold=F,
-                  width=widt, height=height, save=save, ...)
-  } else {
-    section = function(x, quant=0.5, na.rm=T) {
-      if (na.rm) x = x %>% na.omit %>% as.numeric
-      min(x)+(max(x)-min(x))*quant
-    }
-    
-    ylab = bquote(ln(IC[50]))
-    pos = position_dodge(width=0.8)
-    margin1 = margin(5, 5, 5, 5, unit="pt")
-    margin2 = margin(10, 10, 10, 10, unit="pt")
-    margin3 = margin(0, 25, 0, 25, unit="pt")
-    margin4 = margin(0, 25, 0, 10, unit="pt")
-    
-    # add.params = list(alpha=0.5, size=2)
-    # ylab = bquote(Predicted~ln(IC[50]))
-    
-    font1 = font(object="ylab", size=30, margin=margin1)
-    font2 = font(object="axis.text", size=22.5, margin=margin2, color="grey30")
-    font3 = font(object="legend.title", size=25, margin=margin3)
-    font4 = font(object="legend.text", size=25, margin=margin4)
-    font = font1 + font2 + font3 + font4
-    
-    # pl = Pred %>% subset(!is.na(Prediction)) %>%
-    #   ggboxplot(x="Subtype", y="Prediction", fill="Subtype", outlier.shape=NA,
-    #             add="point", size=1, alpha=0.9, xlab=F, add.params=add.params, ...) +
-    #   labs(y=ylab) + font + rotate_x_text(angle=30, hjust=1, vjust=1)
-    
-    col = c("LN_IC50", "Prediction")
-    col_af = c("Response_Type", "Response_Value")
-    color = RColorBrewer::brewer.pal(8, "Reds")[c(8, 3)]
-    
-    labels = c("Actual", "Predicted")
-    # labels = c(bquote(Actual~ln(IC[50])), bquote(Predicted~ln(IC[50])))
-    
-    Pred_ = Pred %>% as.data.frame %>% 
-      reshape2::melt(measure.vars=col, variable.name=col_af[1], value.name=col_af[2]) %>%
-      subset(!is.na(Response_Value)) %>% 
-      mutate(Response_Type=ifelse(Response_Type=="LN_IC50", labels[1], labels[2])) %>% 
-      mutate(Response_Type=Response_Type %>% factor(levels=labels))
-    
-    pl = Pred_ %>% 
-      ggboxplot(x="Subtype", y="Response_Value", fill="Response_Type",
-                outlier.shape=NA, size=1, alpha=0.9, xlab=F, ...) +
-      geom_point(aes(group=Response_Type), size=2, alpha=0.5, position=pos) + 
-      labs(y=ylab, fill="Response") +
-      rotate_x_text(angle=30, hjust=1, vjust=1) + 
-      scale_fill_manual(labels=labels, values=color) + font
-    
-    # 1. Comparison within group [Predicted vs Actual]
-    pl = pl + geom_pwc(aes(group=Response_Type), 
-                       label="p.adj.signif", p.adjust.method="fdr", label.size=size_psig,
-                       tip.length=0, bracket.nudge.y=0.05, step.increase=0.12, hide.ns=F)
-    
-    # 2. Comparison between group [SCLC Type & NSCLC]
-    pl = pl + geom_pwc(data=Pred_ %>% subset(Response_Type!="Actual"), 
-                       label="p.adj.signif", p.adjust.method="fdr", label.size=size_psig,
-                       tip.length=0.02, bracket.nudge.y=0.15+0.05, step.increase=0.12, hide.ns=T)
-    
-    pl = pl %>% ggpar(legend="bottom") + theme(legend.key.size=unit(1, "cm"))
-    # pl = pl %>% ggpar(legend="none")
-    
-    if (save) {
-      save_fig(pl, main, width=width, height=height, units="cm", svg=T)
-    } else print(pl) ; return(Pred)
-  }
-  return(Pred)
+  col = c("Cell_Name", "Drug_Name", "Prediction", "Z_Pred")
+  Info = Importance[rep(1:n_cell, each=n_path), col]
+  Info$Pathway = names(pathway_list)
+  rownames(Info) = NULL
+  return(Info)
 }
 
-# Paired wilcox.test
-# When implementing paired t-test, it is not necessary to specify the sample ID column
-# Just arrange sample IDs from two groups in the same order...
-# https://rpkgs.datanovia.com/rstatix/reference/wilcox_test.html
-# https://www.datanovia.com/en/lessons/how-to-do-a-t-test-in-r-calculation-and-reporting/#paired-t-test
+GCAM_SCLC_Eto = Imp_SCLC %>% get_imp_by_drug(dname="Etoposide")
+# BIOCARTA_AGPCR_PATHWAY
+# BIOCARTA_GH_PATHWAY
+# > GHR Knockdown - MEK/ERK pathway down - poliferation down, apoptosis - sensitivity up (GBM)
+# > Zhang, Hongmei, et al. "The inhibition of GHR enhanced cytotoxic effects of etoposide on neuroblastoma." Cellular Signalling 86 (2021): 110081.
+# BIOCARTA_SLRP_PATHWAY
+# BIOCARTA_ERBB3_PATHWAY
+# BIOCARTA_BARRESTIN_PATHWAY 
 
-# Some cell-lines do not have actual ln(IC50) values
-# This causes the error of paired wilcox.test
-# So we decided to implement unpaired test within each subtype
+GCAM_SCLC_Cis = Imp_SCLC %>% get_imp_by_drug(dname="Cisplatin")
+# BIOCARTA_CIRCADIAN_PATHWAY
+# BIOCARTA_TNFR1_PATHWAY
+# > Release TNF-α - TNF-α & TNFR1/2 interaction - cell death, inflammation
+# > https://synapse.koreamed.org/articles/1050552
+# > TNFR1 Overexpression - Resistant [NSCLC]
+# > Zhen, Jie, et al. "EDN1 facilitates cisplatin resistance of non-small cell lung cancer cells by regulating the TNF signaling pathway." World Journal of Surgical Oncology 23.1 (2025): 71.
+# BIOCARTA_GATA3_PATHWAY
+# > GATA3 - Hippo down - Resistant [NB]
+# > Wang, Jing, Wang Dai, and Ming Zhang. "GATA3 positively regulates PAR1 to facilitate in vitro disease progression and decrease cisplatin sensitivity in neuroblastoma via inhibiting the hippo pathway." Anti-Cancer Drugs 34.1 (2023): 57-72.
+# BIOCARTA_ATM_PATHWAY
+# > ATM inhibition - JAK/STAT3, PD-L1 down - EMT reversal, metastasis in resistant cells [SCLC]
+# Shen, Mingjing, et al. "Inhibition of ATM reverses EMT and decreases metastatic potential of cisplatin-resistant lung cancer cells through JAK/STAT3/PD-L1 pathway." Journal of Experimental & Clinical Cancer Research 38 (2019): 1-14.
+# BIOCARTA_BCELLSURVIVAL_PATHWAY 
 
-pc2_type = c("LN_IC50", "Log2TPM", "GSVA")
-shape = c(22, 23, 24, 25, 21)
-color = c("brown1", "gold", "seagreen3", "royalblue1", "mediumorchid")
+GCAM_SCLC_Lur = Imp_SCLC %>% get_imp_by_drug(dname="Lurbinectedin")
+# BIOCARTA_CCR5_PATHWAY [drug-gene X, sclc-gene M]
+# > CCL5/CCR5 axis in SCLC and various cancer - progression, including angiogenesis, cell migration, and metastasis
+# > Zeng, Zhen, et al. "CCL5/CCR5 axis in human diseases and related treatments." Genes & diseases 9.1 (2022): 12-27.
+# BIOCARTA_IL12_PATHWAY
+# BIOCARTA_CARM_ER_PATHWAY [drug-gene X, sclc-gene O]
+# > ER - modulate ECM remodeling, cell adhesion - tumor progression, metastasis in SCLC
+# > Wang, Hong, et al. "Therapeutic targeting ERRγ suppresses metastasis via extracellular matrix remodeling in small cell lung cancer." Embo Molecular Medicine 16.9 (2024): 2043-2059.
+# BIOCARTA_SARS_PATHWAY
+# BIOCARTA_RHODOPSIN_PATHWAY
 
-add = list(scale_color_manual(values=color), 
-           scale_shape_manual(values=shape), 
-           theme(legend.key.size=unit(1, "cm")))
+GCAM_SCLC_PBD = Imp_SCLC %>% get_imp_by_drug(dname="Pyrrolobenzodiazepine")
+# BIOCARTA_SLRP_PATHWAY [drug-gene X, sclc-gene M]
+# > 
+# > Ao, Zhi, et al. "Tumor angiogenesis of SCLC inhibited by decreased expression of FMOD via downregulating angiogenic factors of endothelial cells." Biomedicine & Pharmacotherapy 87 (2017): 539-547.
+# BIOCARTA_HER2_PATHWAY
+# > 
+# BIOCARTA_REELIN_PATHWAY
+# BIOCARTA_IL7_PATHWAY
+# BIOCARTA_CCR5_PATHWAY [drug-gene M, sclc-gene M]
+# > CCL5 - 
 
-dir = "Case Study [SCLC]"
-main = sprintf("%s/PC2 Plot [%s]", dir, pc2_type)
-cells_lung = rownames(SANGER_RNA_TPM) %in% unique(Pred_Lung$Pred$Cell)   # 202
+GCAM_SCLC_DXd = Imp_SCLC %>% get_imp_by_drug(dname="Deruxtecan")
+# BIOCARTA_CIRCADIAN_PATHWAY
+# BIOCARTA_TNFR1_PATHWAY
+# > "blocking TNFα may enhance the sensitivity of HER2-positive breast cancer to trastuzumab deruxtecan"
+# > https://pmc.ncbi.nlm.nih.gov/articles/PMC10016294
+# BIOCARTA_GABA_PATHWAY
+# BIOCARTA_PDZS_PATHWAY
+# BIOCARTA_RAC1_PATHWAY [drug-gene X, sclc-gene O]
+# > "inhibiting RAC1 can decrease SCLC cell viability and tumorigenicity, potentially enhancing the effectiveness of chemotherapy."
+# > RAC1 inhibition - Nur77 from nucleus to cytoplasm - Nur77 bind to BCL2 - apoptosis
+# > https://www.sciencedirect.com/science/article/pii/S2211124721014583
 
-PC2_IC50 = Pred_Wide[cells_lung, ] %>% 
-  pca_subtype(SCLC_Type, main=main[1], name_else="NSCLC", add=add, save=T)
-PC2_TPM = SANGER_RNA_TPM[cells_lung, ] %>% 
-  pca_subtype(SCLC_Type, main=main[2], name_else="NSCLC", add=add, save=T)
-PC2_GSVA = SANGER_RNA_GSVA[cells_lung, ] %>% 
-  pca_subtype(SCLC_Type, main=main[3], name_else="NSCLC", add=add, save=T)
+GCAM_SCLC_Cal = Imp_SCLC %>% get_imp_by_drug(dname="Calicheamicin")
+# BIOCARTA_CCR5_PATHWAY
+# BIOCARTA_RHODOPSIN_PATHWAY
+# BIOCARTA_WNT_LRP6_PATHWAY [drug-gene X, sclc-gene O]
+# > Wnt is activate in chemoresistant SCLC...
+# > https://www.nature.com/articles/s41467-018-06162-9
+# BIOCARTA_CARM_ER_PATHWAY
+# BIOCARTA_FEEDER_PATHWAY
 
-drug_bcl2 = c("Venetoclax", "Navitoclax", "Obatoclax Mesylate", "Sabutoclax", "ABT737", "TW 37")
-drug_aurka = c("Alisertib", "Tozasertib", "ZM447439", "CD532", "HG-5-113-01", "GSK1070916")
-drug_igf1r = c("Linsitinib", "BMS-536924", "BMS-754807", "GSK1904529A", "NVP-ADW742")
-drug_parp = c("Niraparib", "Olaparib", "Rucaparib", "Talazoparib", "Veliparib")
+GCAM_SCLC_Eto = GCAM_SCLC_Eto %>% subset(Cell_Name=="LB647-SCLC")   # BIOCARTA_P38MAPK_PATHWAY
+GCAM_SCLC_Cis = GCAM_SCLC_Cis %>% subset(Cell_Name=="NCI-H748")     # BIOCARTA_MET_PATHWAY
+GCAM_SCLC_Lur = GCAM_SCLC_Lur %>% subset(Cell_Name=="NCI-H847")     # X
+GCAM_SCLC_PBD = GCAM_SCLC_PBD %>% subset(Cell_Name=="COR-L279")     # BIOCARTA_EPONFKB_PATHWAY
+GCAM_SCLC_DXd = GCAM_SCLC_DXd %>% subset(Cell_Name=="NCI-H209")     # BIOCARTA_TNFR1_PATHWAY
+GCAM_SCLC_Cal = GCAM_SCLC_Cal %>% subset(Cell_Name=="IST-SL1")      # BIOCARTA_EPONFKB_PATHWAY
 
+GCAM_SCLC = Reduce(rbind, list(GCAM_SCLC_Eto, GCAM_SCLC_Cis, GCAM_SCLC_Lur, 
+                               GCAM_SCLC_PBD, GCAM_SCLC_DXd, GCAM_SCLC_Cal))
 
-targets = c("BCL2", "AURKA", "IGF1R", "PARP")
-dir = sprintf("Case Study [SCLC]/Target %s", targets)
-for (d in dir) mkdir(d)
+file = "Grad-CAM [SCLC, Well-known & Promising].csv"
+write.csv(GCAM_SCLC, file=file, row.names=F)
 
-Pred_Lung_BCL2 = list()
-for (drug in drug_bcl2) {
-  main = sprintf("%s/SCLC Prediction [Target %s, %s]", dir[1], targets[1], drug)
-  Pred_Lung_BCL2[[drug]] = Pred_Lung$Pred %>% subset(Drug_Name==drug) %>% 
-    boxplot_subtype(SCLC_Type, main=main, exclude_else=F, name_else="NSCLC", save=T)
+# drugs = Imp_SCLC$Drug %>% unique
+# col = c("Cell", "Prediction")
+# get_head_tail = function(df) {
+#   rbind(head(df), tail(df))
+# }
+# 
+
+for (drug in drugs) {
+  Temp = Imp_SCLC %>% subset(Drug_Name==drug) %>% arrange(Prediction) %>% as.data.frame
+  Anno_Col = data.frame(Prediction=scale(Temp$Prediction))
+  rownames(Temp) = Temp$Cell
+  rownames(Anno_Col) = Temp$Cell
+  
+  Temp[, 6:ncol(Temp)] %>% t %>%
+    heatmap_def(show_row=F, show_col=F, Anno_Col=Anno_Col, clust_col=T, scale_col=F)
+  # color_bottom="white", color_center="palegoldenrod", color_top="firebrick3"
 }
 
-Pred_Lung_AURKA = list()
-for (drug in drug_aurka) {
-  main = sprintf("%s/SCLC Prediction [Target %s, %s]", dir[2], targets[2], drug)
-  Pred_Lung_AURKA[[drug]] = Pred_Lung$Pred %>% subset(Drug_Name==drug) %>% 
-    boxplot_subtype(SCLC_Type, main=main, exclude_else=F, name_else="NSCLC", save=T)
-}
-
-Pred_Lung_IGF1R = list()
-for (drug in drug_igf1r) {
-  main = sprintf("%s/SCLC Prediction [Target %s, %s]", dir[3], targets[3], drug)
-  Pred_Lung_IGF1R[[drug]] = Pred_Lung$Pred %>% subset(Drug_Name==drug) %>% 
-    boxplot_subtype(SCLC_Type, main=main, exclude_else=F, name_else="NSCLC", save=T)
-}
-
-Pred_Lung_PARP = list()
-for (drug in drug_parp) {
-  main = sprintf("%s/SCLC Prediction [Target %s, %s]", dir[4], targets[4], drug)
-  Pred_Lung_PARP[[drug]] = Pred_Lung$Pred %>% subset(Drug_Name==drug) %>% 
-    boxplot_subtype(SCLC_Type, main=main, exclude_else=F, name_else="NSCLC", save=T)
-}
 
 
 supplementary = T
 if (supplementary) {
   save_for_nc = function(df_list, dir=".", num=1, num_fig=NULL, rowNames=F, suppl=T) {
-    
     suppressMessages(library(openxlsx))
     is_list = inherits(df_list, "list")
     if (is_list & is.null(num_fig)) num_fig = letters[1:length(df_list)]
@@ -705,52 +470,75 @@ if (supplementary) {
     write.xlsx(df_list, file=file, sheetName=sheets, rowNames=rowNames)
   }
   
+  # From 139
+  Pred_COREAD1[[1]]$Rest %>% sum      # 91
+  Pred_COREAD1[[2]]$Rest %>% sum      # 91
+  Pred_COREAD1[[3]]$Rest %>% sum      # 91
+  Pred_COREAD1[[4]]$Rest %>% sum      # 91
+  
+  Pred_COREAD1[[1]]$Missing %>% sum   # 0
+  Pred_COREAD1[[2]]$Missing %>% sum   # 0
+  Pred_COREAD1[[3]]$Missing %>% sum   # 1
+  Pred_COREAD1[[4]]$Missing %>% sum   # 0
+  
+  # From 61
+  Pred_Breast1[[1]]$Rest %>% sum      # 10
+  Pred_Breast1[[2]]$Rest %>% sum      # 10
+  Pred_Breast1[[3]]$Rest %>% sum      # 10
+  Pred_Breast1[[4]]$Rest %>% sum      # 10
+  
+  Pred_Breast1[[1]]$Missing %>% sum   # 1
+  Pred_Breast1[[2]]$Missing %>% sum   # 0
+  Pred_Breast1[[3]]$Missing %>% sum   # 0
+  Pred_Breast1[[4]]$Missing %>% sum   # 0
+  
   
   ### [Source Data] Fig. 7
-  Pred_Lung_Ex = list(Pred_Lung_BCL2$Venetoclax, Pred_Lung_AURKA$Alisertib, 
-                      Pred_Lung_IGF1R$Linsitinib, Pred_Lung_PARP$Niraparib)
+  Pred_COREAD1_ = Reduce(rbind, Pred_COREAD1)
+  Pred_COREAD2_ = Reduce(rbind, Pred_COREAD2)
+  Pred_Breast1_ = Reduce(rbind, Pred_Breast1)
+  Pred_Breast2_ = Reduce(rbind, Pred_Breast2)
+  Pred_SCLC1_ = Reduce(rbind, Pred_List_SCLC1)
+  Pred_SCLC2_ = Reduce(rbind, Pred_List_SCLC2)
   
-  Pred_Lung_Ex %>% save_for_nc(num=7, suppl=F)
+  col = c("Cell", "Cell_Name", "Drug", "Drug_Name", 
+          "LN_IC50", "Prediction", "Gene_Name", "Gene")
+  
+  Pred_COREAD1_ = Pred_COREAD1_[, col] %>% rename(Gene_Log2_TPM=Gene)
+  Pred_Breast1_ = Pred_Breast1_[, col] %>% rename(Gene_Log2_TPM=Gene)
+  Pred_COREAD2_ = Pred_COREAD2_[, col] %>% rename(Pathway_Name=Gene_Name, Pathway_GSVA_Score=Gene)
+  Pred_Breast2_ = Pred_Breast2_[, col] %>% rename(Pathway_Name=Gene_Name, Pathway_GSVA_Score=Gene)
+  
+  col_ = c("Pathway_Name", "Pathway_GSVA_Score")
+  identical(Pred_COREAD1_[, col[1:6]], Pred_COREAD2_[, col[1:6]])   # T
+  identical(Pred_Breast1_[, col[1:6]], Pred_Breast2_[, col[1:6]])   # T
+  Pred_COREAD_ = Pred_COREAD1_ %>% cbind(Pred_COREAD2_[, col_])
+  Pred_Breast_ = Pred_Breast1_ %>% cbind(Pred_Breast2_[, col_])
+  
+  Temp = list(Pred_COREAD_, Pred_Breast_)
+  Temp %>% save_for_nc(num=7, suppl=F)
   
   
-  ### [Source Data] Supplementary Fig. 28
-  SCLC_Type_ = SCLC_Type %>% stack %>% setNames(c("Cell", "Subtype"))
-  cells_lung = rownames(SANGER_RNA_TPM) %in% unique(Pred_Lung$Pred$Cell)
-  cells_lung = rownames(SANGER_RNA_TPM)[cells_lung]   # 202
+  ### [Source Data] (Fig. 8)
+  col_ = c("Cell", "Cell_Name", "Drug", "Drug_Name", 
+           "Prediction", "Gene_Name", "Gene")
   
-  cells_nsclc = cells_lung[!(cells_lung %in% SCLC_Type_$Cell)]   # 130
-  NSCLC_Type_ = data.frame(Cell=cells_nsclc, Subtype="NSCLC")
-  Lung_Type = rbind(SCLC_Type_, NSCLC_Type_)
+  by = c("Cell", "Drug")
+  col2 = c("Cell", "Drug", "LN_IC50")
   
-  idx = match(Lung_Type$Cell, Anno_Cells$SANGER_MODEL_ID)
-  Lung_Type$Cell_Name = Anno_Cells$MODEL_NAME[idx]
+  IC50_GDSC$Drug = IC50_GDSC$Drug %>% as.character
+  Pred_SCLC1_$Drug = Pred_SCLC1_$Drug %>% as.character
+  Pred_SCLC2_$Drug = Pred_SCLC2_$Drug %>% as.character
+  Pred_SCLC1_ = Pred_SCLC1_[, col_] %>% left_join(IC50_GDSC[, col2], by=by) %>% relocate(LN_IC50, .before=Prediction)
+  Pred_SCLC2_ = Pred_SCLC2_[, col_] %>% left_join(IC50_GDSC[, col2], by=by) %>% relocate(LN_IC50, .before=Prediction)
   
-  markers_sclc = c(marker_a, marker_n, marker_p, "CD274", "PDCD1")
-  markers_sclc_ = c(marker_a, marker_n, marker_p, "CD274 [PD-L1]", "PDCD1 [PD-1]")
-  TPM_Marker = SANGER_RNA_TPM[cells_lung, markers_sclc]
-  colnames(TPM_Marker) = markers_sclc_
+  Pred_SCLC1_ = Pred_SCLC1_[, col] %>% rename(Gene_Log2_TPM=Gene)
+  Pred_SCLC2_ = Pred_SCLC2_[, col] %>% rename(Pathway_Name=Gene_Name, Pathway_GSVA_Score=Gene)
   
-  # 40 [=33+7] SCLC cell-lines have multiple subtype membership...
-  SCLC_Type_$Cell %>% table %>% table   # 1 [32], 2 [33], 3 [7]
-  SCLC_Feature_ = list(Lung_Type, PC2_IC50, PC2_TPM, PC2_GSVA, TPM_Marker)
+  col_ = c("Pathway_Name", "Pathway_GSVA_Score")
+  identical(Pred_SCLC1_[, col[1:6]], Pred_SCLC2_[, col[1:6]])   # T
+  Pred_SCLC_ = Pred_SCLC1_ %>% cbind(Pred_SCLC2_[, col_])
   
-  num_fig = c(letters[1:4], "e-i")
-  SCLC_Feature_ %>% save_for_nc(num=28, suppl=T, num_fig=num_fig, rowNames=c(F, F, F, F, T))
-  
-  ### [Source Data] Supplementary Fig. 29
-  Pred_Lung_BCL2 %>% save_for_nc(num=29, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 30
-  Pred_Lung_AURKA %>% save_for_nc(num=30, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 31
-  Pred_Lung_IGF1R %>% save_for_nc(num=31, suppl=T)
-  
-  ### [Source Data] Supplementary Fig. 32
-  Pred_Lung_PARP %>% save_for_nc(num=32, suppl=T)
-  
-  # Cf. Cells trained vs not-trained?
-  col = c("Cell", "Rest")
-  Pred_Lung$Pred[, col] %>% distinct %>% subset(Cell %in% cells_sclc & Rest) %>% nrow    # 11 [from 72]
-  Pred_Lung$Pred[, col] %>% distinct %>% subset(Cell %in% cells_nsclc & Rest) %>% nrow   # 30 [from 130]
+  file1 = "SCLC_in_vitro.csv"
+  write.csv(Pred_SCLC_, file=file1, row.names=F)
 }

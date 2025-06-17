@@ -113,7 +113,29 @@ def validate(model, loader, args):
     return mse, rmse, mae, pcc, scc, y_pred
 
 
+def validate_no_labels(model, loader, args):
+    model.eval()
+    device = args.device
+    
+    y_pred = [] 
+
+    with torch.no_grad():
+        for data in tqdm(loader, desc='Iteration'):
+            drug, cell = data
+            if isinstance(cell, list):
+                drug, cell = drug.to(device), [feat.to(device) for feat in cell]
+            else:
+                drug, cell = drug.to(device), cell.to(device)
+            output = model(drug, cell)
+            y_pred.append(output)
+
+    y_pred = torch.cat(y_pred, dim=0)
+    y_pred = y_pred.squeeze().cpu().numpy()
+    return None, None, None, None, None, y_pred
+
+
 def gradcam(model, drug_name, cell_name, drug_dict, cell_dict, edge_index, args):
+    breakpoint()
     cell_dict[cell_name].edge_index = torch.tensor(edge_index, dtype=torch.long)
     drug = Batch.from_data_list([drug_dict[drug_name]]).to(args.device)
     cell = Batch.from_data_list([cell_dict[cell_name]]).to(args.device)
@@ -278,12 +300,17 @@ class MyDataset(Dataset):
         col_drug = args.col_drug
         col_cell = args.col_cell
         col_ic50 = args.col_ic50
+        self.labels = col_ic50 not in [0, "0"]
         
         self.drug_name = IC[col_drug]
         self.Cell_line_name = IC[col_cell]
-        self.value = IC[col_ic50]
         self.edge_index = torch.tensor(edge_index, dtype=torch.long)
         # self.edge_index = edge_index
+        
+        if col_ic50 in [0, "0"]: 
+            self.value = IC
+        else:
+            self.value = IC[col_ic50]
 
     def __len__(self):
         return len(self.value)
@@ -291,7 +318,10 @@ class MyDataset(Dataset):
     def __getitem__(self, index):
         self.cell[self.Cell_line_name[index]].edge_index = self.edge_index
         # self.cell[self.Cell_line_name[index]].adj_t = SparseTensor(row=self.edge_index[0], col=self.edge_index[1])
-        return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]], self.value[index])
+        if not self.labels:
+            return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]])
+        else:
+            return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]], self.value[index])
 
 
 class MyDataset_MLP(Dataset):
@@ -310,11 +340,19 @@ class MyDataset_MLP(Dataset):
         return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]], self.value[index])
 
 
-def _collate(samples):
-    drugs, cells, labels = map(list, zip(*samples))
+def _collate(samples, labels=True):
+    if not labels:
+        drugs, cells = map(list, zip(*samples))
+    else:
+        drugs, cells, labels = map(list, zip(*samples))
+    
     batched_drug = Batch.from_data_list(drugs)
     batched_cell = Batch.from_data_list(cells)
-    return batched_drug, batched_cell, torch.tensor(labels)
+    
+    if not labels:
+        return batched_drug, batched_cell
+    else:
+        return batched_drug, batched_cell, torch.tensor(labels)
 
 
 def _collate_MLP_single(samples):
@@ -381,9 +419,12 @@ def load_data_retrain(ic50_train, ic50_test, drug_dict, cell_dict, edge_index, a
 
 def load_data_test(ic50_test, drug_dict, cell_dict, edge_index, args, shuffle=False): # For PPI network
     
-    collate_fn = _collate
+    from functools import partial
+    labels = args.col_ic50 not in [0, "0"]
+    collate_fn = partial(_collate, labels=labels)
     test_dataset = MyDataset(drug_dict, cell_dict, ic50_test, edge_index, args)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=shuffle, collate_fn=collate_fn, num_workers=args.cpu)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, 
+                             shuffle=shuffle, collate_fn=collate_fn, num_workers=args.cpu)
 
     return test_loader
 

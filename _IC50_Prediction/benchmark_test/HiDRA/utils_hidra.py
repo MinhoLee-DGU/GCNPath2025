@@ -66,9 +66,13 @@ class DataLoader(Sequence) :
         
         Batch_C = [self.data[i].loc[cells].values for i in range(186)]
         Batch_D = self.data[186].loc[drugs].values
-        batch_y = self.ic50_data[self.col_ic50].iloc[indices]
-        batch_y = np.array(batch_y.astype("float32"))
-        return [*Batch_C, Batch_D], batch_y
+        
+        if self.col_ic50 in [0, "0"] :
+            return [*Batch_C, Batch_D]
+        else :
+            batch_y = self.ic50_data[self.col_ic50].iloc[indices]
+            batch_y = np.array(batch_y.astype("float32"))
+            return [*Batch_C, Batch_D], batch_y
         
     def on_epoch_end(self) :
         self.indices = np.arange(len(self.ic50_data))
@@ -113,13 +117,19 @@ if __name__ == '__main__' :
     # 
     # drug_data = pd.read_csv(dir_drug)
     # drug_data = process_drug(drug_data["SMILES_CAN"], drug_data["Drug_CID"])
-    # drug_data.index.name = "Drug name"
-    # drug_data.to_csv(dir_res)
      
-    dir_drug = "_data/SMILES_ChEMBL.csv"
-    dir_res = "_data/ProcessedFile/drug_chembl.csv"
+    # dir_drug = "_data/SMILES_ChEMBL.csv"
+    # dir_res = "_data/ProcessedFile/drug_chembl.csv"
+    # 
+    # drug_data = pd.read_csv(dir_drug)
+    # drug_data = process_drug(drug_data["Canonical_SMILES"], drug_data["Molecule_ChEMBL_ID"])
+
+    dir_drug = "_data/TCGA_Drug_Info.csv"
+    dir_res = "_data/ProcessedFile_TCGA/drug_tcga.csv"
     
     drug_data = pd.read_csv(dir_drug)
-    drug_data = process_drug(drug_data["Canonical_SMILES"], drug_data["Molecule_ChEMBL_ID"])
+    drug_data = process_drug(drug_data["SMILES_Can"], drug_data["Drug_CID"])
+    
     drug_data.index.name = "Drug name"
     drug_data.to_csv(dir_res)
+

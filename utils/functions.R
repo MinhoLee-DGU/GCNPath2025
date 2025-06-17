@@ -747,6 +747,7 @@ venn_def = function(..., main=NULL, labels=NULL, col=NULL, add=NULL,
 
 heatmap_def = function(df, main=NULL, Anno_Row=NULL, Anno_Col=NULL, breaks=NULL, 
                        color=NULL, color_type=NULL, color_bin=NULL, 
+                       color_bottom="royalblue2", color_top="firebrick2",
                        color_center="white", color_num="black", color_border="grey60", 
                        color_scale=1, text_ratio=1, text_row=15, text_col=15, text_num=15, 
                        tree_row=50, tree_col=50, width=20, height=20, dpi=400,  
@@ -759,7 +760,10 @@ heatmap_def = function(df, main=NULL, Anno_Row=NULL, Anno_Col=NULL, breaks=NULL,
   if (center_zero & from_zero) stop("Both center_zero=T and from_zero=T not compatible...")
   
   if (scale_col) df = df %>% scale %>% as.data.frame
-  if (scale_row) df = df %>% apply(1, scale) %>% t %>% as.data.frame
+  if (scale_row) {
+    col = colnames(df)
+    df = df %>% apply(1, scale) %>% t %>% as.data.frame %>% setNames(col)
+  }
   dist_df = df %>% unlist %>% na.omit %>% as.numeric
   
   norm_zero = function(x) (0-min(x)) / (max(x)-min(x))
@@ -776,9 +780,9 @@ heatmap_def = function(df, main=NULL, Anno_Row=NULL, Anno_Col=NULL, breaks=NULL,
   }
   
   if (is.null(color_type)) {
-    color_type = c("royalblue2", "white", "firebrick2")
-    color_type = ifelse_def(!above_zero, color_type, c("white", "firebrick2"))
-    color_type = ifelse_def(!below_zero, color_type, c("royalblue2", "white"))
+    color_type = c(color_bottom, color_center, color_top)
+    color_type = ifelse_def(!above_zero, color_type, c(color_center, color_top))
+    color_type = ifelse_def(!below_zero, color_type, c(color_bottom, color_center))
   }
   
   if (!from_zero) {

@@ -42,7 +42,8 @@ def arg_parse():
     parser.add_argument("-choice", type=int, default=0) 
     
     parser.add_argument("-ic50", type=str, default="_data/IC50_GDSC2.txt")
-    parser.add_argument("-cell", type=str, default="_data/cell_feature_all.npy")
+    # parser.add_argument("-cell", type=str, default="_data/cell_feature_all.npy")
+    parser.add_argument("-cell", type=str, default="_data/cell_feature_all_cncat.npy")
     parser.add_argument("-drug", type=str, default="_data/drug_feature_graph.npy")
     
     parser.add_argument("-col_cell", type=str, default="Cell_BROAD")
@@ -69,9 +70,11 @@ def main():
         args.weight_tgdrp = args.dir_param
     else : 
         args = create_dir_out_(args, suf_param="pth", tgsa=False, retrain=True)
-        args.dir_pred = "{}/pred_total_seed{}.csv".format(args.dir_out, args.seed)
-        args.dir_param = "{}/param_retrain_seed{}.pth".format(args.dir_out, args.seed)
-        
+        # args.dir_pred = "{}/pred_total_seed{}.csv".format(args.dir_out, args.seed)
+        # args.dir_param = "{}/param_retrain_seed{}.pth".format(args.dir_out, args.seed)
+        args.dir_pred = "{}/pred_total_cncat_seed{}.csv".format(args.dir_out, args.seed)
+        args.dir_param = "{}/param_retrain_cncat_seed{}.pth".format(args.dir_out, args.seed)
+
     ic50_data = pd.read_csv(input_ic50, header=0, sep="\t")
     cell_data = np.load(args.cell, allow_pickle=True).item()
     drug_data = np.load(args.drug, allow_pickle=True).item()

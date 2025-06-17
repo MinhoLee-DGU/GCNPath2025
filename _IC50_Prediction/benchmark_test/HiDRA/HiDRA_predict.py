@@ -219,25 +219,39 @@ def main():
     ic50 = args.ic50
 
     dir_ic50 = "./_data"
+    sep = "\t" if ".txt" in args.ic50 else ","
     input_ic50 = os.path.join(dir_ic50, args.ic50)
-    ic50_data = pd.read_csv(input_ic50, header=0, sep="\t")
+    ic50_data = pd.read_csv(input_ic50, header=0, sep=sep)
     
     print("\n### Data Processing")
     data = read_files(args.dir_in, args.drug)
     data = index_to_str(data)
     ic50_data = filt_ic50_(ic50_data, data, args)
-
+    
     batch_size = 1024
     test_loader = DataLoader(ic50_data, data, args, batch_size=batch_size, shuffle=False)
     
-    model=Making_Model()
+    model = Making_Model()
     model.load_weights(args.dir_param)
     
     
     # Test Performance
     print("\n### Test Performance...")
+    import time
+    start_time = time.perf_counter()
     pred_test = model.predict_generator(test_loader, workers=args.cpu)
-    pred_to_csv(pred_test, ic50_data, args.dir_test) 
+    end_time = time.perf_counter()
+    
+    test_time = 1000*(end_time - start_time)
+    # pred_to_csv(pred_test, ic50_data, args.dir_test) 
+    
+    
+    # Inference Time
+    if "ChEMBL" in args.ic50 and args.col_cell=="COSMIC_ID":
+        args.seed = args.dir_test.split("seed")[-1].split(".")[0]
+        args.dir_out = "/".join(args.dir_test.split("/")[:-1])
+        args.dir_time = "{}/log_time_chembl_seed{}.csv".format(args.dir_out, args.seed)
+        time_to_csv(test_time=test_time, dir_time=args.dir_time)
     
     # #Read input files from predict list 
     # model_input=read_files(args.p,args.i)

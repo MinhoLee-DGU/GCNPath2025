@@ -172,7 +172,30 @@ def main(modeling, train_batch, val_batch, test_batch, lr, num_epoch, log_interv
                     break
     
     else :
+        args.device = device
+        if args.device!="cpu" :
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
+        else :
+            import time
+            start = time.perf_counter()
+        
         G_test, P_test = predicting(model, device, test_loader)
+        
+        if args.device!="cpu" :
+            end.record()
+            torch.cuda.synchronize()
+            test_time = start.elapsed_time(end)
+        else :
+            end = time.perf_counter()
+            test_time = 1000*(end - start)
+      
+        if "ChEMBL" in args.ic50 and args.col_cell=="COSMIC_ID":
+            args.seed = args.dir_test.split("seed")[-1].split(".")[0]
+            args.dir_out = "/".join(args.dir_test.split("/")[:-1])
+            args.dir_time = "{}/log_time_chembl_seed{}.csv".format(args.dir_out, args.seed)
+            time_to_csv(test_time=test_time, dir_time=args.dir_time)
     
     pred_to_csv_norm(P_test, ic50_test, args.dir_test)
     # draw_loss(train_losses, val_losses, loss_fig_name)

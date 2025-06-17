@@ -23,15 +23,40 @@ def ensp_to_hugo_map():
     return ensp_map
 
 
+def add_rand_noise(cell_data, std=1.0, noise_seed=2021) :
+    if noise_seed==-1 :
+        pass
+    else :
+        rng = np.random.default_rng(seed=noise_seed)
+        noise = rng.normal(0, std, size=cell_data.shape)
+        cell_data = cell_data + noise
+        print(f"# Adding noise N(0, {std}) to Cell Data...")
+        print(f"{noise}\n")
+    return cell_data
+
+
 def save_cell_graph(gene_path, save_path, type):
+    # file_out = os.path.join(save_path, 'cell_feature_std_{}.npy').format(type)
+    # file_out = os.path.join(save_path, 'cell_feature_std_{}_gdsc.npy').format(type)
+    # file_out = os.path.join(save_path, 'cell_feature_std_{}_ccle.npy').format(type)
+    # file_out = os.path.join(save_path, 'cell_feature_std_{}_tcga.npy').format(type)
+    # file_out = os.path.join(save_path, 'cell_feature_std_{}_liu24.npy').format(type)
+    file_out = os.path.join(save_path, 'cell_feature_std_{}_noise.npy').format(type)
+    
     # if os.path.exists(os.path.join(save_path, 'cell_feature_std_{}.npy'.format(type))):
-    if os.path.exists(os.path.join(save_path, 'cell_feature_std_{}_gdsc.npy'.format(type))):
+    if os.path.exists(file_out):
         print('already exists!')
     else:
         # os.makedirs(save_path)
-        # exp = pd.read_csv(os.path.join(gene_path, 'EXP.csv'), index_col=0)
-        exp = pd.read_csv(os.path.join(gene_path, 'EXP_GDSC.csv'), index_col=0)
+        exp = pd.read_csv(os.path.join(gene_path, 'EXP.csv'), index_col=0)
+        # exp = pd.read_csv(os.path.join(gene_path, 'EXP_GDSC.csv'), index_col=0)
         # exp = pd.read_csv(os.path.join(gene_path, 'CCLE_2369_EXP.csv'), index_col=0)
+        # exp = pd.read_csv(os.path.join(gene_path, 'EXP_TCGA.csv'), index_col=0)
+        # exp = pd.read_csv(os.path.join(gene_path, 'EXP_Liu_2024.csv'), index_col=0)
+        
+        noise = "noise" in file_out
+        if noise : exp = add_rand_noise(exp)
+        
         index = exp.index
         columns = exp.columns
 
@@ -83,9 +108,8 @@ def save_cell_graph(gene_path, save_path, type):
                 x = pd.concat(x)
                 cell_dict[i] = Data(x=torch.tensor([x], dtype=torch.float).T, x_mask=torch.tensor(x_mask, dtype=torch.int))
 
-        print(cell_dict)
+        np.save(file_out, cell_dict)
         # np.save(os.path.join(save_path, 'cell_feature_std_{}.npy').format(type), cell_dict)
-        np.save(os.path.join(save_path, 'cell_feature_std_{}_gdsc.npy').format(type), cell_dict)
         print("finish saving cell data!")
         return gene_list
 

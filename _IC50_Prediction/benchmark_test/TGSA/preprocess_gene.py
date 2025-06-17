@@ -89,23 +89,42 @@ def save_cell_graph(genes_path, save_path) :
         os.makedirs(save_path)
     
     exp = pd.read_csv(os.path.join(genes_path, 'EXP.csv'), index_col=0)
-    cn = pd.read_csv(os.path.join(genes_path, 'CNV.csv'), index_col=0)
     mu = pd.read_csv(os.path.join(genes_path, 'MUT.csv'), index_col=0)
-
+    
+    cncat = True
+    if not cncat:
+        # CNV in log2(CN-Ratio + 1)
+        cn = pd.read_csv(os.path.join(genes_path, 'CNV.csv'), index_col=0)
+    else:
+        # CNV categorized for prediction of TCGA dataset
+        cn = pd.read_csv(os.path.join(genes_path, 'CNV_Category.csv'), index_col=0)
+    
     index = exp.index
     columns = exp.columns
 
     scaler_exp = StandardScaler()
     scaler_cnv = StandardScaler()
+    
     exp = scaler_exp.fit_transform(exp)
     cn = scaler_cnv.fit_transform(cn)
     
+    if genes_path == "./_data" and cncat:
+        file_scaler_exp = os.path.join(save_path, 'scaler_exp.pickle')
+        file_scaler_cnv = os.path.join(save_path, 'scaler_cncat.pickle')
+        
+        import pickle
+        with open(file_scaler_exp, "wb") as f:
+            pickle.dump(scaler_exp, f)
+        with open(file_scaler_cnv, "wb") as f:
+            pickle.dump(scaler_cnv, f)
+    
     imp_mean = SimpleImputer()
     exp = imp_mean.fit_transform(exp)
-
+    
     exp = pd.DataFrame(exp, index=index, columns=columns)
     cn = pd.DataFrame(cn, index=index, columns=columns)
-    mu = pd.DataFrame(mu, index=index, columns=columns)
+    # mu = pd.DataFrame(mu, index=index, columns=columns)
+    mu = pd.DataFrame(mu.values, index=index, columns=columns)
     
     cell_dict = {}
     cell_names = exp.index
@@ -113,7 +132,10 @@ def save_cell_graph(genes_path, save_path) :
     for i in cell_names:
         cell_dict[i] = Data(x=torch.tensor([exp.loc[i], cn.loc[i], mu.loc[i]], dtype=torch.float).T)
     
-    np.save(os.path.join(save_path, 'cell_feature_all.npy'), cell_dict)
+    if not cncat:
+        np.save(os.path.join(save_path, 'cell_feature_all.npy'), cell_dict)
+    else:
+        np.save(os.path.join(save_path, 'cell_feature_all_cncat.npy'), cell_dict)
 
 
 def get_STRING_graph(genes_path, thresh=0.95):
@@ -183,7 +205,8 @@ if __name__ == '__main__':
     
     # genes_path = "./_data"
     # genes_path = "./_data_gdsc"
-    genes_path = "./_data_sanger"
+    # genes_path = "./_data_sanger"
+    genes_path = "./_data_tcga"
     save_path = genes_path
     
     # edge_index_850 = get_STRING_graph(genes_path, thresh=0.85)
@@ -198,16 +221,21 @@ if __name__ == '__main__':
     
     
     # EXP for Similarity Graph
-    import pickle
-    file1 = os.path.join(genes_path, 'EXP.csv')
-    file2 = os.path.join(genes_path, 'EXP_Total_Scaled.csv')
-    
-    exp = pd.read_csv(file1, index_col=0)
-    exp_scaled = pd.read_csv(file2, index_col=0)
-    
-    sum(exp_scaled.index!=exp.index)   # 0
-    sum(exp_scaled.index==exp.index)   # 1399
-    
-    cell_feature_normalized = {k:v for k,v in zip(exp_scaled.index, exp_scaled.values)}
-    with open("./{}/cell_feature_normalized".format(save_path), "wb") as f : 
-        pickle.dump(cell_feature_normalized, f)
+    if genes_path != "./_data_tcga":
+        file = "./{}/cell_feature_normalized".format(save_path)
+        if os.path.exists(file):
+            print("Normalized Feature Exist...")
+        else:
+            import pickle
+            file1 = os.path.join(genes_path, 'EXP.csv')
+            file2 = os.path.join(genes_path, 'EXP_Total_Scaled.csv')
+            
+            exp = pd.read_csv(file1, index_col=0)
+            exp_scaled = pd.read_csv(file2, index_col=0)
+            
+            sum(exp_scaled.index!=exp.index)   # 0
+            sum(exp_scaled.index==exp.index)   # 1399
+            
+            cell_feature_normalized = {k:v for k,v in zip(exp_scaled.index, exp_scaled.values)}
+            with open(file, "wb") as f : 
+                pickle.dump(cell_feature_normalized, f)

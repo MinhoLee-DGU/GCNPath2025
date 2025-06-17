@@ -15,6 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn import Linear, Tanh, ReLU, ELU, LeakyReLU, Softmax
 from torch.optim.lr_scheduler import ExponentialLR, CosineAnnealingLR
 
+import time
 from utils.utils import *
 from torch_geometric.data import Batch
 
@@ -119,7 +120,6 @@ class Logger_Perf :
 
 
 def set_random_seed(seed, deterministic=True) :
-    
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -142,7 +142,6 @@ def seed_worker(worker_id) :
 
 def load_data(ic50_data, cell_data, drug_data, args, no_labels=False,
               batch_size=256, num_workers=0, shuffle=False, fix_seed=False) :
-    
     sa_ddi = args.attn_mode==4
     gnn_cell = args.gnn_cell!="linear"
     gnn_drug = args.gnn_drug!="linear"
@@ -159,7 +158,6 @@ def load_data(ic50_data, cell_data, drug_data, args, no_labels=False,
 
 
 def choose_params(args, verbose=False) :
-  
     gnn_cell_list = ["linear", "gcn", "gat", "gin", "rgcn", "rgat"]
     gnn_drug_list = ["linear", "gcn", "gat", "gin", "gine"]
     mode_list = ["plain", "res", "res+", "dense", "jk_cat", "jk_max"]
@@ -177,7 +175,6 @@ def choose_params(args, verbose=False) :
 
 
 def get_cell_info(args, sample_cell, dim_list=None, verbose=False) :
-    
     if args.gnn_cell!="linear" :
         n_path = sample_cell.x.shape[0]
         n_rel = hasattr(sample_cell, "edge_type")
@@ -203,7 +200,6 @@ def get_cell_info(args, sample_cell, dim_list=None, verbose=False) :
 
 
 def get_drug_info(args, sample_drug, dim_list=None, verbose=False) :
-    
     if args.gnn_drug!="linear" :
         n_drug_edge = hasattr(sample_drug, "edge_attr")
         n_drug_edge = sample_drug.edge_attr.shape[1] if n_drug_edge else None
@@ -227,7 +223,6 @@ def get_drug_info(args, sample_drug, dim_list=None, verbose=False) :
 
 
 def get_pred_info(args, dim_list=None, verbose=False) :
-    
     dim = args.dim_pred
     n_hidden = args.n_hid_pred
     dim_def = [dim for _ in range(n_hidden)]
@@ -252,7 +247,6 @@ def choose_scheduler(scheduler, gamma=0.99, T_max=10, lr=0.001) :
 
 
 def train_epoch(model, train_loader, device, optimizer) :
-    
     model.train()
     model.to(device)
     loss_epoch = 0.0
@@ -265,6 +259,8 @@ def train_epoch(model, train_loader, device, optimizer) :
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
+    else :
+        start_time = time.perf_counter()
     
     for batch, (cell, drug, ic50) in enumerate(tqdm(train_loader, desc="Train")) :
         cell = cell.to(device)
@@ -285,9 +281,10 @@ def train_epoch(model, train_loader, device, optimizer) :
     if device!="cpu" :
         end.record()
         torch.cuda.synchronize()
-        time = start.elapsed_time(end)
+        time_elapsed = start.elapsed_time(end)
     else :
-        time = 0
+        end_time = time.perf_counter()
+        time_elapsed = 1000*(end_time - start_time)
     
     loss_epoch = loss_epoch / len(train_loader)
     y_pred = y_pred.detach().squeeze().numpy()
@@ -297,11 +294,10 @@ def train_epoch(model, train_loader, device, optimizer) :
     pcc = calc_pcc(y_pred, y_true, digit=3)
     scc = calc_scc(y_pred, y_true, digit=3)
     
-    return loss_epoch, rmse, pcc, scc, time
+    return loss_epoch, rmse, pcc, scc, time_elapsed
 
 
 def valid_epoch(model, valid_loader, device) :
-    
     model.eval()
     model.to(device)
     loss_epoch = 0.0
@@ -314,6 +310,8 @@ def valid_epoch(model, valid_loader, device) :
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
+    else :
+        start_time = time.perf_counter()
     
     with torch.no_grad() :
         for batch, (cell, drug, ic50) in enumerate(tqdm(valid_loader, desc="Valid")) :
@@ -331,9 +329,10 @@ def valid_epoch(model, valid_loader, device) :
     if device!="cpu" :
         end.record()
         torch.cuda.synchronize()
-        time = start.elapsed_time(end)
+        time_elapsed = start.elapsed_time(end)
     else :
-        time = 0
+        end_time = time.perf_counter()
+        time_elapsed = 1000*(end_time - start_time)
         
     loss_epoch = loss_epoch / len(valid_loader)
     y_pred = y_pred.detach().squeeze().numpy()
@@ -343,7 +342,7 @@ def valid_epoch(model, valid_loader, device) :
     pcc = calc_pcc(y_pred, y_true, digit=3)
     scc = calc_scc(y_pred, y_true, digit=3)
     
-    return loss_epoch, rmse, pcc, scc, time
+    return loss_epoch, rmse, pcc, scc, time_elapsed
 
 
 def train(model, train_loader, valid_loader, device, optimizer,
@@ -413,7 +412,6 @@ def train_wo_valid(model, train_loader, device, optimizer,
 
 
 def test(model, test_loader, device, return_attn=False) :
-    
     model.eval()
     model.to(device)
     loss_epoch = 0.0
@@ -430,6 +428,8 @@ def test(model, test_loader, device, return_attn=False) :
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
+    else :
+        start_time = time.perf_counter()
     
     with torch.no_grad() :
         for batch, (cell, drug, ic50) in enumerate(tqdm(test_loader, desc="Test")) :
@@ -455,9 +455,10 @@ def test(model, test_loader, device, return_attn=False) :
     if device!="cpu" :
         end.record()
         torch.cuda.synchronize()
-        time = start.elapsed_time(end)
+        time_elapsed = start.elapsed_time(end)
     else :
-        time = 0
+        end_time = time.perf_counter()
+        time_elapsed = 1000*(end_time - start_time)
     
     loss_epoch = loss_epoch / len(test_loader)
     y_pred = y_pred.detach().squeeze().numpy()
@@ -470,18 +471,17 @@ def test(model, test_loader, device, return_attn=False) :
     print("# Performance (RMSE) : {}".format(rmse))
     print("# Performance (PCC) : {}".format(pcc))
     print("# Performance (SCC) : {}".format(scc))
-    print("# Performance (SCC) : {}".format(time))
+    print("# Performance (Time) : {}".format(time_elapsed))
     
     if model.attn_mode in [1, 2] and return_attn :
-        return y_pred, attn, time
+        return y_pred, attn, time_elapsed
     elif model.attn_mode in [3, 4] and return_attn :
-        return y_pred, attn_path, attn_subs, time
+        return y_pred, attn_path, attn_subs, time_elapsed
     else :
-        return y_pred, time
+        return y_pred, time_elapsed
 
 
 def test_no_labels(model, test_loader, device, return_attn=False) :
-    
     model.eval()
     model.to(device)
     pred_test = torch.Tensor()
@@ -494,6 +494,8 @@ def test_no_labels(model, test_loader, device, return_attn=False) :
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
+    else :
+        start_time = time.perf_counter()
     
     with torch.no_grad() :
         for batch, (cell, drug) in enumerate(tqdm(test_loader, desc="Test")) :
@@ -515,18 +517,19 @@ def test_no_labels(model, test_loader, device, return_attn=False) :
     if device!="cpu" :
         end.record()
         torch.cuda.synchronize()
-        time = start.elapsed_time(end)
+        time_elapsed = start.elapsed_time(end)
     else :
-        time = 0
+        end_time = time.perf_counter()
+        time_elapsed = 1000*(end_time - start_time)
     
     pred_test = pred_test.squeeze().numpy()
     
     if model.attn_mode in [1, 2] and return_attn :
-        return pred_test, attn, time
+        return pred_test, attn, time_elapsed
     elif model.attn_mode in [3, 4] and return_attn :
-        return pred_test, attn_path, attn_subs, time
+        return pred_test, attn_path, attn_subs, time_elapsed
     else :
-        return pred_test, time
+        return pred_test, time_elapsed
 
 
 def grad_cam(model, cell_data, drug_data, ic50_data, args):
@@ -552,8 +555,57 @@ def grad_cam(model, cell_data, drug_data, ic50_data, args):
     return importance
 
 
-class EarlyStopping :
+def integrated_gradient(model, cell_data, drug_data, ic50_data, args):
+    from captum.attr import IntegratedGradients
+    from torch_geometric.utils import to_dense_batch
+    model.to(args.device)
+    model.eval()
+    importance = []
+    
+    cell_ids = ic50_data[args.col_cell].unique()
+    cell_total = Batch.from_data_list([cell_data[i] for i in cell_ids]).to(args.device)
+    cell_total = to_dense_batch(cell_total.x, cell_total.batch)[0]
+    baseline_total = cell_total.mean(0)
+    
+    for i in range(ic50_data.shape[0]):
+        cell_id = ic50_data[args.col_cell][i]
+        drug_id = ic50_data[args.col_drug][i]
+        
+        # Prepare cell and drug data (Batch)
+        cell = cell_data[cell_id].to(args.device)
+        drug = drug_data[drug_id].to(args.device)
+        
+        # Cell input tensor that requires attribution
+        n_path = cell.x.shape[0]
+        cell_input = cell.x.clone().detach().requires_grad_(True)
+        baseline = torch.zeros_like(cell_input)
+        if not args.z_emb_igrad : baseline = baseline_total
+        
+        # Replace model forward to allow Captum
+        def forward_func(x):
+            n_graph = int(x.shape[0] / n_path)
+            cell_batch = Batch.from_data_list([cell] * n_graph).to(args.device)
+            drug_batch = Batch.from_data_list([drug] * n_graph).to(args.device)
+            cell_batch.x = x
+            pred = model(cell_batch, drug_batch)
+            return pred
 
+        # Apply Integrated Gradients
+        ig = IntegratedGradients(forward_func)
+        attributions, _ = ig.attribute(
+            inputs=cell_input,
+            baselines=baseline,
+            n_steps=args.steps_igrad,
+            return_convergence_delta=True
+        )
+        
+        importance.append(attributions.squeeze().detach().cpu())
+    
+    importance = torch.stack(importance).squeeze().numpy()
+    return importance
+
+
+class EarlyStopping :
     def __init__(self, patience=10, verbose=False, delta=0, path='checkpoint.pt') :
         self.path = path
         self.delta = delta

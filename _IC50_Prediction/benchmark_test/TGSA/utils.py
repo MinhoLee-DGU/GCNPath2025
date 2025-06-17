@@ -80,6 +80,25 @@ def validate(model, loader, device):
     return rmse, MAE, r2, r, y_pred.cpu().numpy()
 
 
+def validate_no_labels(model, loader, device):
+    model.eval()
+    y_pred = []
+
+    total_loss = 0
+    with torch.no_grad():
+        for data in tqdm(loader, desc='Iteration'):
+            drug, cell = data
+            if isinstance(cell, list):
+                drug, cell = drug.to(device), [feat.to(device) for feat in cell]
+            else:
+                drug, cell = drug.to(device), cell.to(device)
+            output = model(drug, cell)
+            y_pred.append(output)
+
+    y_pred = torch.cat(y_pred, dim=0)
+    return None, None, None, None, y_pred.cpu().numpy()
+
+
 def gradient(model, drug_name, cell_name, drug_dict, cell_dict, edge_index, args):
     cell_dict[cell_name].edge_index = torch.tensor(edge_index, dtype=torch.long)
     drug = Batch.from_data_list([drug_dict[drug_name]]).to(args.device)
@@ -207,11 +226,19 @@ class MyDataset_name(Dataset):
 #     return batched_drug, batched_cell, torch.tensor(labels)
 
 
-def collate_fn(samples):
-    drugs, cells, labels = map(list, zip(*samples))
+def collate_fn(samples, labels=True):
+    if not labels:
+        drugs, cells = map(list, zip(*samples))
+    else:
+        drugs, cells, labels = map(list, zip(*samples))
+    
     batched_drug = Batch.from_data_list(drugs)
     batched_cell = Batch.from_data_list(cells)
-    return batched_drug, batched_cell, torch.tensor(labels)
+    
+    if not labels:
+        return batched_drug, batched_cell
+    else:
+        return batched_drug, batched_cell, torch.tensor(labels)
 
 
 def _collate_drp(samples):
@@ -699,13 +726,24 @@ class MyDataset(Dataset) :
         super().__init__()
         self.drug, self.cell = drug_dict, cell_dict
         IC.reset_index(drop=True, inplace=True)  # train_test_split之后，数据集的index混乱，需要reset
+        
         # self.drug_name = IC['Drug name']
         # self.Cell_line_name = IC['DepMap_ID']
         # self.value = IC['IC50']
         
+        col_drug = args.col_drug
+        col_cell = args.col_cell
+        col_ic50 = args.col_ic50
+        self.labels = col_ic50 not in [0, "0"]
+        
+        if col_ic50 in [0, "0"]: 
+            self.value = IC
+        else:
+            self.value = IC[col_ic50]
+        
         self.drug_name = IC[args.col_drug]
         self.Cell_line_name = IC[args.col_cell]
-        self.value = IC[args.col_ic50]
+        # self.value = IC[args.col_ic50]
         self.edge_index = torch.tensor(edge_index, dtype=torch.long)
 
     def __len__(self):
@@ -713,8 +751,11 @@ class MyDataset(Dataset) :
 
     def __getitem__(self, index):
         self.cell[self.Cell_line_name[index]].edge_index = self.edge_index
-        return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]], self.value[index])
-
+        if not self.labels:
+            return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]])
+        else:
+            return (self.drug[self.drug_name[index]], self.cell[self.Cell_line_name[index]], self.value[index])
+        
 
 class MyDataset_SA(Dataset) :
     

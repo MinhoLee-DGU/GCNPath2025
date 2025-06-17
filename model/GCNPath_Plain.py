@@ -24,6 +24,8 @@ class GCNPath(Module) :
         super().__init__()
         self.n_path = n_path
         self.n_subs = len(dim_drug[1:])
+        self.dim_cell = dim_cell
+        self.dim_drug = dim_drug
         
         self.dim_attn = dim_attn
         self.dim_embed_cell = dim_embed_cell
@@ -113,13 +115,14 @@ class GCNPath(Module) :
         print("# Model Parameters : {} [Final]".format(param_final))
     
     
-    def forward(self, cell_data, drug_data, return_attn=False) :
+    def forward(self, cell_data, drug_data, return_attn=False, grad_cam=False) :
         
         cell = cell_data
         batch_cell = None
         edge_index_cell = None
         edge_type_cell = None
-                
+        edge_attr_cell = None
+        
         drug = drug_data
         batch_drug = None
         edge_index_drug = None
@@ -129,6 +132,7 @@ class GCNPath(Module) :
             cell = cell_data.x
             batch_cell = cell_data.batch
             edge_index_cell = cell_data.edge_index
+            edge_attr_cell = cell_data.edge_attr
             
             if hasattr(cell_data, "edge_type") :
                 edge_type_cell = cell_data.edge_type
@@ -140,9 +144,15 @@ class GCNPath(Module) :
             edge_attr_drug = drug_data.edge_attr
         
         # Cell Layer
-        cell = self.cell_layer(cell, edge_index_cell, edge_type=edge_type_cell)
+        cell = self.cell_layer(cell, edge_index_cell, edge_type=edge_type_cell, 
+                               edge_attr=edge_attr_cell, grad_cam=grad_cam)
         # Linear    [batch, dim_cell_fin]
         # GNN       [batch*n_path, dim_cell_fin]
+        
+        # Grad-CAM
+        if grad_cam :
+            cell, cell_explain = cell
+            # [batch*n_path, dim_cell_fin, [batch*n_path, dim_cell[1]]
         
         # Drug Layer
         drug = self.drug_layer(drug, edge_index_drug, edge_attr=edge_attr_drug, batch=batch_drug)
@@ -173,6 +183,8 @@ class GCNPath(Module) :
         
         if self.attn_mode!=0 and return_attn :
             return ic50, attn
+        elif grad_cam :
+            return ic50, cell_explain
         else :
             return ic50
 

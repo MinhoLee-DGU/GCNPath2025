@@ -13,12 +13,8 @@ col_drug=$8
 col_ic50=$9
 
 gpu=${10}
-RAM=80
-
-case $gpu in
-    0) CPU=2 ;;
-    *) CPU=4 ;;
-esac
+RAM=8
+CPU=4
 
 case $choice in
     0) ch="N" ;;
@@ -27,7 +23,7 @@ case $choice in
     *) ch="S" ;;
 esac
 
-f_name="GraphDRP_T_${ch}${nth}"
+f_name="Test_${ch}${nth}"
 f_name_1=exe/${f_name}.sh
 
 echo "#!/usr/bin/bash" > $f_name_1

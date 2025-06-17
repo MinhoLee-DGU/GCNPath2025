@@ -1,5 +1,5 @@
 
-read_pred = function(dir, pattern, sep=",") {
+read_pred = function(dir, pattern, pattern2=NULL, sep=",") {
   Pred = data.frame()
   df_name_list = list.files(path=dir, pattern=pattern, full.names=T)
   # [pattern] "Pred_.*([0-9]+$)\\.csv", "Pred_CCLE_.*([0-9]+)\\.csv"
@@ -10,18 +10,26 @@ read_pred = function(dir, pattern, sep=",") {
       df_name_ = strsplit(df_name, "/")[[1]] %>% tail(1)
       nth = gsub(pattern, "\\1", df_name_) %>% as.numeric
       Pred_TP$Seed = nth
+      
+      if (!is.null(pattern2)) {
+        # Performance of RF
+        df_name_ = sub(pattern, pattern2, df_name)
+        Pred_TP_ = fread(df_name_, header=T, sep=sep)
+        colnames(Pred_TP_) = "Prediction"
+        Pred_TP = Pred_TP %>% cbind(Pred_TP_)
+      }
+      
       Pred = Pred %>% rbind(Pred_TP)
     }
     return(Pred)
   }
 }
 
-
-read_pred_all = function(dir_list, model_name, pattern, sep=",") {
+read_pred_all = function(dir_list, model_name, pattern, pattern2=NULL, sep=",") {
   
   Pred = data.frame()
   for (dir in dir_list) {
-    Pred_TP = read_pred(dir, pattern, sep=sep)
+    Pred_TP = read_pred(dir, pattern, pattern2=pattern2, sep=sep)
     if (!is.null(Pred_TP)) {
       dir_detail = strsplit(dir, "/") %>% unlist
       
@@ -55,7 +63,6 @@ read_pred_all = function(dir_list, model_name, pattern, sep=",") {
   }
   return(Pred)
 }
-
 
 boxplot_tcga = function(Pred, test_type="Normal", main=NULL, 
                         resp_class1=T, tumor_only=T, drug_gdsc=T, axis_tl=25, axis_tx=18, 
@@ -151,7 +158,6 @@ boxplot_tcga = function(Pred, test_type="Normal", main=NULL,
   } else print(pl)
 }
 
-
 select_pat_tn = function(Pred) {
   
   col = c("Patient", "Sample", "Sample_Type", "Drug_CID", "TCGA_Code")
@@ -176,7 +182,6 @@ select_pat_tn = function(Pred) {
   
   return(Pred)
 }
-
 
 boxplot_tn = function(Pred_TN, test_type="Normal", resp_class1=T, main=NULL, 
                       axis_tl=22.5, axis_tx=18, width=7.2, height=15, save=F) {
@@ -265,7 +270,47 @@ boxplot_tn = function(Pred_TN, test_type="Normal", resp_class1=T, main=NULL,
   return(Pred_TN)
 }
 
-
+boxplot_tn_total = function(Pred_TN, main=NULL, axis_tl=22.5, axis_tx=18, 
+                            legend_tl=20, legend_tx=20, width=20, height=15, save=F) {
+  ylab = "△Pred [Tumor-Normal]"
+  color = c("royalblue3", "#66b3ed")
+  
+  pos_point = position_dodge(width=0.7)
+  pos = position_dodge2(width=0.8, preserve="single")
+  
+  margin1 = margin(l=0.25, r=0.25, unit="cm")
+  margin2 = margin(0.25, 0.25, 0.15, 0.25, unit="cm")
+  margin3 = margin(r=1, unit="cm")
+  margin4 = margin(l=0.25, r=0.5, unit="cm")
+  
+  font1 = font(object="ylab", size=axis_tl, margin=margin1)
+  font2 = font(object="axis.text", size=axis_tx, margin=margin2, color="grey30")
+  font3 = font(object="legend.title", size=legend_tl, margin=margin3)
+  font4 = font(object="legend.text", size=legend_tx, margin=margin4)
+  font = font1 + font2 + font3 + font4
+  
+  pl = Pred_TN %>%
+    ggboxplot(x="Model", y="Diff_Pred", fill="Resp_Class",
+              outlier.shape=NA, size=0.5, alpha=0.9, xlab=F)
+  
+  pl$layers[[1]]$position = pos
+  pl_point = geom_point(data=Pred_TN, aes(group=Resp_Class), size=2, alpha=0.25, position=pos_point)
+  
+  pl = pl + pl_point + labs(y=ylab) + font +
+    rotate_x_text(angle=30, hjust=1, vjust=1) +
+    scale_fill_manual(labels=labs, values=color)
+  
+  method_args = list(alternative="greater")
+  pl = pl + stat_pwc(aes(group=Resp_Class), label="p.signif", label.size=5, 
+                     ref.group="Non-Responder", method.args=method_args,
+                     tip.length=0, bracket.nudge.y=0.1, hide.ns=F)
+  
+  pl = pl %>% ggpar(legend="bottom")
+  
+  if (save) {
+    save_fig(pl, main, width=width, height=height, units="cm", svg=T)
+  } else print(pl)
+}
 
 sig_test = function(Pred, resp_class1=T, tumor_only=T) {
   
@@ -304,7 +349,6 @@ sig_test = function(Pred, resp_class1=T, tumor_only=T) {
   })
 }
 
-
 sig_test_all = function(Pred, resp_class1=T, tumor_only=T) {
   
   Sig_Test = data.frame()
@@ -336,7 +380,6 @@ sig_test_all = function(Pred, resp_class1=T, tumor_only=T) {
   return(Sig_Test)
 }
 
-
 plot_effect_pval = function(Pred, main=NULL, axis_tl=32, axis_tx=27, 
                             legend_tl=20, legend_tx=18, inner_tx=6, 
                             width=18.6, height=16, drug_gdsc=T, save=F) {
@@ -364,5 +407,3 @@ plot_effect_pval = function(Pred, main=NULL, axis_tl=32, axis_tx=27,
   # pl = Pred %>% ggscatter("MLog10_Pval", "Effect_Size", color="Freq", size="Freq", 
   #                         xlab="-Log10(Pval)", ylab="Effect Size", legend="right")
 }
-
-

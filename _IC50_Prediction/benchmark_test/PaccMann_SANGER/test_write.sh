@@ -22,12 +22,12 @@ col="-col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50"
 RAM=8
 gpu=${11}
 case $gpu in
-    0) cpu=2 ;;
-    1) cpu=3 ;;
+    0) CPU=1 ;;
+    1) CPU=4 ;;
 esac
 
 echo "#!/usr/bin/bash" > $f_name_1
-echo "#sbatch -c $cpu" >> $f_name_1
+echo "#sbatch -c $CPU" >> $f_name_1
 echo "#SBATCH -J $f_name" >> $f_name_1
 
 if [[ $gpu -eq 1 ]] ; then
@@ -48,7 +48,7 @@ echo "dir_conda=\`conda info --base\`" >> $f_name_1
 echo "export PATH=\$dir_conda/envs/paccmann_predictor/bin" >> $f_name_1
 
 echo "python examples/IC50/test_paccmann.py $ic50 $cell $drug \
-    $gdict $smi_lan $dir_param $dir_test $dir_hparam $col" >> $f_name_1
+    $gdict $smi_lan $dir_param $dir_test $dir_hparam $col -cpu $CPU" >> $f_name_1
 
 chmod 777 $f_name_1
 sbatch $f_name_1

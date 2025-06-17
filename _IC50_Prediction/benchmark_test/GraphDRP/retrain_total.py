@@ -101,10 +101,15 @@ def main(modeling, train_batch, lr, num_epoch, log_interval, args) :
     ic50 = args.ic50
     choice = args.choice
     args = create_dir_out_(args, suf_param="pt", retrain=True)
+    
+    args.dir_time = "{}/log_time_seed_{}.csv".format(args.dir_out, args.seed)
     args.dir_pred = "{}/pred_total_seed{}.csv".format(args.dir_out, args.seed)
     args.dir_param = "{}/param_retrain_seed{}.pt".format(args.dir_out, args.seed)
     args.dir_test = "{}/pred_chembl_seed{}.csv".format(args.dir_out, args.seed)
-
+    
+    if "ChEMBL" in args.ic50:
+        args.dir_time = "{}/log_time_chembl_seed_{}.csv".format(args.dir_out, args.seed)
+    
     cell_data = pd.read_csv(args.dir_cell, index_col=0)
     cell_data.index = cell_data.index.astype(str)
     cell_data = {k:v for k, v in zip(cell_data.index, cell_data.values)}
@@ -147,7 +152,7 @@ def main(modeling, train_batch, lr, num_epoch, log_interval, args) :
         if args.pretrain==1 :
             checkpoint = torch.load("model_GINConvNet_GDSC.model", map_location=device)
         else :
-            checkpoint = torch.load(args.dir_param)
+            checkpoint = torch.load(args.dir_param, map_location=device)
         model.load_state_dict(checkpoint)
     
     if args.mode=="train" :
@@ -165,8 +170,25 @@ def main(modeling, train_batch, lr, num_epoch, log_interval, args) :
         # loss_fig_name = 'model_' + model_st + '_' + dataset + '_loss'
         # pearson_fig_name = 'model_' + model_st + '_' + dataset + '_pearson'
         
+        train_time_list = []
+        args.device = device
+        
+        if args.device!="cpu" :
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
+        
         for epoch in range(num_epoch):
             train_loss = train(model, device, train_loader, optimizer, epoch+1, log_interval)
+            
+            if args.device!="cpu" :
+                end.record()
+                torch.cuda.synchronize()
+                train_time = start.elapsed_time(end)
+            else :
+                train_time = 0
+            
+            train_time_list.append(train_time)
             torch.save(model.state_dict(), model_file_name)
             
             # G,P = predicting(model, device, val_loader)
@@ -199,12 +221,45 @@ def main(modeling, train_batch, lr, num_epoch, log_interval, args) :
             #         print("Early stopping occured...")
             #         break
         
+        if args.device!="cpu" :
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
+        
         G_Total, P_Total = predicting(model, device, train_loader_)
+        
+        if args.device!="cpu" :
+            end.record()
+            torch.cuda.synchronize()
+            test_time = start.elapsed_time(end)
+        else :
+            test_time = 0
+        
         pred_to_csv_norm(P_Total, ic50_data, args.dir_pred)
+        time_to_csv(train_time_list, test_time, dir_time=args.dir_time)
         
     else :
+        args.device = device
+        if args.device!="cpu" :
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
+        else :
+            import time
+            start = time.perf_counter()
+      
         G_test, P_test = predicting(model, device, test_loader)
+        
+        if args.device!="cpu" :
+            end.record()
+            torch.cuda.synchronize()
+            test_time = start.elapsed_time(end)
+        else :
+            end = time.perf_counter()
+            test_time = 1000*(end - start)
+        
         pred_to_csv_norm(P_test, ic50_data, args.dir_test)
+        time_to_csv(test_time=test_time, dir_time=args.dir_time)
         # draw_loss(train_losses, val_losses, loss_fig_name)
         # draw_pearson(val_pearsons, pearson_fig_name)
 

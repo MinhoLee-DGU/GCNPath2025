@@ -15,12 +15,8 @@ f_name=$9
 f_name_1=exe/$f_name.sh
 
 gpu=${10}
-RAM=60
-
-case $gpu in
-    0) CPU=2 ;;
-    *) CPU=3 ;;
-esac
+RAM=8
+CPU=4
 
 echo "#!/usr/bin/bash" > $f_name_1
 echo "#SBATCH -n 1" >> $f_name_1
@@ -45,6 +41,6 @@ echo "source activate geometric" >> $f_name_1
 
 echo "python main.py -ic50 $ic50 --pretrain 0 --mode 'test' \
     -cell $cell -drug $drug -dir_param $dir_param -dir_test $dir_test \
-    -col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50" >> $f_name_1
+    -col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50 -cpu $CPU" >> $f_name_1
 chmod 777 $f_name_1
 sbatch $f_name_1

@@ -20,7 +20,7 @@ use_slurm=${14}
 RAM=4
 
 case $gpu in
-    0) CPU=2 ;;
+    0) CPU=1 ;;
     *) CPU=4 ;;
 esac
 
@@ -42,10 +42,10 @@ if [[ $gpu -eq 1 ]] ; then
 	echo "#SBATCH -p glu" >> $f_name_1
 	echo "#SBATCH --gres=gpu:1" >> $f_name_1
 else 
-    echo "#SBATCH -p full" >> $f_name_1
+    echo "#SBATCH -p $node" >> $f_name_1
 fi
 
-echo "#SBATCH -x lysine" >> $f_name_1
+# echo "#SBATCH -x lysine" >> $f_name_1
 echo "#SBATCH --mem=${RAM}GB" >> $f_name_1
 echo "#SBATCH -o out/%j.out" >> $f_name_1
 echo "#SBATCH -e out/e%j.out" >> $f_name_1
@@ -54,10 +54,14 @@ echo "dir_conda=\`conda info --base\`" >> $f_name_1
 echo "export PATH=\$dir_conda/envs/GCNPath/bin" >> $f_name_1
 echo "export PYTHONNOUSERSITE=1" >> $f_name_1
 
+if [[ $gpu -eq 0 ]] ; then
+    echo "export CUDA_VISIBLE_DEVICES=none" >> $f_name_1
+fi
+
 data="-cell $cell -drug $drug -ic50 $ic50"
 col="-col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50"
 echo "python test.py $data $col -dir_param $param -dir_hparam $hparam \
-    -out_file $out_file -out_grad_cam $out_cam -cpu $(($CPU-1))" >> $f_name_1
+    -out_file $out_file -out_grad_cam $out_cam -cpu $CPU" >> $f_name_1
 chmod 777 $f_name_1
 
 case $use_slurm in

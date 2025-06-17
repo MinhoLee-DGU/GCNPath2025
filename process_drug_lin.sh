@@ -9,3 +9,4 @@ option="-drug_feat $feat -col_names $col_names -col_smi $col_smi"
 smi=data/drug_data/SMILES_GDSC.csv
 out=processed/drug_data/GDSC_Drug_Morgan.pickle
 python process_drug.py -smi $smi -out_dir $out $option
+

@@ -16,7 +16,7 @@ f_name_1=exe/$f_name.sh
 
 gpu=${10}
 case $gpu in
-    0) CPU=2 ;;
+    0) CPU=1 ;;
     *) CPU=4 ;;
 esac
 
@@ -42,6 +42,7 @@ echo "export PATH=\$dir_conda/envs/geometric/bin" >> $f_name_1
 
 echo "python main.py -ic50 $ic50 -pretrain 0 --mode 'test' --sim 0 \
     -cell $cell -drug $drug -dir_param $dir_param -dir_test $dir_test \
-    -col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50" >> $f_name_1
+    -col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50 -cpu $CPU" >> $f_name_1
+
 chmod 777 $f_name_1
 sbatch $f_name_1

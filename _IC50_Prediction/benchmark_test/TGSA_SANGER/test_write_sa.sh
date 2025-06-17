@@ -16,13 +16,13 @@ dir_sim=${10}
 dir_cidx=${11}
 
 gpu=1
-RAM=60
+RAM=72
 f_name=${12}
 f_name_1=exe/$f_name.sh
 
 case $gpu in
-    0) CPU=2 ;;
-    1) CPU=3 ;;
+    0) CPU=1 ;;
+    1) CPU=4 ;;
 esac
 
 echo "#!/usr/bin/bash" > $f_name_1
@@ -47,7 +47,7 @@ echo "export PATH=\$dir_conda/envs/geometric/bin" >> $f_name_1
 
 echo "python main_SA.py -ic50 $ic50 --pretrain 0 --mode 'test' \
     -cell $cell -drug $drug -dir_param $dir_param -dir_tgsa $dir_tgsa -dir_test $dir_test \
-    -dir_cidx $dir_cidx -dir_sim $dir_sim \
+    -dir_cidx $dir_cidx -dir_sim $dir_sim -cpu $CPU \
     -col_cell $col_cell -col_drug $col_drug -col_ic50 $col_ic50" >> $f_name_1
 chmod 777 $f_name_1
 sbatch $f_name_1

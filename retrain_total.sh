@@ -12,20 +12,19 @@ gnn_drug=2
 mode_cell=3
 mode_drug=3
 
-dir_out=Ex
+dir_out=RGCN_Noise
 dir_cell=processed/cell_data_biocarta
 dir_drug=processed/drug_data
 
 case $gnn_cell in
     0) cell=${dir_cell}/SANGER_RNA_Lin.pickle ;;
-    *) cell=${dir_cell}/SANGER_RNA_KNN5_STR9_Reg_Corr.pickle ;;
+    *) cell=${dir_cell}/SANGER_RNA_KNN5_STR9_Reg_Corr_Noise.pickle ;;
 esac
 
 case $gnn_drug in
     0) drug=${dir_drug}/GDSC_Drug_Morgan.pickle ;;
     # 0) drug=${dir_drug}/GDSC_Drug_SMILESVec.pickle ;;
-    *) drug=${dir_drug}/GDSC_Drug_Custom.pickle ;;
-    # *) drug=${dir_drug}/GDSC_Drug_SA.pickle ;;
+    *) drug=${dir_drug}/GDSC_Drug_Graph.pickle ;;
 esac
 
 case $ic50_th in

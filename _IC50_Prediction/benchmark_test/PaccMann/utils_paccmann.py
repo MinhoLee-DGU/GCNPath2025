@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def filt_ic50_(ic50_data, cell_data, drug_data, args) :
-
+    
     ic50_data = ic50_data.astype({args.col_cell:"str"})
     ic50_data = ic50_data.astype({args.col_drug:"str"})
     # cell_list = list(cell_data.keys())
@@ -55,10 +55,12 @@ def create_dir_out_(args, dir_out=None, suf_param="pt", retrain=False) :
         
         if not retrain : 
             args.dir_test = "{}/pred_test_{}.csv".format(dir_out, args.nth)
+            args.dir_time = "{}/perf_time_{}.txt".format(dir_out, args.nth)
             args.dir_param = "{}/param_{}.{}.tar".format(dir_out, args.nth, suf_param)
             args.dir_hparam = "{}/hyper_param_{}.json".format(dir_out, args.nth)
         else :
             args.dir_test = "{}/pred_test_retrain_{}.csv".format(dir_out, args.nth)
+            args.dir_time = "{}/perf_time_retrain_{}.txt".format(dir_out, args.nth)
             args.dir_param = "{}/param_retrain_{}.{}.tar".format(dir_out, args.nth, suf_param)
             args.dir_hparam = "{}/hyper_param_retrain_{}.json".format(dir_out, args.nth)
 
@@ -132,10 +134,12 @@ def create_dir_out_seed(args, dir_out=None, suf_param="pt", retrain=False) :
         args.dir_valid = "{}/pred_valid_{}.csv".format(dir_out, args.nth)
         
         if not retrain : 
+            args.dir_time = "{}/perf_time_{}.txt".format(dir_out, args.nth)
             args.dir_test = "{}/pred_test_{}.csv".format(dir_out, args.nth)
             args.dir_param = "{}/param_{}.{}.tar".format(dir_out, args.nth, suf_param)
             args.dir_hparam = "{}/hyper_param_{}.json".format(dir_out, args.nth)
         else :
+            args.dir_time = "{}/perf_time_retrain_{}.txt".format(dir_out, args.nth)
             args.dir_test = "{}/pred_test_retrain_{}.csv".format(dir_out, args.nth)
             args.dir_param = "{}/param_retrain_{}.{}.tar".format(dir_out, args.nth, suf_param)
             args.dir_hparam = "{}/hyper_param_retrain_{}.json".format(dir_out, args.nth)

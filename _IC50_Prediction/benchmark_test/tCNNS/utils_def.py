@@ -196,3 +196,31 @@ def pred_to_csv_norm(pred_y, ic50_test, dir_pred) :
     ic50_test = ic50_test.reset_index(drop=True)
     ic50_pred = pd.concat([ic50_test, ic50_pred], axis=1)
     ic50_pred.to_csv(dir_pred, header=True, index=False)
+
+
+def time_to_csv(train_time_list=None, test_time=None, valid_time=None, dir_time=None) :
+    if train_time_list is None :
+        # Test only
+        steps = ["Test"]
+        times = [test_time]
+    elif valid_time is None :
+        # Retrain total dataset without valid dataset
+        steps = ["Train_Sum", "Train_Mean"]
+        times = [np.sum(train_time_list), np.mean(train_time_list)]
+        # steps_epoch = [f"Train_Epoch{epoch+1}" for epoch in range(len(train_time_list))]
+        steps_epoch = ["Train_Epoch{}".format(epoch+1) for epoch in range(len(train_time_list))]
+        steps.extend(steps_epoch)
+        times.extend(train_time_list)
+    else :
+        # Train with train, valid, test dataset
+        steps = ["Train_Sum", "Train_Mean", "Valid", "Test"]
+        times = [np.sum(train_time_list), np.mean(train_time_list), valid_time, test_time]
+        # steps_epoch = [f"Train_Epoch{epoch+1}" for epoch in range(len(train_time_list))]
+        steps_epoch = ["Train_Epoch{}".format(epoch+1) for epoch in range(len(train_time_list))]
+        steps.extend(steps_epoch)
+        times.extend(train_time_list)
+    
+    times_info = pd.DataFrame({"Step": steps, "Time": times})
+    times_info.to_csv(dir_time, header=True, index=False)
+    print(times_info)
+

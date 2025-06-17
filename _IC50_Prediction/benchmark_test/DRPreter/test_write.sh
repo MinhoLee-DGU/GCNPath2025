@@ -17,7 +17,7 @@ f_name_1=exe/$f_name.sh
 gpu=${10}
 case $gpu in
     0) CPU=2 ;;
-    1) CPU=3 ;;
+    1) CPU=4 ;;
 esac
 
 echo "#!/usr/bin/bash" > $f_name_1
@@ -29,7 +29,7 @@ if [[ $gpu -eq 1 ]] ; then
 	echo "#SBATCH -p glu" >> $f_name_1
     echo "#SBATCH --gres=gpu:1" >> $f_name_1
 else
-	echo "#SBATCH -p fMet,met" >> $f_name_1
+	echo "#SBATCH -p full" >> $f_name_1
 fi
 
 echo "#SBATCH -x lysine" >> $f_name_1
