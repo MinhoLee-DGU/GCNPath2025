@@ -367,13 +367,6 @@ GCAM_SCLC = Reduce(rbind, list(GCAM_SCLC_Eto, GCAM_SCLC_Cis, GCAM_SCLC_Lur,
 file = "Grad-CAM [SCLC, Well-known & Promising].csv"
 write.csv(GCAM_SCLC, file=file, row.names=F)
 
-# drugs = Imp_SCLC$Drug %>% unique
-# col = c("Cell", "Prediction")
-# get_head_tail = function(df) {
-#   rbind(head(df), tail(df))
-# }
-# 
-
 for (drug in drugs) {
   Temp = Imp_SCLC %>% subset(Drug_Name==drug) %>% arrange(Prediction) %>% as.data.frame
   Anno_Col = data.frame(Prediction=scale(Temp$Prediction))
@@ -384,6 +377,7 @@ for (drug in drugs) {
     heatmap_def(show_row=F, show_col=F, Anno_Col=Anno_Col, clust_col=T, scale_col=F)
   # color_bottom="white", color_center="palegoldenrod", color_top="firebrick3"
 }
+
 
 
 
