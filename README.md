@@ -17,6 +17,91 @@ bash retrain_total.sh
 bash test_ccle.sh
 ```
 
+# Directory Structure
+## GCNPath2025
+```
+GCNPath2025
+├── SMILESVec                       
+│   └── source
+│       └── process_drug_svec.sh    Process drug data into SMILESVec Fingerprint
+├── _IC50_Prediction                Case study with cell lines (Colorectal, Breast, SCLC)
+├── _case_study                     Case study with cell lines (Colorectal, Breast, SCLC)
+├── _performance_tuning             Performances analysis in ablation tests
+├── data                            Store daw data
+│   ├── cell_data                    - Cell transcriptome data
+│   ├── drug_data                    - Drug structure data in SMILES format
+│   ├── ic50_data                    - IC50 or drug response data
+│   ├── net_data_biocarta            - PCN graph structure data
+│   └── path_data                    - Pathway annotation retrieved from MSigDB
+├── exe                             Store executable bash files when running train.sh, retrain_total.sh and test_xxx.sh
+├── model                           Model architectures
+├── out                             Store SLURM error and log files when running train.sh, retrain_total.sh and test_xxx.sh
+├── processed                       Store processed data
+│   ├── cell_data_biocarta           - Store cell data processed with process_cell.sh
+│   └── drug_data                    - Store drug data processed with process_drug.sh
+├── results                         Store model weight parameters and prediction results
+│   └── IC50_GDSC                    - Results when training with GDSC1+2 dataset and 4 test scenarios
+│       ├── Unblinded
+│       ├── Cell_Blind
+│       ├── Drug_Blind
+│       └── Strict_Blind
+├── utils                           Utils
+│   ├── functions.R                  - Utils for data analysis in _case_study and _performance_tuning
+│   ├── utils.py                     - Utils for calculating performance, splitting data, and saving prediction results
+│   ├── utils_gnn.py                 - Utils for graph neural networks
+│   ├── utils_gsva.R                 - Utils for GSVA in process_cell_gsva.R
+│   └── utils_model.py               - Utils for loading data, training and testing models, and model interpretability
+├── GCNPath.yaml                    Conda environment file
+├── process_cell.sh                 Process cell data into graph-based format (run process_cell_gsva.R and process_cell.py)
+├── process_cell_lin.sh             Process cell data into non-graph-based format (run process_cell_gsva.R and process_cell.py)
+├── process_cell_pert.sh            Process cell data with PCN graphs in perturbed topologies (run process_cell_gsva.R and process_cell.py)
+├── process_cell_gsva.R             Process cell data from gene- into pathway-level with GSVA
+├── process_cell.py                 Process cell data
+├── process_drug.sh                 Process drug data into graph-based format (run process_drug.py)
+├── process_drug_lin.sh             Process drug data into Morgan Fingerprint (run process_drug.py)
+├── process_drug.py                 Process drug data
+├── Readme.md                       README
+├── train.sh                        Train model with GDSC datasets (25 or 10 outer cross-validation)
+├── retrain_total.sh                Train model with GDSC datasets (no data split in train-valid-test)
+├── train_write.sh                  Operated after train.sh & retrain_total.sh (contain SLURM configurations)
+├── test_xxx.sh                     Test model with external datasets (e.g. ChEMBL, TCGA, SCLC)
+└── test_write.sh                   Operated after test_xxx.sh (contain SLURM configurations)
+```
+
+## _IC50_Prediction
+The ```GCNPath2025``` directory was originally a subdirectory within ```_IC50_Prediction/benchmark_test```
+```
+_IC50_Prediction
+├── benchmark_test
+│   ├── (SOTA model names)            SOTA models
+│   ├── GCNPath                       GCNPath (You are here)
+│   ├── _case_study_sclc              SCLC case study with Liu et al. (2024)
+│   ├── _performance_chembl           Performance analysis with ChEMBL
+│   ├── _performance_gdsc             Performance analysis with GDSC
+│   ├── _performance_pretrain         Performance analysis with GDSC, using models pretrained by original model developers
+│   ├── _performance_tcga             Performance analysis with TCGA
+│   └── _performance_tcga_combat      Performance analysis with TCGA, after applying ComBat batch correction
+├── processed_data
+│   ├── cell_data                     Store cell data processed by "1-1_process_rna" and "4-2_tcga_response"
+│   ├── drug_data                     Store drug data processed by "2-1_get_drug_cid"
+│   ├── ic50_data                     Store ic50 data processed by "3-1_process_ic50" and "3-2_process_ic50_ccle"
+│   └── net_data                      Store network data processed by "1-2_process_net" and "1-3_gsva_pcn"
+├── project
+│   ├── 1-1_process_rna               Process cell data from SANGER Cell Model Passports, CCLE and GDSC
+│   ├── 1-2_process_net               Process network data (STRING, RegNetwork)
+│   ├── 1-3_gsva_pcn                  Process PCN graphs
+│   ├── 2-1_get_drug_cid              Process drug data from GDSC
+│   ├── 3-1_process_ic50              Process IC50 data from GDSC
+│   ├── 3-2_process_ic50_ccle         Process IC50 data from CCLE
+│   ├── 4-1_external_chembl           Process IC50 data from ChEMBL
+│   ├── 4-2_tcga_response             Process RNA-seq and drug response data from TCGA
+│   ├── 4-3_SCLC_Liu_2024             Process RNA-seq and drug response data from Liu et al. (2024) for SCLC case study
+│   ├── _prepare_(SOTA model names)   Process data to run SOTA models
+│   ├── functions.R                   Utils for data analysis
+│   └── utils_gsva.R                  Utils for GSVA in 1-3_gsva_pcn
+└── raw_data                          Store raw data
+```
+
 # Requirement
 To install the Conda environment, run:
 ```
