@@ -4,7 +4,7 @@
 
 GCNPath is a graph-based deep learning model designed for predicting anticancer drug responses. The model utilizes pathway crosstalk network (PCN) graphs, which are compressed from STRING and RegNetwork, along with a GSVA pathway correlation network. GCNPath is trained using transcriptome data from the SANGER Cell Model Passports.
 
-The ```GCNPath2025``` directory was originally a subdirectory within ```_IC50_Prediction/do_better```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory for the GCNPath project, containing benchmark tests as well as preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
+The ```GCNPath2025``` directory was originally a subdirectory within ```_IC50_Prediction/benchmark_test```, where the benchmark tests are implemented. The ```_IC50_Prediction``` directory serves as the root directory for the GCNPath project, containing benchmark tests as well as preprocessing steps for cell lines, drugs, and ln(IC<sub>50</sub>) data.
 
 # Quick start
 ```
@@ -49,7 +49,7 @@ Required packages:
 # Implementation
 
 ## 1. Processing Cell Data
-Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway score data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```.
+Cell data are processed using ```process_cell.sh```, which sequentially executes ```process_cell_gsva.R``` and ```process_cell.py```. If PCN graphs are not provided (```-net None``` in ```process_cell.py```), the pathway score data are not formatted as graph[s], which can be implemented by the script ```process_cell_lin.sh```. We conducted an ablation test to evaluate the impact of PCN graph topology on prediction performance, using perturbed PCN graphs that preserve the degree of each pathway node, generated via ```process_cell_pert.sh```.
 
 ### process_cell_gsva.R
 This script compresses RNA data from the gene level to the pathway level using GSVA. By default, genes not included in any pathway are filtered out.
@@ -91,7 +91,7 @@ bash process_cell.sh
 ```
 
 ## 2. Processing Drug Data
-Drug data are processed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs. When graph featurization is deactivated (```-drug_feat 0```), drug data are processed in Morgan Fingerprints (256-bit, radius 2), which can be implemented by the script ```process_drug_lin.sh```.
+Drug data are processed using ```process_drug.sh```, which executes ```process_drug.py``` to convert drug structures into 2D graphs. When graph featurization is deactivated (```-drug_feat 0```), drug data are processed in Morgan Fingerprints (256-bit, radius 2), which can be implemented by the script ```process_drug_lin.sh```. We also generated SMILESVec features via ```SMILESVec/source/process_drug_svec.sh```, which were also found to underperformed compared to graph-based features in ablation tests.
 
 ### process_drug.py
 * [```-smi```] Drug structure data in SMILES format containing at least one columns (```-col_smi```, [```-col_name```]) (input, CSV)
@@ -171,7 +171,8 @@ Testing models is performed using test bash scripts (e.g., ```test_ccle.sh```, `
 * ```test_tcga.sh``` : Predict drug responses in TCGA (clinical application)
 * ```test_miss.sh``` : Predict missing IC<sub>50</sub> values in GDSC (case study)
 * ```test_rest.sh``` : Predict IC<sub>50</sub> values for cell lines listed in SANGER Cell Passports but not estimated in GDSC (case study)
-* ```test_chembl_total.sh``` : Predict IC<sub>50</sub> values in ChEMBL (external benchmark test)
+* ```test_chembl.sh``` : Predict IC<sub>50</sub> values in ChEMBL (external benchmark test)
+* ```test_liu_2024_in_vivo.sh``` : Predict drug responses for Liu et al. (2024) (clinical application)
 
 ```
 bash test_ccle.sh
